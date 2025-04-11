@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+form{
+    width:80%;
+    padding:5%;
+    border:2px solid gray;
+    box-shadow: 10px 10px 30px black;
+    margin-left: auto;
+    margin-right: auto;
+}
+form h1{
+    font-size: 30px;
+    font-weight: bolder;
+}
+input{
+    display: block;
+    margin: 5px;
+    padding:5px
+}
+input[type=text]{
+    border: 1px solid darkblue;
+}
+input[type=button]{
+    color:white
+}
+
+.pscols2{
+    position: relative;
+    width: 46%;
+    height: auto;
+    background-color: honeydew;
+    display: inline-block;
+    border: 1px solid gray;
+    padding: 10px;
+    margin: 2%;
+}
+.btnfinalizar{
+    text-align: center;
+    font-size: larger;
+}
+.btnfinalizar input{
+    width: 100%;
+}
+.navmenu{
+
+}
+.navuser{
+    color:purple;
+    font-size: small;
+}
+.navuser img{display:inline;}
+.itemMenu{
+    padding:5px; 
+    font-weight: bolder;
+    background-color: #333;
+    color:#ffcc0b;
+    margin:2px;
+    border-radius:10px;
+
+}
+.viewer{
+    text-align: center;
+}
+.viewer h1{
+    font-size:30px;
+    font-weight: bolder;
+}
+.viewer h2{
+    font-size:20px;
+    font-weight: bolder;
+    margin-top: 2%;
+}
