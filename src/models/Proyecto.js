@@ -1,11 +1,26 @@
-import mongoose from 'mongoose';
+import {Schema, model, models} from 'mongoose';
 
-const ProyectoSchema = new mongoose.Schema({
-  name: {
+const proyectoSchema = new Schema({
+  nombre: {
     type: String,
-    required: true,
+    required: [true,'El nombre del proyecto es requerido'],
   },
-  description: String,
+  descripcion: {
+    type: String,
+    required: [true,'El nombre del proyecto es requerido'],
+  },
+  mision: {
+    type: String,
+    required: [true,'El nombre del proyecto es requerido'],
+  },
+  vision: {
+    type: String,
+    required: [true,'El nombre del proyecto es requerido'],
+  },
+  logo: {
+    type: String,
+    required: [true,'El nombre del proyecto es requerido'],
+  },
 });
 
-export default mongoose.models.Item || mongoose.model('Proyecto', ItemSchema);
+export default models.Proyecto || model('Proyecto', proyectoSchema)

@@ -1,6 +1,15 @@
-import { describe } from "node:test";
+import { connectDB } from "@/utils/mongoose";
+import Proyecto from "@/models/Proyecto";
 
-function Appviewer(){
+async function loadProyectos(){
+  connectDB()
+  const proyectos = await Proyecto.find()
+  return proyectos
+}
+
+async function Appviewer(){
+
+    const proyectos = await loadProyectos()
     
     const proyecto = {
      nombre: "AppMakerDemo",  
@@ -10,6 +19,16 @@ function Appviewer(){
     }
     return(
         <div className="viewer">
+            <div>
+            <h1>Mis Proyectos</h1>
+                <ul>
+                    {proyectos.map(proyecto => (
+                        <li key={proyecto._id}>{proyecto.nombre}: {proyecto.descripcion}</li>
+                    ))}
+                </ul>
+
+            </div>
+
             <h1>{proyecto.nombre}</h1>
             <p>{proyecto.descripcion}</p>
             <h2>Mision</h2>

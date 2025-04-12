@@ -14,20 +14,20 @@ function Navbar(){
                 <div className="container mx-auto flex items-center justify-between">
 
                 <div className="flex items-center space-x-4">
-                <button className="text-gray-700 hover:text-gray-900 focus:outline-none">
+                <Link href="/"><button className="text-gray-700 hover:text-gray-900 focus:outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
-                </button>
-                <button className="text-gray-700 hover:text-gray-900 focus:outline-none">
+                </button></Link>
+                <Link href="/proyectos"><button className="text-gray-700 hover:text-gray-900 focus:outline-none">
                     Proyectos
-                </button>
-                <button className="text-gray-700 hover:text-gray-900 focus:outline-none">
+                </button></Link>
+                <Link href="/appmaker"><button className="text-gray-700 hover:text-gray-900 focus:outline-none">
                     AppMaker
-                </button>
-                <button className="text-gray-700 hover:text-gray-900 focus:outline-none">
+                </button></Link>
+                <Link href="/appviewer"><button className="text-gray-700 hover:text-gray-900 focus:outline-none">
                     AppViewer
-                </button>
+                </button></Link>
             </div>
 
             <div className="flex items-center space-x-4">
@@ -38,9 +38,9 @@ function Navbar(){
                         <p className="text-xs text-gray-600">{session.user.email}</p>
                     </div>
                 </div>
-                <button className="bg-red-500 hover:bg-red-700 text-white text-xs font-semibold py-1 px-2 rounded focus:outline-none focus:shadow-outline">
+                <Link href="/logout"><button className="bg-red-500 hover:bg-red-700 text-white text-xs font-semibold py-1 px-2 rounded focus:outline-none focus:shadow-outline">
                     Cerrar Sesión
-                </button>
+                </button></Link>
             </div>
 
             </div>
@@ -48,9 +48,9 @@ function Navbar(){
             ):(
 
                 // USUARIO NO  ESTA LOGEADO
-                <button onClick={()=> signIn()} className="bg-sky-500 px-3 py-2 rounded">
+                <Link href="/login"><button onClick={()=> signIn()} className="bg-sky-500 px-3 py-2 rounded">
                     Sign In
-                </button>
+                </button></Link>
 
             )}
             

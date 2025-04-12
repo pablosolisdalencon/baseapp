@@ -1,5 +1,18 @@
+import { connectDB } from "@/utils/mongoose";
+import Proyecto from "@/models/Proyecto";
 import Products from "@/components/Products";
-export default function Home() {
+
+async function loadProyectos(){
+  connectDB()
+  const proyectos = await Proyecto.find()
+  return proyectos
+}
+
+export default async function Home() {
+
+
+  const proyectos = await loadProyectos()
+
   const proyecto = {
     nombre: "Kick Starter Media Kit",  
     descripcion: "¿Sueñas con lanzar tu app y hacerla crecer? El Kick Starter Media Kit es tu solución integral. ✨  Obtén un potente generador de apps intuitivo y una colección curada de recursos de marketing esenciales, todo en un solo lugar. Ideal para emprendedores que buscan una manera fácil y efectiva de dar sus primeros pasos en el mundo digital. ¡Tu viaje emprendedor nunca ha sido tan accesible!" ,

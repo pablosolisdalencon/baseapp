@@ -70,3 +70,7 @@ input[type=button]{
     font-weight: bolder;
     margin-top: 2%;
 }
+
+.oculto{
+    display:none;
+}
