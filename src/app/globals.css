@@ -74,3 +74,98 @@ input[type=button]{
 .oculto{
     display:none;
 }
+
+/* SECCION PROYECTOS */
+.pagina-proyectos { @apply bg-gray-100 font-sans; }
+.contenedor-proyectos { @apply container mx-auto py-8; }
+.titulo-proyectos { @apply text-3xl font-bold text-gray-800 mb-6 text-center; }
+.lista-proyectos { @apply space-y-4; }
+.item-proyecto { @apply bg-white rounded-lg shadow-md overflow-hidden hover:bg-gray-50 transition duration-300 ease-in-out; }
+.contenido-proyecto { @apply flex items-center p-4; }
+.imagen-proyecto { @apply w-15 h-10 object-cover rounded mr-4; } /* Asegúrate de que w-15 y h-10 son intencionales, Tailwind usa escalas numéricas */
+.titulo-contenedor-proyecto { @apply flex-grow; }
+.nombre-proyecto { @apply text-lg font-semibold text-gray-700; }
+.acciones-proyecto { @apply space-x-2; }
+.boton-gestion { @apply bg-blue-500 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
+.boton-ficha { @apply bg-green-500 hover:bg-green-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2; }
+.boton-app { @apply bg-indigo-500 hover:bg-indigo-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2; }
+.boton-mkt { @apply bg-purple-500 hover:bg-purple-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2; }
+.boton-eliminar { @apply bg-red-500 hover:bg-red-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2; }
+
+/* SECCION  CATALOGO */
+.catalog-manager-page { @apply bg-gray-100 font-sans; }
+        .catalog-manager-container { @apply container mx-auto py-8; }
+        .project-title { @apply text-3xl font-bold text-gray-800 mb-2 text-center; }
+        .catalog-subtitle { @apply text-lg text-gray-600 mb-6 text-center; }
+        .catalog-list { @apply space-y-4; }
+        .catalog-item { @apply bg-white rounded-lg shadow-md overflow-hidden hover:bg-gray-50 transition duration-300 ease-in-out; }
+        .catalog-item-content { @apply flex items-center p-4; }
+        .product-image { @apply w-16 h-12 object-cover rounded mr-4; }
+        .product-info { @apply flex-grow; }
+        .product-name { @apply text-lg font-semibold text-gray-700; }
+        .product-type-label { @apply inline-block bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700 mr-2; }
+        .catalog-actions { @apply space-x-2 flex-shrink-0; }
+        .button-edit { @apply bg-yellow-500 hover:bg-yellow-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2; }
+        .button-delete { @apply bg-red-500 hover:bg-red-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2; }
+        .catalog-controls { @apply mt-8 flex justify-end space-x-4; }
+        .button-add-item { @apply bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
+        .button-finish { @apply bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2; }
+
+/* SECCION FICHA ITEM */
+.ficha-item-page { @apply bg-gray-100 font-sans; }
+.ficha-item-container { @apply container mx-auto py-8; }
+.ficha-title { @apply text-3xl font-bold text-gray-800 mb-2 text-center; }
+.project-subtitle { @apply text-lg text-gray-600 mb-6 text-center; }
+.ficha-form { @apply bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4; }
+.form-group { @apply mb-4; }
+.form-label { @apply block text-gray-700 text-sm font-bold mb-2; }
+.form-input { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
+.form-textarea { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none h-32 resize-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
+.radio-group { @apply flex items-center space-x-4; }
+.radio-label { @apply inline-flex items-center text-gray-700 text-sm; }
+.radio-input { @apply h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
+.form-actions { @apply mt-8 flex justify-end; }
+.button-agregar-item { @apply bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2; }
+
+/* SECCION MKT VIEWER */
+.mkt-viewer-page { @apply bg-gray-100 font-sans; }
+.mkt-viewer-container { @apply container mx-auto py-8; }
+.project-title { @apply text-3xl font-bold text-gray-800 mb-2 text-center; }
+.mkt-subtitle { @apply text-lg text-gray-600 mb-6 text-center; }
+.main-cards-container { @apply space-y-6; }
+.elegant-card { @apply bg-white rounded-lg shadow-xl overflow-hidden; }
+.card-header { @apply px-6 py-4; }
+.card-title { @apply text-xl font-semibold text-gray-800 mb-2; }
+.card-body { @apply px-6 py-4 text-gray-700 leading-relaxed; }
+.horizontal-card { @apply bg-white rounded-lg shadow-md overflow-hidden flex; }
+.horizontal-card-image { @apply w-1/3 object-cover; }
+.horizontal-card-content { @apply p-6 w-2/3; }
+.product-grid { @apply grid grid-cols-1 md:grid-cols-3 gap-4; }
+.product-post { @apply bg-white rounded-lg shadow-sm overflow-hidden; }
+.product-image-container { @apply relative; }
+.product-image { @apply w-full h-32 object-cover; }
+.product-price { @apply absolute bottom-2 right-2 bg-indigo-500 text-white text-sm font-semibold px-2 py-1 rounded; }
+.post-content { @apply p-4; }
+.post-title { @apply text-lg font-semibold text-gray-800 mb-2; }
+.post-description { @apply text-gray-600 text-sm leading-relaxed; }
+
+/* SECION  SETTING */
+.settings-page { @apply bg-gray-100 font-sans; }
+.settings-container { @apply container mx-auto py-8 space-y-6; }
+.settings-card { @apply bg-white rounded-lg shadow-md p-6; }
+.card-title { @apply text-xl font-semibold text-gray-800 mb-4; }
+.form-group { @apply mb-4; }
+.form-label { @apply block text-gray-700 text-sm font-bold mb-2; }
+.form-input { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
+.form-select { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
+.form-actions { @apply mt-4 flex justify-end space-x-2; }
+.button-save { @apply bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2; }
+.button-cancel { @apply bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2; }
+.social-link-group { @apply grid grid-cols-2 gap-4 mb-4; }
+.social-label { @apply block text-gray-700 text-sm font-bold mb-2 col-span-1; }
+.social-input { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none col-span-1 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
+.other-social-group { @apply grid grid-cols-3 gap-4 mb-4; }
+.other-social-label-name { @apply block text-gray-700 text-sm font-bold mb-2 col-span-1; }
+.other-social-input-name { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none col-span-2 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
+.other-social-label-link { @apply block text-gray-700 text-sm font-bold mb-2 col-span-1; }
+.other-social-input-link { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none col-span-2 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }

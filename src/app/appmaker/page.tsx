@@ -42,6 +42,7 @@ function Appmaker(){
 
     
     const showFormServ = () => {
+    /*
         var fs = document.getElementById("frmserv");
         var fp = document.getElementById("frmprod");
         if(!fs || !fp)
@@ -49,10 +50,12 @@ function Appmaker(){
         else
         fs.style.display="block";
         fp.style.display="none";
-        
+    */
+        router.push('catalogo')    
         
     }
     const showFormProd = () => {
+        /*
         var fs = document.getElementById("frmserv");
         var fp = document.getElementById("frmprod");
         if(!fs || !fp)
@@ -60,7 +63,8 @@ function Appmaker(){
         else
         fs.style.display="none";
         fp.style.display="block";
-        
+        */
+        router.push('catalogo')
     }
 
 
@@ -71,8 +75,12 @@ function Appmaker(){
         <div>
              <form onSubmit={handleSubmit}>
                 <h1>App Maker</h1>
-                <p>Completa el formulario con toda la informacion relevante de tu emprendimiento, utilizaremos esta informacion como base para crear tus productos Digitales</p>
-                <h2>Info General</h2>
+                <p>
+                ¡Estamos listos para crear tus productos digitales! 🛠️ Para empezar, necesitamos conocer a fondo tu emprendimiento. Completa este formulario con toda la información relevante. ¡Esta será la base para construir herramientas digitales poderosas para tu negocio!
+
+
+                </p>
+                <h2>PASO 1</h2>
            
                 <input onChange={handleChange}  name="nombre" type="text" placeholder="Nombre del Proyecto"/>
                 <textarea onChange={handleChange} name="descripcion"  placeholder="Descripción breve"></textarea>
@@ -80,7 +88,8 @@ function Appmaker(){
                 <textarea onChange={handleChange}  name="vision"  placeholder="Vision"></textarea>
                 <input onChange={handleChange}  name="logo" type="file" placeholder="Logo"/>
 
-                <h2>Que vendes?</h2>
+                <h2>PASO 2</h2>
+                <h3>Que vendes?</h3>
                 
                 
                 
