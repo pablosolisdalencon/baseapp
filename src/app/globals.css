@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@tailwind utilities;
+
 form{
     width:80%;
     padding:5%;
@@ -109,6 +111,7 @@ input[type=button]{
         .button-delete { @apply bg-red-500 hover:bg-red-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2; }
         .catalog-controls { @apply mt-8 flex justify-end space-x-4; }
         .button-add-item { @apply bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
+        .button-add-proyecto { @apply bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; margin-left:auto; margin-right:auto;position:relative;display:block; margin-top:2%;}
         .button-finish { @apply bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2; }
 
 /* SECCION FICHA ITEM */
@@ -169,3 +172,203 @@ input[type=button]{
 .other-social-input-name { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none col-span-2 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
 .other-social-label-link { @apply block text-gray-700 text-sm font-bold mb-2 col-span-1; }
 .other-social-input-link { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none col-span-2 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
+
+/* APP VIEWER prod*/
+
+/* css/styles.css */
+
+
+/* Estilos Generales de la Página */
+.landing-page {
+    @apply bg-gray-100 font-sans;
+}
+
+/* Barra CTA Fija Superior */
+.cta-bar {
+    @apply fixed top-0 w-full bg-indigo-500 text-white text-center py-2 z-50;
+}
+
+.cta-link {
+    @apply font-semibold hover:underline;
+}
+
+/* Navbar */
+.main-nav {
+    @apply bg-white shadow-md py-4 sticky top-8 z-40;
+}
+
+.nav-container {
+    @apply container mx-auto flex justify-between items-center;
+}
+
+.nav-logo {
+    @apply font-bold text-xl text-gray-800;
+}
+
+.nav-links {
+    @apply space-x-4;
+}
+
+.nav-link {
+    @apply text-gray-600 hover:text-indigo-500;
+}
+
+.nav-button {
+    @apply bg-indigo-500 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
+}
+
+/* Sección de Bienvenida */
+.welcome-section {
+    @apply py-24 text-white text-center relative;
+    background-image: url('/fondo.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.welcome-overlay {
+    @apply absolute inset-0 bg-black opacity-40;
+}
+
+.welcome-content {
+    @apply container mx-auto relative z-10;
+}
+
+.welcome-title {
+    @apply text-4xl font-bold mb-6;
+}
+
+.welcome-subtitle {
+    @apply text-lg mb-8;
+}
+
+.welcome-form {
+    @apply max-w-md mx-auto flex rounded-full overflow-hidden shadow-lg;
+}
+
+.welcome-input {
+    @apply w-2/3 py-3 px-4 text-gray-700 focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
+}
+
+.welcome-button {
+    @apply w-1/3 bg-indigo-500 hover:bg-indigo-700 text-white font-semibold py-3 px-4 focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
+}
+
+/* Sección del Logo */
+.logo-section {
+    @apply py-12 bg-gray-50;
+}
+
+.logo-container {
+    @apply container mx-auto text-center;
+}
+
+.company-logo {
+    @apply mx-auto;
+}
+
+/* Sección Descripción de la Empresa */
+.about-us-section {
+    @apply py-16 bg-white;
+}
+
+.about-us-container {
+    @apply container mx-auto text-center;
+}
+
+.about-us-title {
+    @apply text-3xl font-bold text-gray-800 mb-8;
+}
+
+.about-us-grid {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-8;
+}
+
+.about-us-item {
+    @apply text-center;
+}
+
+.about-us-subtitle {
+    @apply text-xl font-semibold text-indigo-500 mb-2;
+}
+
+.about-us-text {
+    @apply text-gray-700 leading-relaxed;
+}
+
+/* Sección Catálogo de Productos/Servicios */
+.catalog-section {
+    @apply py-16 bg-gray-100;
+}
+
+.catalog-container {
+    @apply container mx-auto text-center;
+}
+
+.catalog-title {
+    @apply text-3xl font-bold text-gray-800 mb-8;
+}
+
+.catalog-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6;
+}
+
+.product-card {
+    @apply bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300;
+}
+
+.product-image {
+    @apply w-full h-48 object-cover;
+}
+
+.product-info {
+    @apply p-4 text-center;
+}
+
+.product-name {
+    @apply text-lg font-semibold text-gray-700 mb-2;
+}
+
+.product-description {
+    @apply text-gray-600 text-sm mb-3;
+}
+
+.product-price {
+    @apply text-xl font-bold text-indigo-500 block mb-2;
+}
+
+.product-button {
+    @apply inline-block mt-4 bg-indigo-500 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
+}
+
+/* Sección Footer con Mini Form de Contacto */
+.contact-footer {
+    @apply bg-gray-800 py-16 text-white;
+}
+
+.contact-container {
+    @apply container mx-auto text-center;
+}
+
+.contact-title {
+    @apply text-2xl font-bold mb-6;
+}
+
+.contact-subtitle {
+    @apply text-gray-300 mb-8;
+}
+
+.contact-form {
+    @apply max-w-md mx-auto flex rounded-full overflow-hidden shadow-lg;
+}
+
+.contact-input {
+    @apply w-2/3 py-3 px-4 text-gray-700 focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
+}
+
+.contact-button {
+    @apply w-1/3 bg-indigo-500 hover:bg-indigo-700 text-white font-semibold py-3 px-4 focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
+}
+
+.copyright-text {
+    @apply mt-8 text-gray-400 text-sm;
+}

@@ -1,21 +1,21 @@
 import { NextResponse } from "next/server";
 import { connectDB } from '@/utils/mongoose';
-import Proyecto from '@/models/Proyecto';
+import ItemCatalogo from "@/models/ItemCatalogo";
 
 export async function GET(request, {params}){
     try{
-        connectDB()
+        connectDB()     
         const { id } = await params;
-        const proyectoFound = await Proyecto.findById(id);
+        const itemFound = await ItemCatalogo.findById(id);
 
-        if (!proyectoFound)
+        if (!itemFound)
             return NextResponse.json({
-                message: "Proyecto no encontrado",
+                message: "Item no encontrado",
             },{
                 status:404
             });
 
-        return NextResponse.json(proyectoFound);
+        return NextResponse.json(itemFound);
 
     }catch (error){
         return NextResponse.json(error.message,{
@@ -26,16 +26,16 @@ export async function GET(request, {params}){
 
 export async function DELETE(request, {params}){
     try{
-        const proyectoEliminado = await Proyecto.findByIdAndDelete(params.id)
-        if(!proyectoEliminado)
+        const itemEliminado = await ItemCatalogo.findByIdAndDelete(params.id)
+        if(!itemEliminado)
 
         return NextResponse.json({
-            message: `Proyecto no encontrado para su eliminacion :  ${params.id} ...`,
+            message: `Item no encontrado para su eliminacion :  ${params.id} ...`,
         },{
             status: 404
         })
 
-        return NextResponse.json(proyectoEliminado)
+        return NextResponse.json(itemEliminado)
 
     }catch(error){
         return NextResponse.json(error.message,{
@@ -48,11 +48,11 @@ export async function DELETE(request, {params}){
 export async function PUT(request,{params}){
     try{
         const data = await request.json()
-        const proyectoUpdated = await Proyecto.findByIdAndUpdate(params.id, data,{
+        const itemUpdated = await ItemCatalogo.findByIdAndUpdate(params.id, data,{
             new:true
         })
 
-        return NextResponse.json(proyectoUpdated)
+        return NextResponse.json(itemUpdated)
 
     }catch(error){
         return NextResponse.json(error.message,{

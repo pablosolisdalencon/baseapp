@@ -1,4 +1,4 @@
-function MktViewer(){
+export default function MktViewer(){
     return(
     <div className="mkt-viewer-container">
         <h1 className="project-title">[Nombre del Proyecto]</h1>

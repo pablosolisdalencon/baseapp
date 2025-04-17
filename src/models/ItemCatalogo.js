@@ -1,6 +1,10 @@
 import {Schema, model, models} from 'mongoose';
 
-const proyectoSchema = new Schema({
+const itemSchema = new Schema({
+    id_proyecto: {
+        type: String,
+        required: [true,'El id del proyecto es requerido'],
+      },
   nombre: {
     type: String,
     required: [true,'El nombre del proyecto es requerido'],
@@ -9,22 +13,14 @@ const proyectoSchema = new Schema({
     type: String,
     required: [true,'El nombre del proyecto es requerido'],
   },
-  user: {
-    type: String,
-    required: [true,'El correo del propietario del proyecto es requerido'],
-  },
-  mision: {
+  precio: {
     type: String,
     required: [true,'El nombre del proyecto es requerido'],
   },
-  vision: {
-    type: String,
-    required: [true,'El nombre del proyecto es requerido'],
-  },
-  logo: {
+  foto: {
     type: String,
     required: [true,'El nombre del proyecto es requerido'],
   },
 });
 
-export default models.Proyecto || model('Proyecto', proyectoSchema)
+export default models.ItemCatalogo || model('ItemCatalogo', itemSchema)

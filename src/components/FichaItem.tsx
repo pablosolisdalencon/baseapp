@@ -1,9 +1,43 @@
-export default function FichaItem(){
+"use client";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { connectDB } from "@/utils/mongoose";
+import ItemCatalogo from "@/models/ItemCatalogo";
+
+
+
+
+export default function  FichaItem(){
+    const searchParams = useSearchParams();
+   
+
+    useEffect(() => {
+        const id = searchParams.get('idProyecto')
+        if (id){
+            
+            const loadCatalogo = ( async () => {
+                try{
+                    "use server";
+                    connectDB()
+                    const items = await ItemCatalogo.find()
+                    console.log(items)
+                    return items
+                }catch(error){
+                    console.log(error);
+                }
+               
+            });
+            const pepe = loadCatalogo();
+
+            console.log(id);
+        }
+    },[searchParams]);
+
     return(
 
     <div className="ficha-item-container">
         <h1 className="ficha-title">Ficha Item de Catálogo</h1>
-        <h2 className="project-subtitle">Proyecto [Nombre del Proyecto]</h2>
+        <h2 className="project-subtitle">Proyecto {searchParams}</h2>
 
         <form className="ficha-form">
             <div className="form-group">
