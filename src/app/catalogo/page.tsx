@@ -34,10 +34,11 @@ export default  function Catalogo(){
 
 
 
-    const searchParams = useSearchParams();
+    
    
 
     useEffect( () => {
+        const searchParams = useSearchParams();
         const id = searchParams.get('id')
         if (id){
             console.log(id);
