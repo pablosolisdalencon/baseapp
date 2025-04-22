@@ -43,7 +43,7 @@ export default  function Fichaitem(){
 
 
 
-    const searchParams = useSearchParams();
+    
    
 
     const [newItem, setNewItem ] = useState({
@@ -90,6 +90,7 @@ export default  function Fichaitem(){
       
 
     useEffect( () => {
+        const searchParams = useSearchParams();
         const id = searchParams.get('id');
         setIdItem(id);
         const nombreProyecto = searchParams.get('nombreProyecto');
@@ -139,7 +140,7 @@ export default  function Fichaitem(){
     },[]);
 
     
-    if(searchParams.get('id')!=null){
+    if(idItem!=null){
 
         if(isLoadingI){
             return <p>Cargando datos del item...</p>;
