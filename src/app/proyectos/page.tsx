@@ -28,7 +28,7 @@ export default async function Proyectos(){
                     </div>
                     <div className="acciones-proyecto">
                         <Link href={`catalogo/?id=${proyecto._id}`}><button className="boton-gestion">Gestionar Catálogo</button></Link>
-                        <Link href={`fichaproyecto/?id=${proyecto._id}`}> <button className="boton-ficha">Ver Ficha</button></Link>
+                        <Link href={`updateproyecto/?id=${proyecto._id}`}> <button className="boton-ficha">Ver Ficha</button></Link>
                         <Link href={`catalogo/${proyecto._id}`}><button className="boton-app">Ver App</button></Link>
                         <Link href={`catalogo/${proyecto._id}`}><button className="boton-mkt">Ver MKT</button></Link>
                         <Link href={`catalogo/${proyecto._id}`}> <button className="boton-eliminar">Eliminar</button></Link>
@@ -40,7 +40,7 @@ export default async function Proyectos(){
         </ul>
 
         <hr />
-        <Link href="fichaproyecto"><button className="button-add-proyecto"> + Agregar Nuevo Proyecto</button></Link>
+        <Link href="addproyecto"><button className="button-add-proyecto"> + Agregar Nuevo Proyecto</button></Link>
     </div>
     );
  }

@@ -10,6 +10,8 @@ interface ItemTypeProyecto {
     _id: string;
     nombre: string;
     descripcion: string;
+    texto: string;
+    frase: string;
     logo: string;
     mision: string;
     vision: string;
@@ -24,7 +26,6 @@ interface ItemType {
     precio: string;
     tipo: string;
 }
-
 
 
 export default function Webapp() {
@@ -78,8 +79,8 @@ export default function Webapp() {
     const AppProyecto=data?.proyecto;
     const AppCatalogo=data?.catalogo;
     const nombreProyecto=AppProyecto?.nombre;
-    const textoProyecto="El Texto Atractivo que Captará la Atención";
-    const fraseProyecto="Descripcion corta resumen y directa de lo que se ofrece";
+    const textoProyecto=AppProyecto?.texto;
+    const fraseProyecto=AppProyecto?.frase;
     const descripcionProyecto=AppProyecto?.descripcion;
     const misionProyecto=AppProyecto?.mision;
     const visionProyecto=AppProyecto?.vision;
@@ -94,8 +95,7 @@ export default function Webapp() {
             <h1 className="welcome-title">{textoProyecto}</h1>
             <p className="welcome-subtitle">{fraseProyecto}</p>
             <div className="welcome-form">
-                <input type="email" className="welcome-input" placeholder="Tu Correo Electrónico" />
-                <button className="welcome-button">¡Suscríbete!</button>
+                <a href="https://wa.me/56920905973?text=Quiero%20hablar%20del%20eWave%20Pack"><button className="welcome-button">¡Hablemos!</button></a>
             </div>
         </div>
     </section>
@@ -135,13 +135,13 @@ export default function Webapp() {
  {/* AQUI DEBIERAMOS RECORRER EL CATALOGO E IMPRIMIR UNA TARJETA SIMPLE con el nombre del item */}
     {AppCatalogo && AppCatalogo.length > 0 ? (
               AppCatalogo.map((item) => (
-                <div className="product-card">
+                <div className="product-card" key={item._id}>
                     <img src={item.foto} alt={item.nombre} className="product-image" />
                     <div className="product-info">
                         <h3 className="product-name">{item.nombre}</h3>
                         <p className="product-description">{item.descripcion}</p>
-                        <span className="product-price">{item.precio}</span>
-                        <a href="#" className="product-button">Leer Más</a>
+                        
+                        <a href="#" className="product-button">{item.precio}</a>
                     </div>
                 </div>
                    
@@ -161,8 +161,8 @@ export default function Webapp() {
             <h2 className="contact-title">¿Listo para Empezar?</h2>
             <p className="contact-subtitle">Déjanos un mensaje y nos pondremos en contacto contigo.</p>
             <div className="contact-form">
-                <input type="text" className="contact-input" id="contacto_cliente" placeholder="tu correo" />
-                <button className="contact-button">Enviar</button>
+                
+                <a href="https://wa.me/56920905973?text=Quiero%20hablar%20del%20eWave%20Pack"><button className="contact-button">Hablemos!</button></a>
             </div>
             <p className="copyright-text">© 2025 {nombreProyecto}. Todos los derechos reservados.</p>
         </div>
@@ -176,3 +176,5 @@ export default function Webapp() {
 
    );
 }
+///<!--span className="product-price">{item.precio}</span-->
+//<input type="text" className="contact-input" id="contacto_cliente" placeholder="tu correo" />

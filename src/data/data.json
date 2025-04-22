@@ -2,11 +2,11 @@
 	"proyecto": {
 	  "_id": "67f99da9f7b90ff068b870b2",
 	  "nombre": "eWave Pack",
-	  "texto": "¿Harto de remar contra la corriente digital? **Desata la ola de éxito con eWave Pack: la solución TODO-EN-UNO que impulsa tu emprendimiento a la velocidad de la luz.** Deja atrás los costos prohibitivos y la complejidad tecnológica. Prepárate para una transformación radical y conquista el mercado digital como nunca antes.",
-	  "frase": "**No esperes más para hacer realidad tu visión. ¡Súbete a la ola eWave Pack y comienza hoy mismo tu revolución digital!**",
+	  "texto": "¡Súbete a la ola eWave Pack y revoluciona tu negocio digital hoy!",
+	  "frase": "¡La solución TODO-EN-UNO para tu éxito digital! Deja de remar, ¡súbete a la ola hoy!",
 	  "descripcion": "eWave Pack es la plataforma integral diseñada para emprendedores visionarios que buscan digitalizar su marketing y potenciar su negocio online al menor costo posible. Combinamos herramientas esenciales, automatización inteligente y estrategias probadas para romper las barreras tecnológicas y democratizar el acceso al éxito digital.",
-	  "mision": "Facilitar el emprendimiento y la digitalización del marketing al menor costo posible.",
-	  "vision": "Reducir los costos con automatización a tal punto de romper la barrera tecnológica en el emprendimiento, democratización, revolución digital.",
+	  "mision": "¡Incendiar la chispa emprendedora en cada rincón de Chile, liberando a los visionarios de las cadenas tecnológicas y económicas para que conquisten sus sueños digitales con una fuerza imparable!",
+	  "vision": " ¡Un futuro donde la innovación digital sea un torrente desbordante y accesible para cada emprendedor chileno, pulverizando las barreras, democratizando el éxito y desatando una ola de transformación que redefina el panorama empresarial de la nación!",
 	  "logo": "logo.png",
 	  "fondo": "fondo.jpg",
 	  "__v": 0
@@ -18,7 +18,7 @@
 		"nombre": "eWaveApp Starter",
 		"descripcion": "**Tu escaparate digital listo en minutos.** Una aplicación web ultra-compacta con diseño de landing page que concentra toda la información vital de tu proyecto, un catálogo dinámico y múltiples canales de contacto directo con tus clientes. ¡Impresiona desde el primer clic!",
 		"precio": "60.000",
-		"foto": "webapp.png",
+		"foto": "item1.jpg",
 		"__v": 0
 	  },
 	  {
@@ -27,7 +27,7 @@
 		"nombre": "Estudio de Mercado eWave Insights",
 		"descripcion": "**Conoce a tu audiencia como nunca antes.** Realizamos estudios de mercado profundos, precisos y a tu medida, enfocados en tu proyecto, campañas, productos, servicios o cualquier objetivo específico. Obtén la inteligencia estratégica para tomar decisiones informadas y minimizar riesgos.",
 		"precio": "30.000",
-		"foto": "fodddto1.png",
+		"foto": "item2.jpg",
 		"__v": 0
 	  },
 	  {
@@ -36,16 +36,16 @@
 		"nombre": "Planes Estratégicos eWave Digital",
 		"descripcion": "**Tu hoja de ruta al éxito digital.** Generamos planes y estrategias de marketing digital multiplataforma diseñados para conquistar internet. Recibe un detalle exhaustivo e instrucciones claras para cada contenido y etapa de tu campaña. ¡Maximiza tu impacto online!",
 		"precio": "30.000",
-		"foto": "estrategias.jpg",
+		"foto": "item3.jpg",
 		"__v": 0
 	  },
 	  {
-		"_id": "67fca21ec11220f2fbabc177",
+		"_id": "67fca21ec11220f2fbabc178",
 		"id_proyecto": "67f99da9f7b90ff068b870b2",
 		"nombre": "Contenido Multimedia eWave Pro",
 		"descripcion": "**Captura la atención con contenido que vende.** Creamos todo el material multimedia de marketing digital que necesitas para ejecutar campañas impactantes: publicaciones de presentación, promociones irresistibles, contenido atractivo para blogs y redes sociales, gráficas profesionales para cada tipo de publicación y mucho más. ¡Tu marca con una imagen poderosa!",
 		"precio": "10.000",
-		"foto": "contenido.jpg",
+		"foto": "item4.jpg",
 		"__v": 0
 	  }
 	]
