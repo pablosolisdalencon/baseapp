@@ -1,23 +1,96 @@
+"use client";
 import Link from "next/link";
 import { connectDB } from "@/utils/mongoose";
 import Proyecto from "@/models/Proyecto";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
-async function loadProyectos(){
-  connectDB()
-  const proyectos = await Proyecto.find()
-  return proyectos
+interface ItemType {
+    _id: string;
+    nombre: string;
+    descripcion: string;
+    logo: string;
 }
 
-export default async function Proyectos(){
-    const proyectos = await loadProyectos()
+  
+
+export default function Proyectos(){
+    const { data: session, status } = useSession();
+
+        const [dataList,setDataList] = useState<ItemType[] | null>(null);
+        const [isLoadingC, setIsLoadingC] = useState(true);
+        const [errorC, setErrorC] = useState<string | null>(null);
+    
+        const [idProyecto, setIdProyecto] = useState<string | null>(null);
+
+
+        const router = useRouter();
+
+       useEffect( () => {
+        router.refresh();
+            const user = session?.user?.email;
+            if (user){
+                console.log(user);
+                
+            
+    
+            //traer el proyecto
+    
+            const getFichaProyecto = async () => {
+                setIsLoadingC(true);
+                setErrorC(null);
+    
+                try {
+                    const response = await fetch('api/proyecto/?u='+user);
+                    if(!response.ok){
+                        throw new Error(`<br>HTTP error! in Catalogo status: ${response.status}`);
+                    }
+                    const jsonData: ItemType[] = await response.json();
+                    setDataList(jsonData);
+                
+                }catch (e: any){
+                    setErrorC('<br>Error al cargar Catalogo :'+e.message);
+                    setDataList(null);
+                } finally {
+                    setIsLoadingC(false);
+                }
+            };
+            
+             
+            if( !getFichaProyecto()){
+                setErrorC('<br>Algo paso ejecutando la funcion getFichaProyecto(); linea 84');
+            }
+            
+            
+        }
+        
+    
+        },[router]);
+    
+        
+        
+           
+        if(isLoadingC){
+            return <p>Cargando datos del Catalogo...</p>;
+        }
+        if(errorC){
+            return <p>Error cargando el catalogo: {errorC}</p>;
+        }
+        
+        
+    
+       
+
+    const proyectos = dataList;
 
     return(
     <div className="contenedor-proyectos">
         <h1 className="titulo-proyectos">Mis Proyectos</h1>
-
+        { proyectos?.length as number > 0 ?  (
         <ul className="lista-proyectos">
 
-        {proyectos.map(proyecto => (
+        { proyectos?.map(proyecto => (
             
 
             <li className="item-proyecto" key={proyecto._id}>
@@ -36,9 +109,13 @@ export default async function Proyectos(){
                 </div>
             </li>
         ))}
-
         </ul>
+            ) :(
 
+                <p>sin datos </p> 
+            
+            )
+            }
         <hr />
         <Link href="addproyecto"><button className="button-add-proyecto"> + Agregar Nuevo Proyecto</button></Link>
     </div>

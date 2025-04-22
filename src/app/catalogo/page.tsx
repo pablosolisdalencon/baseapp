@@ -1,5 +1,5 @@
 "use client";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import FichaItem from "@/components/FichaItem";
 import Link from "next/link";
@@ -36,8 +36,10 @@ export default  function Catalogo(){
 
     
    
-
+    const router = useRouter();
     useEffect( () => {
+        
+        router.refresh();
         const searchParams = useSearchParams();
         const id = searchParams.get('id')
         if (id){
@@ -101,7 +103,7 @@ export default  function Catalogo(){
     }
     
 
-    },[]);
+    },[router]);
 
     
     
@@ -155,4 +157,8 @@ export default  function Catalogo(){
             <Link href={`fichaitem/?idProyecto=${idProyecto}`}><button className="button-add-proyecto"> + Agregar Nuevo Item al Catalogo</button></Link>
         </div>
     );
+}
+
+function refreshRouter() {
+    throw new Error("Function not implemented.");
 }
