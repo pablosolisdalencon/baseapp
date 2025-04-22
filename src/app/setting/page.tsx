@@ -1,4 +1,4 @@
-function Settinng(){
+function Setting(){
     return(
       
     <div className="settings-container">
