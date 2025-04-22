@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { CldUploadWidget } from 'next-cloudinary';
 
 export default function UpdateProyecto() {
-  const searchParams = useSearchParams();
+  
   const { data: session, status } = useSession();
   const [newProyecto, setNewProyecto] = useState<{
     [key: string]: string;
@@ -42,6 +42,7 @@ export default function UpdateProyecto() {
   const [fondoPreviewUrl, setFondoPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    const searchParams = useSearchParams();
     const id = searchParams.get('id');
     if (id) {
       console.log(id);
@@ -79,7 +80,7 @@ export default function UpdateProyecto() {
         user: session.user?.email as string ?? "",
       }));
     }
-  }, [searchParams, session]);
+  }, [useSearchParams, session]);
 
   const llenarFormulario = () => {
     for (const key in newProyecto) {
