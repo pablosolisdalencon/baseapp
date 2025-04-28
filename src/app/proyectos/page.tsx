@@ -1,123 +1,101 @@
 "use client";
 import Link from "next/link";
-import { connectDB } from "@/utils/mongoose";
-import Proyecto from "@/models/Proyecto";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 
 interface ItemType {
-    _id: string;
-    nombre: string;
-    descripcion: string;
-    logo: string;
+  _id: string;
+  nombre: string;
+  descripcion: string;
+  logo: string;
 }
 
-  
+export default function Proyectos() {
+  const { data: session, status } = useSession();
+  const [dataList, setDataList] = useState<ItemType[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [userReady, setUserReady] = useState(false);
 
-export default function Proyectos(){
-    const { data: session, status } = useSession();
+  useEffect(() => {
+    if (status === 'loading') {
+      setIsLoading(true);
+      setUserReady(false);
+      return;
+    }
 
-        const [dataList,setDataList] = useState<ItemType[] | null>(null);
-        const [isLoadingC, setIsLoadingC] = useState(true);
-        const [errorC, setErrorC] = useState<string | null>(null);
-    
-        const [idProyecto, setIdProyecto] = useState<string | null>(null);
+    const user = session?.user?.email;
+    setUserReady(!!user);
 
-
-        const router = useRouter();
-
-       useEffect( () => {
-        router.refresh();
-            const user = session?.user?.email;
-            if (user){
-                console.log(user);
-                
-            
-    
-            //traer el proyecto
-    
-            const getFichaProyecto = async () => {
-                setIsLoadingC(true);
-                setErrorC(null);
-    
-                try {
-                    const response = await fetch('api/proyecto/?u='+user);
-                    if(!response.ok){
-                        throw new Error(`<br>HTTP error! in Catalogo status: ${response.status}`);
-                    }
-                    const jsonData: ItemType[] = await response.json();
-                    setDataList(jsonData);
-                
-                }catch (e: any){
-                    setErrorC('<br>Error al cargar Catalogo :'+e.message);
-                    setDataList(null);
-                } finally {
-                    setIsLoadingC(false);
-                }
-            };
-            
-             
-            if( !getFichaProyecto()){
-                setErrorC('<br>Algo paso ejecutando la funcion getFichaProyecto(); linea 84');
-            }
-            
-            
+    if (user) {
+      const fetchData = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const res = await fetch(`/api/proyecto?user=${user}`);
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+          const jsonData: any = await res.json();
+          setDataList(jsonData.data);
+        } catch (err: any) {
+          setError(`Error al cargar proyectos: ${err.message}`);
+          setDataList(null);
+        } finally {
+          setIsLoading(false);
         }
-        
-    
-        },[router]);
-    
-        
-        
-           
-        if(isLoadingC){
-            return <p>Cargando datos del Catalogo...</p>;
-        }
-        if(errorC){
-            return <p>Error cargando el catalogo: {errorC}</p>;
-        }
-        
-        
-    
-       
+      };
 
-    const proyectos = dataList;
+      fetchData();
+    } else {
+      setIsLoading(false);
+      setDataList(null);
+    }
+  }, [session?.user?.email, status]);
 
-    return(
-    <div className="contenedor-proyectos">
-        <h1 className="titulo-proyectos">Mis Proyectos</h1>
-        { proyectos?.length as number > 0 ?  (
+  // Método para generar el JSX del retorno basado en el estado
+  const renderContent = () => {
+    if (isLoading) {
+      return <p>Cargando proyectos...</p>;
+    }
+
+    if (error) {
+      return <p>Error: {error}</p>;
+    }
+
+    if (userReady && dataList && dataList.length > 0) {
+      return (
         <ul className="lista-proyectos">
-
-        { proyectos?.map(proyecto => (
-            
-
+          {dataList.map(proyecto => (
             <li className="item-proyecto" key={proyecto._id}>
-                <div className="contenido-proyecto">
-                    <img src={proyecto.logo} alt={proyecto.nombre} className="imagen-proyecto" />
-                    <div className="titulo-contenedor-proyecto">
-                        <h2 className="nombre-proyecto">{proyecto.nombre}</h2>
-                    </div>
-                    <div className="acciones-proyecto">
-                        <Link href={`catalogo/?id=${proyecto._id}`}><button className="boton-gestion">Gestionar Catálogo</button></Link>
-                        <Link href={`updateproyecto/?id=${proyecto._id}`}> <button className="boton-ficha">Ver Ficha</button></Link>
-                        <Link href={`catalogo/${proyecto._id}`}><button className="boton-app">Ver App</button></Link>
-                        <Link href={`catalogo/${proyecto._id}`}><button className="boton-mkt">Ver MKT</button></Link>
-                        <Link href={`catalogo/${proyecto._id}`}> <button className="boton-eliminar">Eliminar</button></Link>
-                    </div>
+              <div className="contenido-proyecto">
+                <img src={proyecto.logo} alt={proyecto.nombre} className="imagen-proyecto" />
+                <div className="titulo-contenedor-proyecto">
+                  <h2 className="nombre-proyecto">{proyecto.nombre}</h2>
                 </div>
+                <div className="acciones-proyecto">
+                  <Link href={`catalogo/?id=${proyecto._id}`}><button className="boton-gestion">Gestionar Catálogo</button></Link>
+                  <Link href={`updateproyecto/?id=${proyecto._id}`}> <button className="boton-ficha">Ver Ficha</button></Link>
+                  <Link href={`catalogo/${proyecto._id}`}><button className="boton-app">Ver App</button></Link>
+                  <Link href={`catalogo/${proyecto._id}`}><button className="boton-mkt">Ver MKT</button></Link>
+                  <Link href={`catalogo/${proyecto._id}`}> <button className="boton-eliminar">Eliminar</button></Link>
+                </div>
+              </div>
             </li>
-        ))}
+          ))}
         </ul>
-            ) :(
+      );
+    } else {
+      return <p>{userReady ? 'Sin datos' : 'Esperando información del usuario...'}</p>;
+    }
+  };
 
-                <p>sin datos </p> 
-            
-            )
-            }
-        <hr />
-        <Link href="addproyecto"><button className="button-add-proyecto"> + Agregar Nuevo Proyecto</button></Link>
+  return (
+    <div className="contenedor-proyectos">
+      <h1 className="titulo-proyectos">Mis Proyectos</h1>
+      {renderContent()}
+      <hr />
+      <Link href="addproyecto"><button className="button-add-proyecto"> + Agregar Nuevo Proyecto</button></Link>
     </div>
-    );
- }
+  );
+}

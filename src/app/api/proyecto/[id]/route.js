@@ -14,7 +14,7 @@ export async function GET(request, {params}){
             },{
                 status:404
             });
-
+        console.error(proyectoFound);
         return NextResponse.json(proyectoFound);
 
     }catch (error){
@@ -26,11 +26,12 @@ export async function GET(request, {params}){
 
 export async function DELETE(request, {params}){
     try{
-        const proyectoEliminado = await Proyecto.findByIdAndDelete(params.id)
+        const { id } = await params;
+        const proyectoEliminado = await Proyecto.findByIdAndDelete(id)
         if(!proyectoEliminado)
 
         return NextResponse.json({
-            message: `Proyecto no encontrado para su eliminacion :  ${params.id} ...`,
+            message: `Proyecto no encontrado para su eliminacion :  ${id} ...`,
         },{
             status: 404
         })
@@ -47,8 +48,9 @@ export async function DELETE(request, {params}){
 
 export async function PUT(request,{params}){
     try{
-        const data = await request.json()
-        const proyectoUpdated = await Proyecto.findByIdAndUpdate(params.id, data,{
+        const data = await request.json();
+        const { id } = await params;
+        const proyectoUpdated = await Proyecto.findByIdAndUpdate(id, data,{
             new:true
         })
 

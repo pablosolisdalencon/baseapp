@@ -15,17 +15,14 @@ form h1{
     font-size: 30px;
     font-weight: bolder;
 }
-input{
+input, textarea{
     display: block;
     margin: 5px;
-    padding:5px
-}
-input[type=text]{
+    padding:5px;
     border: 1px solid darkblue;
+    width:100%;
 }
-textarea{
-    border: 1px solid darkblue;
-}
+
 .upload-button{
     color: #fff;
     background-color: #dc143c;
@@ -49,22 +46,31 @@ input[type=button]{
     padding: 10px;
     margin: 2%;
 }
-.btnfinalizar{
+.btnfinalizar, .btncancelar{
     text-align: center;
     font-size: larger;
+    width: 50%;
+    display: inline-block;
 }
-.btnfinalizar input{
-    width: 100%;
+.btnfinalizar input,.btncancelar input{
+    width: 95%;
 }
 .boton-crear-proyecto{
-    background-color: black;
+    background-color: green;
     color:white;
     font-weight: bolder;
     border-radius: 50px;
 }
-.navmenu{
 
+.boton-cancelar{
+    background-color: rgb(53, 53, 53);
+    color:white;
+    font-weight: bolder;
+    border-radius: 50px;
 }
+
+
+
 .navuser{
     color:purple;
     font-size: small;
