@@ -1,9 +1,8 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import { ChangeEvent, FormEvent, useState, useEffect } from "react";
-import Link from "next/link";
+import { ChangeEvent, FormEvent, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-
+import { CldUploadWidget } from 'next-cloudinary';
 
 interface DataType {
     id?: string;
@@ -36,11 +35,12 @@ export default  function Fichaitem(){
    
 
 
-    const [nombreProyecto,setnombreProyecto] = useState<string | null>(null);
+    const [nombreProyecto,setNombreProyecto] = useState<string | null>(null);
     const [idProyecto, setIdProyecto] = useState<string | null>(null);
 
     const [idItem, setIdItem] = useState<string | null>(null);
 
+    const [fotoPreviewUrl, setFotoPreviewUrl] = useState<string | null>(null);
 
 
     
@@ -73,11 +73,14 @@ export default  function Fichaitem(){
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
-        await createItem()
+    }
+    
+    const  submitUpdateItem = async () => {
+        await createItem();
     }
      
     const handleChange = (
-        e: ChangeEvent <HTMLInputElement | HTMLTextAreaElement>
+        e: ChangeEvent <HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
         if(!idItem){
             setNewItem({ ... newItem, [e.target.name]: e.target.value as string})     
@@ -87,16 +90,32 @@ export default  function Fichaitem(){
         }
     
     }
-      
 
+    const handleFotoUpload = (result: any, widget: any) => {
+        if (result && result.info && result.info.secure_url) {
+          setNewItem((prevData) => ({
+            ...prevData!,
+            foto: result.info.secure_url,
+          }));
+          setFotoPreviewUrl(result.info.secure_url);
+          widget.close();
+        }
+      };
+      
+    const searchParams = useSearchParams();
     useEffect( () => {
-        const searchParams = useSearchParams();
-        const id = searchParams.get('id');
-        setIdItem(id);
+        
+        const id = searchParams.get('id'); 
         const nombreProyecto = searchParams.get('nombreProyecto');
         const idProyecto = searchParams.get('idProyecto');
-        setnombreProyecto(nombreProyecto);
+        setIdItem(id);
+        setNombreProyecto(nombreProyecto);
         setIdProyecto(idProyecto);
+        setNewItem((prevData) => ({
+            ...prevData!,
+            id_proyecto: idProyecto as string,
+          }));
+
         if (id!=null){
             //este es el id del ITEM
             console.log(id);
@@ -137,7 +156,7 @@ export default  function Fichaitem(){
     }
     
 
-    },[]);
+    },[searchParams]);
 
     
     if(idItem!=null){
@@ -154,71 +173,55 @@ export default  function Fichaitem(){
    
     const nombreItem=dataI?.nombre as string;
     const descripcionItem=dataI?.descripcion as string;
-    const fotoItem=dataI?.foto as string;
     const tipoItem=dataI?.tipo as string;
     const precioItem=dataI?.precio as string;
-    const idProyectoS=idProyecto || "";
+    
 
 
    
-    return(
-<div className="ficha-item-container">
-
-        <h1 className="ficha-title">Agregar Item al Catálogo</h1>
-        <h2 className="project-subtitle">Proyecto {nombreProyecto}</h2>
-        <h3>{idProyectoS}</h3>
-        
-            
-        <form className="ficha-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-            <input onChange={handleChange} value={idProyectoS} type="hidden" id="id_royecto" />
-
-            <label htmlFor="nombre" className="form-label">Nombre del Item</label>
-                <input onChange={handleChange}  value={nombreItem as string} type="text" id="nombre" className="form-input" placeholder="Ingrese el nombre del producto o servicio"/>
-            </div>
-
-            <div className="form-group">
-                <label htmlFor="descripcion" className="form-label">Descripción</label>
-                <textarea onChange={handleChange} id="descripcion" className="form-textarea" placeholder="Ingrese una descripción detallada" value={descripcionItem as string}></textarea>
-            </div>
-
-            <div className="form-group">
-                <label htmlFor="precio" className="form-label">Precio</label>
-                <input onChange={handleChange} value={precioItem as string} type="text" id="precio" className="form-input" placeholder="Ingrese el precio" />
-            </div>
-
-            <div className="form-group">
-                <label htmlFor="foto" className="form-label">Foto</label>
-               
-            </div>
-
-            <div className="form-group">
-                <label className="form-label">Tipo de Item</label>
-                <div className="radio-group">
-             
+    return (
+            <div className="form">
+              <form onSubmit={handleSubmit}>
+                <h1>Editar Item</h1>
+                <p>
+                  Edita la información de tu item. Realiza los cambios necesarios y guarda para actualizar.
+                </p>
+                <h2>PASO 1</h2>
+                <input onChange={handleChange} name="nombre" type="text" placeholder="Nombre del Item" value={nombreItem} />
+                <textarea onChange={handleChange} name="descripcion" placeholder="Descripción breve" value={descripcionItem}></textarea>               
+                <input onChange={handleChange} name="precio" type="text" placeholder="Precio" value={precioItem} />
+                TIPO:<select onChange={handleChange} name="tipo">
+                <option>{tipoItem}</option>
+                <option>PRODUCTO</option>
+                <option>SERVICIO</option>
+            </select>
+              </form>
+              
+              <CldUploadWidget uploadPreset="ewavepack" onSuccess={handleFotoUpload}>
+                {({ open }) => {
+                  const handleOpenFondoWidget = useCallback(() => {
+                    open();
+                  }, [open]);
+                  return (
+                    <button className="upload-button" name="fondo" onClick={handleOpenFondoWidget}>
+                      Carga la foto del Item
+                    </button>
+                  );
+                }}
+              </CldUploadWidget>
+              {fotoPreviewUrl && (
+                <div>
+                  <p>Vista previa del Fondo:</p>
+                  <img src={fotoPreviewUrl} alt="Vista previa del fondo" style={{ maxWidth: '100px', maxHeight: '100px' }} />
                 </div>
+              )}
+              <hr />
+              <div className="btncancelar">
+                <a href="proyectos"><input type="button"  className="boton-cancelar" value="Cancelar" /></a>
+              </div>
+              <div className="btnfinalizar">
+                <input type="button" onClick={submitUpdateItem} className="boton-crear-proyecto" value="Guardar" />
+              </div>
             </div>
-
-            <div className="form-actions">
-                <button type="submit" className="button-agregar-item">Agregar</button>
-            </div>
-        </form>
-            
-    </div>
-    );
+          );
 }
-/*
-
- <input onChange={handleChange} type="file" id="foto" className="form-input"/>
-
-
-
-        <!--<div className="radio-label">{tipoItem}
-                       <input onChange={handleChange} type="radio" className="radio-input" name="tipo" value="producto" id="producto" checked/>
-                        <label htmlFor="producto" className="ml-2">Producto</label>
-                    </div>
-                    <div className="radio-label">
-                        <input onChange={handleChange} type="radio" className="radio-input" name="tipo" value="servicio" id="servicio"/>
-                        <label htmlFor="servicio" className="ml-2">Servicio</label>
-                    </div>-->
-*/
