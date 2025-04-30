@@ -63,7 +63,6 @@ export default function AddProyecto() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    await createProyecto();
   };
 
   const handleChange = (

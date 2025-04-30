@@ -30,17 +30,14 @@ export default  function Catalogo(){
     const [errorP, setErrorP] = useState<string | null>(null);
 
     const [idProyecto, setIdProyecto] = useState<string | null>(null);
-
-
-
-
-    
    
     const router = useRouter();
+    const searchParams = useSearchParams();
+    
     useEffect( () => {
         
         router.refresh();
-        const searchParams = useSearchParams();
+        
         const id = searchParams.get('id')
         if (id){
             console.log(id);
@@ -154,7 +151,7 @@ export default  function Catalogo(){
             )
             }
         <hr />
-            <Link href={`fichaitem/?idProyecto=${idProyecto}`}><button className="button-add-proyecto"> + Agregar Nuevo Item al Catalogo</button></Link>
+            <Link href={`additem/?idProyecto=${idProyecto}`}><button className="button-add-proyecto"> + Agregar Nuevo Item al Catalogo</button></Link>
         </div>
     );
 }
