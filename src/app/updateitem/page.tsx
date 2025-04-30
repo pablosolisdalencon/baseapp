@@ -5,25 +5,16 @@ import { useRouter } from "next/navigation";
 import { CldUploadWidget } from 'next-cloudinary';
 
 interface DataType {
-    id?: string;
-    nombre: string;
-    descripcion: string;
-    foto: string;
-    tipo: string;
-    precio: string;
-    id_proyecto?:string;
-}
-interface ItemType {
-    id: string;
-    id_proyecto?:string;
-    nombre: string;
-    data: ItemType[];
-    foto: string;
-    tipo: string;
+  [key: string]: string;
+  nombre: string;
+  descripcion: string;
+  foto: string;
+  precio: string;
+  tipo: string;
+  id_proyecto: string;
 }
 
-
-export default  function Fichaitem(){
+export default  function UpdateItem(){
 
 
       
@@ -32,6 +23,7 @@ export default  function Fichaitem(){
     const [dataI,setDataI] = useState<DataType | null>(null);
     const [isLoadingI, setIsLoadingI] = useState(true);
     const [errorI, setErrorI] = useState<string | null>(null);
+    
    
 
 
@@ -46,28 +38,19 @@ export default  function Fichaitem(){
     
    
 
-    const [newItem, setNewItem ] = useState({
-            id: "",
-            nombre: "",
-            id_proyecto: "",
-            descripcion: "",
-            precio: "",
-            tipo: "",
-            foto: ""
-    });
-
+ 
     const router = useRouter()
      
     const createItem = async () => {
         const res = await fetch('api/item', {
-            method: "POST",
-            body: JSON.stringify(newItem),
+            method: "PUT",
+            body: JSON.stringify(dataI),
             headers: {
                 "Content-Type": "application/json"
             }
         })
         const data = await res.json()
-        router.push(`catalogo/?id=${newItem.id_proyecto}`)
+        router.push(`catalogo/?id=${data.id_proyecto}`)
         console.log(data)
     }
 
@@ -82,18 +65,12 @@ export default  function Fichaitem(){
     const handleChange = (
         e: ChangeEvent <HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => {
-        if(!idItem){
-            setNewItem({ ... newItem, [e.target.name]: e.target.value as string})     
-        }else{
             setDataI({ ... dataI as DataType, [e.target.name]: e.target.value})  
-
-        }
-    
     }
 
     const handleFotoUpload = (result: any, widget: any) => {
         if (result && result.info && result.info.secure_url) {
-          setNewItem((prevData) => ({
+          setDataI((prevData) => ({
             ...prevData!,
             foto: result.info.secure_url,
           }));
@@ -111,7 +88,7 @@ export default  function Fichaitem(){
         setIdItem(id);
         setNombreProyecto(nombreProyecto);
         setIdProyecto(idProyecto);
-        setNewItem((prevData) => ({
+        setDataI((prevData) => ({
             ...prevData!,
             id_proyecto: idProyecto as string,
           }));
@@ -183,6 +160,7 @@ export default  function Fichaitem(){
             <div className="form">
               <form onSubmit={handleSubmit}>
                 <h1>Editar Item</h1>
+                <h3>Catalogo de {nombreProyecto}</h3>
                 <p>
                   Edita la información de tu item. Realiza los cambios necesarios y guarda para actualizar.
                 </p>
