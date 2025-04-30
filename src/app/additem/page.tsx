@@ -29,7 +29,7 @@ export default function AddItem() {
 
   useEffect(() => {
     const idProyecto = searchParams.get('idProyecto');
-    setIdProyecto(idProyecto);
+    setIdProyecto(idProyecto);4
 
     if (idProyecto) {
         setNewItem((prevItem) => ({
@@ -69,7 +69,7 @@ export default function AddItem() {
       if (result && result.info && result.info.secure_url) {
         setNewItem((prevData) => ({
           ...prevData!,
-          logo: result.info.secure_url,
+          foto: result.info.secure_url,
         }));
         setFotoPreviewUrl(result.info.secure_url);
         widget.close();

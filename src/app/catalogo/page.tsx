@@ -137,7 +137,7 @@ export default  function Catalogo(){
                                             <span className="product-type-label">{item.tipo}</span>
                                         </div>
                                         <div className="catalog-actions">
-                                            <Link href={`fichaitem/?id=${item._id}&nombreProyecto=${nombreProyecto}&idProyecto=${idProyecto}`} > <button className="button-edit" >Editar</button></Link>
+                                            <Link href={`updateitem?id=${item._id}&nombreProyecto=${nombreProyecto}&idProyecto=${idProyecto}`} > <button className="button-edit" >Editar</button></Link>
                                             <button className="button-delete">Eliminar</button>
                                         </div>
                                     </div>

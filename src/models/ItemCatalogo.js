@@ -11,15 +11,15 @@ const itemSchema = new Schema({
   },
   descripcion: {
     type: String,
-    required: [true,'El nombre del proyecto es requerido'],
+    required: [true,'El descripcion del proyecto es requerido'],
   },
   precio: {
     type: String,
-    required: [true,'El nombre del proyecto es requerido'],
+    required: [true,'El precio del proyecto es requerido'],
   },
   foto: {
     type: String,
-    required: [true,'El nombre del proyecto es requerido'],
+    required: [true,'El foto del proyecto es requerido'],
   },
 });
 

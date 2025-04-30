@@ -14,15 +14,8 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: `
-              script-src 'self' 'unsafe-inline' ${process.env.NODE_ENV === 'production' ? '' : "'unsafe-eval'"} https://res.cloudinary.com/;
-              style-src 'self' 'unsafe-inline' https://res.cloudinary.com/;
-              font-src 'self' https://res.cloudinary.com/;
-              connect-src 'self' https://api.cloudinary.com/ https://${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}.cloudinary.com/;
-              object-src 'none';
-              frame-ancestors 'self';
-              
-            `.replace(/\s{2,}/g, ' ').trim(),
+            value: "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://res.cloudinary.com/ https://upload-widget.cloudinary.com/;" 
+            .replace(/\s{2,}/g, ' ').trim(),
           },
         ],
       },

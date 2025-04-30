@@ -157,6 +157,7 @@ export default  function Fichaitem(){
     const fotoItem=dataI?.foto as string;
     const tipoItem=dataI?.tipo as string;
     const precioItem=dataI?.precio as string;
+    const idProyectoS=idProyecto || "";
 
 
    
@@ -165,12 +166,12 @@ export default  function Fichaitem(){
 
         <h1 className="ficha-title">Agregar Item al Catálogo</h1>
         <h2 className="project-subtitle">Proyecto {nombreProyecto}</h2>
-        <h3>{idProyecto as string}</h3>
+        <h3>{idProyectoS}</h3>
         
             
         <form className="ficha-form" onSubmit={handleSubmit}>
             <div className="form-group">
-            <input onChange={handleChange} value={idProyecto as string} type="hidden" id="id_royecto" />
+            <input onChange={handleChange} value={idProyectoS} type="hidden" id="id_royecto" />
 
             <label htmlFor="nombre" className="form-label">Nombre del Item</label>
                 <input onChange={handleChange}  value={nombreItem as string} type="text" id="nombre" className="form-input" placeholder="Ingrese el nombre del producto o servicio"/>
