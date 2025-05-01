@@ -16,73 +16,20 @@ interface DataType {
 
 export default  function UpdateItem(){
 
-
-      
-
-
     const [dataI,setDataI] = useState<DataType | null>(null);
     const [isLoadingI, setIsLoadingI] = useState(true);
     const [errorI, setErrorI] = useState<string | null>(null);
-    
-   
-
 
     const [nombreProyecto,setNombreProyecto] = useState<string | null>(null);
     const [idProyecto, setIdProyecto] = useState<string | null>(null);
-
     const [idItem, setIdItem] = useState<string | null>(null);
-
     const [fotoPreviewUrl, setFotoPreviewUrl] = useState<string | null>(null);
-
-
-    
-   
-
- 
     const router = useRouter()
      
-    const createItem = async () => {
-        const res = await fetch('api/item/'+idItem, {
-            method: "PUT",
-            body: JSON.stringify(dataI),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-        const data = await res.json()
-        router.push(`catalogo/?id=${data.id_proyecto}`)
-        console.log(data)
-    }
-
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault()
-    }
-    
-    const  submitUpdateItem = async () => {
-      console.log(dataI);
-        await createItem();
-    }
-    const pepe =  submitUpdateItem 
-     
-    const handleChange = (
-        e: ChangeEvent <HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-    ) => {
-            setDataI({ ... dataI as DataType, [e.target.name]: e.target.value})  
-    }
-
-    const handleFotoUpload = (result: any, widget: any) => {
-        if (result && result.info && result.info.secure_url) {
-          setDataI((prevData) => ({
-            ...prevData!,
-            foto: result.info.secure_url,
-          }));
-          setFotoPreviewUrl(result.info.secure_url);
-          widget.close();
-        }
-      };
-      
     const searchParams = useSearchParams();
+
     useEffect( () => {
+      router.refresh();
         
         const id = searchParams.get('id'); 
         const nombreProyecto = searchParams.get('nombreProyecto');
@@ -141,6 +88,47 @@ export default  function UpdateItem(){
     },[searchParams]);
 
     
+    const createItem = async () => {
+      const res = await fetch('api/item/'+idItem, {
+          method: "PUT",
+          body: JSON.stringify(dataI),
+          headers: {
+              "Content-Type": "application/json"
+          }
+      })
+      const data = await res.json()
+      router.push(`catalogo/?id=${data.id_proyecto}`)
+      console.log(data)
+    }
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault()
+    }
+    
+    const  submitUpdateItem = async () => {
+      console.log(dataI);
+        await createItem();
+    }
+    const pepe =  submitUpdateItem 
+    
+    const handleChange = (
+        e: ChangeEvent <HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => {
+            setDataI({ ... dataI as DataType, [e.target.name]: e.target.value})  
+    }
+
+    const handleFotoUpload = (result: any, widget: any) => {
+        if (result && result.info && result.info.secure_url) {
+          setDataI((prevData) => ({
+            ...prevData!,
+            foto: result.info.secure_url,
+          }));
+          setFotoPreviewUrl(result.info.secure_url);
+          widget.close();
+        }
+      };
+      
+      
     if(idItem!=null){
 
         if(isLoadingI){
