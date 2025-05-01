@@ -1,7 +1,6 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import FichaItem from "@/components/FichaItem";
 import Link from "next/link";
 
 
@@ -34,6 +33,66 @@ export default  function Catalogo(){
     const router = useRouter();
     const searchParams = useSearchParams();
     
+    useEffect( () => {
+        router.refresh();
+        
+        const id = searchParams.get('id')
+        if (id){
+            console.log(id);
+            setIdProyecto(id);
+            //traer ficha proyecto
+            const getFichaProyecto = async () => {
+                setIsLoadingP(true);
+                setErrorP(null);
+
+                try {
+                    const response = await fetch('api/proyecto/'+id);
+                    if(!response.ok){
+                        throw new Error(`<br>HTTP error! in Proyecto status: ${response.status}`);
+                    }
+
+                    const jsonData: DataType = await response.json();
+                    setData(jsonData);
+                
+                }catch (e: any){
+                    setErrorP('<br>Error al cargar Proyecto['+id+']:'+e.message);
+                    setData(null);
+                } finally {
+                    setIsLoadingP(false);
+                }
+            };
+       
+
+            // traer todo el catalogo del proyecto
+
+            const getCatalogo = async () => {
+                setIsLoadingC(true);
+                setErrorC(null);
+
+                try {
+                    const response = await fetch('api/item/?p='+id);
+                    if(!response.ok){
+                        throw new Error(`<br>HTTP error! in Catalogo status: ${response.status}`);
+                    }
+                    const jsonData: ItemType = await response.json();
+                    setDataList(jsonData.data);
+                
+                }catch (e: any){
+                    setErrorC('<br>Error al cargar Catalogo :'+e.message);
+                    setDataList(null);
+                } finally {
+                    setIsLoadingC(false);
+                }
+            };
+        
+         
+            if( !getFichaProyecto()){
+                setErrorC('<br>Algo paso ejecutando la funcion getFichaProyecto(); linea 84');
+            }else{
+                getCatalogo();
+            }   
+        }
+    },[router]);
 
     // ELIMINAR 
 
@@ -48,81 +107,10 @@ export default  function Catalogo(){
         if(data){
             alert("Eliminado correctamente");
             console.log(data)
-            router.refresh()
             router.push(`catalogo/?id=${idProyecto}`)
         }
         
     }
-    useEffect( () => {
-        
-        router.refresh();
-        
-        const id = searchParams.get('id')
-        if (id){
-            console.log(id);
-            setIdProyecto(id);
-
-        
-    
-        
-
-        //traer ficha proyecto
-        const getFichaProyecto = async () => {
-            setIsLoadingP(true);
-            setErrorP(null);
-
-            try {
-                const response = await fetch('api/proyecto/'+id);
-                if(!response.ok){
-                    throw new Error(`<br>HTTP error! in Proyecto status: ${response.status}`);
-                }
-
-                const jsonData: DataType = await response.json();
-                setData(jsonData);
-            
-            }catch (e: any){
-                setErrorP('<br>Error al cargar Proyecto['+id+']:'+e.message);
-                setData(null);
-            } finally {
-                setIsLoadingP(false);
-            }
-        };
-       
-
-        // traer todo el catalogo del proyecto
-
-        const getCatalogo = async () => {
-            setIsLoadingC(true);
-            setErrorC(null);
-
-            try {
-                const response = await fetch('api/item/?p='+id);
-                if(!response.ok){
-                    throw new Error(`<br>HTTP error! in Catalogo status: ${response.status}`);
-                }
-                const jsonData: ItemType = await response.json();
-                setDataList(jsonData.data);
-            
-            }catch (e: any){
-                setErrorC('<br>Error al cargar Catalogo :'+e.message);
-                setDataList(null);
-            } finally {
-                setIsLoadingC(false);
-            }
-        };
-        
-         
-        if( !getFichaProyecto()){
-            setErrorC('<br>Algo paso ejecutando la funcion getFichaProyecto(); linea 84');
-        }else{
-            getCatalogo();
-        }
-        
-        
-    }
-    
-
-    },[router]);
 
     const goEliminar = async (id:string) => {
         await eliminar(id);
