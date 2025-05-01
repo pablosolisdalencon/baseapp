@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 
 interface ItemType {
   _id: string;
@@ -16,6 +18,9 @@ export default function Proyectos() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userReady, setUserReady] = useState(false);
+
+  const router = useRouter();
+  
 
   useEffect(() => {
     if (status === 'loading') {
@@ -52,6 +57,29 @@ export default function Proyectos() {
       setDataList(null);
     }
   }, [session?.user?.email, status]);
+  // ELIMINAR 
+
+  const eliminar = async (id:string) => {
+    const res = await fetch('api/proyecto/'+id, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    const data = await res.json()
+    if(data){
+        alert("Eliminado correctamente");
+        console.log(data)
+        router.refresh()
+        router.push(`proyectos`)
+    }
+    
+  }
+  
+  const goEliminar = async (id:string) => {
+    await eliminar(id);
+  }
+
 
   // Método para generar el JSX del retorno basado en el estado
   const renderContent = () => {
@@ -78,7 +106,7 @@ export default function Proyectos() {
                   <Link href={`updateproyecto/?id=${proyecto._id}`}> <button className="boton-ficha">Ver Ficha</button></Link>
                   <Link href={`catalogo/${proyecto._id}`}><button className="boton-app">Ver App</button></Link>
                   <Link href={`catalogo/${proyecto._id}`}><button className="boton-mkt">Ver MKT</button></Link>
-                  <Link href={`catalogo/${proyecto._id}`}> <button className="boton-eliminar">Eliminar</button></Link>
+                  <button  onClick={()=>goEliminar(proyecto._id)} className="boton-eliminar">Eliminar</button>
                 </div>
               </div>
             </li>
