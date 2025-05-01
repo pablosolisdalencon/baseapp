@@ -25,12 +25,13 @@ export async function GET(request, {params}){
 }
 
 export async function DELETE(request, {params}){
+    const { id } = await params;
     try{
-        const itemEliminado = await ItemCatalogo.findByIdAndDelete(params.id)
+        const itemEliminado = await ItemCatalogo.findByIdAndDelete(id)
         if(!itemEliminado)
 
         return NextResponse.json({
-            message: `Item no encontrado para su eliminacion :  ${params.id} ...`,
+            message: `Item no encontrado para su eliminacion :  ${id} ...`,
         },{
             status: 404
         })
@@ -46,9 +47,10 @@ export async function DELETE(request, {params}){
 }
 
 export async function PUT(request,{params}){
+    const { id } = await params;
     try{
         const data = await request.json()
-        const itemUpdated = await ItemCatalogo.findByIdAndUpdate(params.id, data,{
+        const itemUpdated = await ItemCatalogo.findByIdAndUpdate(id, data,{
             new:true
         })
 

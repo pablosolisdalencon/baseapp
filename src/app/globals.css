@@ -55,7 +55,7 @@ input[type=button]{
 .btnfinalizar input,.btncancelar input{
     width: 95%;
 }
-.boton-crear-proyecto{
+.boton-crear-proyecto, .boton-crear-item{
     background-color: green;
     color:white;
     font-weight: bolder;

@@ -34,6 +34,25 @@ export default  function Catalogo(){
     const router = useRouter();
     const searchParams = useSearchParams();
     
+
+    // ELIMINAR 
+
+    const eliminar = async (id:string) => {
+        const res = await fetch('api/item/'+id, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        const data = await res.json()
+        if(data){
+            alert("Eliminado correctamente");
+            console.log(data)
+            router.refresh()
+            router.push(`catalogo/?id=${idProyecto}`)
+        }
+        
+    }
     useEffect( () => {
         
         router.refresh();
@@ -42,6 +61,9 @@ export default  function Catalogo(){
         if (id){
             console.log(id);
             setIdProyecto(id);
+
+        
+    
         
 
         //traer ficha proyecto
@@ -102,6 +124,10 @@ export default  function Catalogo(){
 
     },[router]);
 
+    const goEliminar = async (id:string) => {
+        await eliminar(id);
+    }
+
     
     
     if(isLoadingP){
@@ -138,7 +164,7 @@ export default  function Catalogo(){
                                         </div>
                                         <div className="catalog-actions">
                                             <Link href={`updateitem?id=${item._id}&nombreProyecto=${nombreProyecto}&idProyecto=${idProyecto}`} > <button className="button-edit" >Editar</button></Link>
-                                            <button className="button-delete">Eliminar</button>
+                                            <button onClick={()=>goEliminar(item._id)} className="button-delete">Eliminar</button>
                                         </div>
                                     </div>
                                 </li>

@@ -42,7 +42,7 @@ export default  function UpdateItem(){
     const router = useRouter()
      
     const createItem = async () => {
-        const res = await fetch('api/item', {
+        const res = await fetch('api/item/'+idItem, {
             method: "PUT",
             body: JSON.stringify(dataI),
             headers: {
@@ -59,8 +59,10 @@ export default  function UpdateItem(){
     }
     
     const  submitUpdateItem = async () => {
+      console.log(dataI);
         await createItem();
     }
+    const pepe =  submitUpdateItem 
      
     const handleChange = (
         e: ChangeEvent <HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -112,6 +114,9 @@ export default  function UpdateItem(){
                 const jsonData: DataType = await response.json();
                 setDataI(jsonData);
                 setIdProyecto(jsonData.id_proyecto as string)
+                
+                setFotoPreviewUrl(jsonData.foto);
+                
                 console.log(jsonData.id_proyecto);
             
             }catch (e: any){
@@ -153,6 +158,7 @@ export default  function UpdateItem(){
     const tipoItem=dataI?.tipo as string;
     const precioItem=dataI?.precio as string;
     
+    const urlCatalogo = "catalogo?idroyecto="+{idProyecto};
 
 
    
@@ -195,10 +201,10 @@ export default  function UpdateItem(){
               )}
               <hr />
               <div className="btncancelar">
-                <a href="proyectos"><input type="button"  className="boton-cancelar" value="Cancelar" /></a>
+                <a href={urlCatalogo}> <input type="button"  className="boton-cancelar" value="Cancelar" /></a>
               </div>
               <div className="btnfinalizar">
-                <input type="button" onClick={submitUpdateItem} className="boton-crear-proyecto" value="Guardar" />
+                <input type="button" onClick={submitUpdateItem} className="boton-crear-item" value="Guardar" />
               </div>
             </div>
           );
