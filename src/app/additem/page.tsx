@@ -28,6 +28,7 @@ export default function AddItem() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    router.refresh();
     const idProyecto = searchParams.get('idProyecto');
     setIdProyecto(idProyecto);4
 
@@ -37,7 +38,7 @@ export default function AddItem() {
         id_proyecto: idProyecto as string ?? "",
       }));
     }
-  }, [idProyecto]);
+  }, [idProyecto, router]);
 
  
 

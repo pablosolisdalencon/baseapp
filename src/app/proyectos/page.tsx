@@ -20,7 +20,7 @@ export default function Proyectos() {
   const [userReady, setUserReady] = useState(false);
 
   const router = useRouter();
-  
+
 
   useEffect(() => {
     if (status === 'loading') {
