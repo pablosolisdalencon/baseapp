@@ -31,10 +31,11 @@ export default  function CatalogoClient(){
     const [idProyecto, setIdProyecto] = useState<string | null>(null);
    
     const router = useRouter();
+    router.refresh();
     const searchParams = useSearchParams();
     
     useEffect( () => {
-        router.refresh();
+        
         
         const id = searchParams.get('id')
         if (id){
@@ -97,6 +98,7 @@ export default  function CatalogoClient(){
     // ELIMINAR 
 
     const eliminar = async (id:string) => {
+        
         const res = await fetch('api/item/'+id, {
             method: "DELETE",
             headers: {

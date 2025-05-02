@@ -9,7 +9,7 @@ function Navbar(){
 
     <nav className="main-nav">
         <div className="cta-bar">
-            <a href="#contacto" className="cta-link">¡Oferta Especial por Tiempo Limitado! Contáctanos Ahora</a>
+            <a href="#contacto" className="cta-link">¡Oferta Lanzamiento! Contáctanos Ahora!</a>
         </div>
         <div className="nav-container">
             <a href="/" className="nav-logo"><img src="logo.png"/></a>
