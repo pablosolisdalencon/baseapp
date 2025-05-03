@@ -3,6 +3,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit,  faBoxesPacking, faTrashCan, faBullhorn, faMobileScreenButton } from '@fortawesome/free-solid-svg-icons';
+
 
 
 interface ItemType {
@@ -102,11 +105,31 @@ export default function ProyectosClient() {
                   <h2 className="nombre-proyecto">{proyecto.nombre}</h2>
                 </div>
                 <div className="acciones-proyecto">
-                  <Link href={`catalogo/?id=${proyecto._id}`}><button className="boton-gestion">Gestionar Catálogo</button></Link>
-                  <Link href={`updateproyecto/?id=${proyecto._id}`}> <button className="boton-ficha">Ver Ficha</button></Link>
-                  <Link href={`catalogo/${proyecto._id}`}><button className="boton-app">Ver App</button></Link>
-                  <Link href={`catalogo/${proyecto._id}`}><button className="boton-mkt">Ver MKT</button></Link>
-                  <button  onClick={()=>goEliminar(proyecto._id)} className="boton-eliminar">Eliminar</button>
+                <Link href={`updateproyecto/?id=${proyecto._id}`}>
+                    <button className="boton-ficha">
+                    <FontAwesomeIcon icon={faEdit} className="mr-2" />
+                    </button>
+                  </Link>
+                  
+                  <Link href={`catalogo/?id=${proyecto._id}`}>
+                    <button className="boton-gestion">
+                    <FontAwesomeIcon icon={faBoxesPacking} />Catálogo
+                    </button>
+                  </Link>
+                  
+                  <Link href={`appviewer/?id=${proyecto._id}`}>
+                    <button className="boton-app">
+                    <FontAwesomeIcon icon={faMobileScreenButton} /> App
+                    </button>
+                  </Link>
+                  <Link href={`catalogo/${proyecto._id}`}>
+                    <button className="boton-mkt">
+                    <FontAwesomeIcon icon={faBullhorn} className="mr-2" /> MKT
+                    </button>
+                  </Link>
+                  <button  onClick={()=>goEliminar(proyecto._id)} className="boton-eliminar">
+                  <FontAwesomeIcon icon={faTrashCan} className="mr-2"/>
+                  </button>
                 </div>
               </div>
             </li>

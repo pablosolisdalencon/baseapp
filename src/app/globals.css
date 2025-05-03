@@ -2,6 +2,12 @@
 
 @tailwind utilities;
 
+iframe {
+    max-width: 90% !important;
+    max-height: 90% !important;
+    margin: 5%;
+    box-shadow: 0px -10px 100px black;
+}
 
 .form{
     box-shadow: 10px 10px 30px black;

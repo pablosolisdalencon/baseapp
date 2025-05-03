@@ -13,22 +13,23 @@ function Navbar(){
         </div>
         <div className="nav-container">
             <a href="/" className="nav-logo"><img src="logo.png"/></a>
-            <div className="nav-links">
+            
                 
                 {session?.user ? (
-                    <a href="proyectos" className="nav-button">Proyectos</a>
+                    <div className="nav-links">
+                    <a href="./proyectos" className="nav-button">Proyectos</a>
+                    </div>
                 ):(
-                    <div>
-                    <a href="/#nosotros" className="nav-link">Nosotros</a>
-                <a href="/#catalogo" className="nav-link">Catálogo</a>
-                <a href="/#contacto" className="nav-link">Contacto</a>
-                    <Link href="/login"><button onClick={()=> signIn()} className="bg-sky-500 nav-button">
+                    <div className="nav-links"> 
+                    <a href="./#nosotros" className="nav-link">Nosotros</a>
+                <a href="./#catalogo" className="nav-link">Catálogo</a>
+                <a href="./#contacto" className="nav-link">Contacto</a>
+                    <Link href="./login"><button onClick={()=> signIn()} className="bg-sky-500 nav-button">
                     Ingresar
                 </button></Link>
                 </div>
                     
                 )}
-            </div>
         </div>
     </nav>
     );
