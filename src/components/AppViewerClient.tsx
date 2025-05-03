@@ -67,7 +67,7 @@ export default function AppViewerClient() {
                 getFichaProyecto();
             }
 
-        },[router]);
+        },[useSearchParams]);
 
 
     if(isLoadingP){
