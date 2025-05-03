@@ -49,7 +49,7 @@ export default function AppViewerClient() {
                 setErrorP(null);
 
                 try {
-                    const response = await fetch('api/maker?id='+id);
+                    const response = await fetch('api/maker?p='+id);
                     if(!response.ok){
                         throw new Error(`<br>HTTP error! in Proyecto status: ${response.status}`);
                     }
