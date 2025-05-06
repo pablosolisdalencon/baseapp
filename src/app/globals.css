@@ -137,9 +137,11 @@ input[type=button]{
   .app-card-buttons {
     @apply flex flex-wrap justify-around space-y-2 space-x-2 md:justify-end md:space-y-0; /* Botones centrados en mobile, a la derecha en desktop */
   }
+  .app-card-buttons a{font-size: smaller;}
+  .app-card-buttons a FontAwesomeIcon{font-size: large;}
   
   .app-card-button {
-    @apply rounded px-4 py-2 font-semibold text-white  focus:outline-none;
+    @apply px-4 py-2 font-semibold text-white  focus:outline-none rounded-full;
      background: linear-gradient(135deg, #fafbfc 0%, #b1b1b3 100%);
      box-shadow:0px 0px 5px black;
   }
@@ -147,7 +149,8 @@ input[type=button]{
   /* Estilos adicionales para un look fresco y moderno */
   .app-card {
     background: linear-gradient(135deg, #a9bccc 0%, #ffffff 100%); 
-    margin:5px;
+    margin:35px 20px;
+    padding:20px;
     border:3px solid rgb(255, 255, 255)/* Fondo con gradiente */
   }
   
@@ -157,10 +160,6 @@ input[type=button]{
   
   .app-card-description {
     @apply text-base; /* Descripción más grande */
-  }
-  
-  .app-card-button {
-    @apply rounded-full; /* Botones redondeados */
   }
   
 
