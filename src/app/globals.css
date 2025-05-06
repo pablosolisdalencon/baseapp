@@ -119,6 +119,8 @@ input[type=button]{
 .titulo-contenedor-proyecto { @apply flex-grow; }
 .nombre-proyecto { @apply text-lg font-semibold text-gray-700; }
 .acciones-proyecto { @apply space-x-2; }
+.acciones-proyecto button{margin:5px;width: 200px!important;border:2px solid #333;}
+
 .boton-gestion { @apply bg-blue-500 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
 .boton-ficha { @apply bg-green-500 hover:bg-green-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2; }
 .boton-app { @apply bg-indigo-500 hover:bg-indigo-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2; }
