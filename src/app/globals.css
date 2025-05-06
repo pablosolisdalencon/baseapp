@@ -137,8 +137,8 @@ input[type=button]{
   .app-card-buttons {
     @apply flex flex-wrap justify-around space-y-2 space-x-2 md:justify-end md:space-y-0; /* Botones centrados en mobile, a la derecha en desktop */
   }
-  .app-card-buttons a{font-size: smaller;}
-  .app-card-buttons a FontAwesomeIcon{font-size: large;}
+  .app-card-buttons a{font-size: x-small;}
+  .app-card-buttons a svg{font-size: x-large;}
   
   .app-card-button {
     @apply px-4 py-2 font-semibold text-white  focus:outline-none rounded-full;
