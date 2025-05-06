@@ -109,23 +109,66 @@ input[type=button]{
 }
 
 /* SECCION PROYECTOS */
-.pagina-proyectos { @apply bg-gray-100 font-sans; }
-.contenedor-proyectos { @apply container mx-auto py-8; }
-.titulo-proyectos { @apply text-3xl font-bold text-gray-800 mb-6 text-center; }
-.lista-proyectos { @apply space-y-4; }
-.item-proyecto { @apply bg-white rounded-lg shadow-md overflow-hidden hover:bg-gray-50 transition duration-300 ease-in-out; }
-.contenido-proyecto { @apply flex items-center p-4; }
-.imagen-proyecto { @apply w-15 h-10 object-cover rounded mr-4; } /* Asegúrate de que w-15 y h-10 son intencionales, Tailwind usa escalas numéricas */
-.titulo-contenedor-proyecto { @apply flex-grow; }
-.nombre-proyecto { @apply text-lg font-semibold text-gray-700; }
-.acciones-proyecto { @apply space-x-2; }
-.acciones-proyecto button{margin:5px;width: 200px!important;border:2px solid #333;}
+.app-card {
+    @apply flex flex-col overflow-hidden rounded-lg bg-white shadow-gray-950 md:flex-row;
+    box-shadow:0px 0px 10px rgba(0, 0, 0, 0.534); /* Vertical en mobile, horizontal en desktop */
+  }
+  
+  .app-card-image-container {
+    @apply w-full md:w-1/3; /* Ocupa todo el ancho en mobile, 1/3 en desktop */
+  }
+  
+  .app-card-image {
+    @apply h-48 w-full object-cover; /* Ajusta la imagen */
+  }
+  
+  .app-card-content {
+    @apply flex flex-col justify-between p-4 md:p-6; /* Padding y disposición flexible */
+  }
+  
+  .app-card-title {
+    @apply mb-2 text-xl font-bold text-gray-800;
+  }
+  
+  .app-card-description {
+    @apply mb-4 text-sm leading-relaxed text-gray-600;
+  }
+  
+  .app-card-buttons {
+    @apply flex flex-wrap justify-around space-y-2 space-x-2 md:justify-end md:space-y-0; /* Botones centrados en mobile, a la derecha en desktop */
+  }
+  
+  .app-card-button {
+    @apply rounded px-4 py-2 font-semibold text-white  focus:outline-none;
+     background: linear-gradient(135deg, #fafbfc 0%, #b1b1b3 100%);
+     box-shadow:0px 0px 5px black;
+  }
+  
+  /* Estilos adicionales para un look fresco y moderno */
+  .app-card {
+    background: linear-gradient(135deg, #a9bccc 0%, #ffffff 100%); 
+    margin:5px;
+    border:3px solid rgb(255, 255, 255)/* Fondo con gradiente */
+  }
+  
+  .app-card-title {
+    @apply text-2xl; /* Título más grande */
+  }
+  
+  .app-card-description {
+    @apply text-base; /* Descripción más grande */
+  }
+  
+  .app-card-button {
+    @apply rounded-full; /* Botones redondeados */
+  }
+  
 
-.boton-gestion { @apply bg-blue-500 hover:bg-blue-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
-.boton-ficha { @apply bg-green-500 hover:bg-green-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2; }
-.boton-app { @apply bg-indigo-500 hover:bg-indigo-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2; }
-.boton-mkt { @apply bg-purple-500 hover:bg-purple-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2; }
-.boton-eliminar { @apply bg-red-500 hover:bg-red-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2; }
+.boton-gestion { color:blue }
+.boton-ficha {color:green}
+.boton-app { color:rgb(1, 101, 252); }
+.boton-mkt {color:purple; }
+.boton-eliminar { color:red }
 
 /* SECCION  CATALOGO */
 .catalog-manager-page { @apply bg-gray-100 font-sans; }

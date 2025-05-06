@@ -96,45 +96,32 @@ export default function ProyectosClient() {
 
     if (userReady && dataList && dataList.length > 0) {
       return (
-        <ul className="lista-proyectos">
+        <div className="container mx-auto py-8">
           {dataList.map(proyecto => (
-            <li className="item-proyecto" key={proyecto._id}>
-              <div className="contenido-proyecto">
-                <img src={proyecto.logo} alt={proyecto.nombre} className="imagen-proyecto" />
-                <div className="titulo-contenedor-proyecto">
-                  <h2 className="nombre-proyecto">{proyecto.nombre}</h2>
+
+              
+              
+        <div className="app-card"  key={proyecto._id}>
+            <div className="app-card-image-container">
+                <img src={proyecto.logo} alt={proyecto.nombre} className="app-card-image" />
+            </div>
+            <div className="app-card-content">
+                <div>
+                    <h2 className="app-card-title">{proyecto.nombre}</h2>
+                    <p className="app-card-description">{proyecto.descripcion}</p>
                 </div>
-                <div className="acciones-proyecto">
-                <Link href={`updateproyecto/?id=${proyecto._id}`}>
-                    <button className="boton-ficha">
-                    <FontAwesomeIcon icon={faEdit} className="mr-2" />
-                    </button>
-                  </Link>
-                  
-                  <Link href={`catalogo/?id=${proyecto._id}`}>
-                    <button className="boton-gestion">
-                    <FontAwesomeIcon icon={faBoxesPacking} />Catálogo
-                    </button>
-                  </Link>
-                  
-                  <Link href={`appviewer/?id=${proyecto._id}`}>
-                    <button className="boton-app">
-                    <FontAwesomeIcon icon={faMobileScreenButton} /> App
-                    </button>
-                  </Link>
-                  <Link href={`catalogo/${proyecto._id}`}>
-                    <button className="boton-mkt">
-                    <FontAwesomeIcon icon={faBullhorn} className="mr-2" /> MKT
-                    </button>
-                  </Link>
-                  <button  onClick={()=>goEliminar(proyecto._id)} className="boton-eliminar">
-                  <FontAwesomeIcon icon={faTrashCan} className="mr-2"/>
-                  </button>
+                <div className="app-card-buttons">
+                    <a href={`catalogo/?id=${proyecto._id}`} className="app-card-button boton-gestion"><FontAwesomeIcon icon={faBoxesPacking} /> Catálogo</a>
+                    <a href={`appviewer/?id=${proyecto._id}`} className="app-card-button boton-app"><FontAwesomeIcon icon={faMobileScreenButton} /> Ver App</a>
+                    <a href={`mktviewer/?id=${proyecto._id}`} className="app-card-button boton-mkt">Ver MKT</a>
+                    <a href={`updateproyecto/?id=${proyecto._id}`} className="app-card-button boton-ficha"><FontAwesomeIcon icon={faEdit} className="mr-2" /> Editar</a>
+                    <a href="#" onClick={()=>goEliminar(proyecto._id)} className="app-card-button boton-eliminar"><FontAwesomeIcon icon={faTrashCan} className="mr-2"/> Eliminar</a>
                 </div>
-              </div>
-            </li>
+            </div>
+        </div>
+
           ))}
-        </ul>
+        </div>
       );
     } else {
       return <p>{userReady ? 'Sin datos' : 'Esperando información del usuario...'}</p>;
