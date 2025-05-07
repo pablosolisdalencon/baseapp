@@ -171,21 +171,7 @@ input[type=button]{
 .boton-eliminar { color:red }
 
 /* SECCION  CATALOGO */
-.catalog-manager-page { @apply bg-gray-100 font-sans; }
-        .catalog-manager-container { @apply container mx-auto py-8; }
-        .project-title { @apply text-3xl font-bold text-gray-800 mb-2 text-center; }
-        .catalog-subtitle { @apply text-lg text-gray-600 mb-6 text-center; }
-        .catalog-list { @apply space-y-4; }
-        .catalog-item { @apply bg-white rounded-lg shadow-md overflow-hidden hover:bg-gray-50 transition duration-300 ease-in-out; }
-        .catalog-item-content { @apply flex items-center p-4; }
-        .product-image { @apply w-16 h-12 object-cover rounded mr-4; }
-        .product-info { @apply flex-grow; }
-        .product-name { @apply text-lg font-semibold text-gray-700; }
-        .product-type-label { @apply inline-block bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700 mr-2; }
-        .catalog-actions { @apply space-x-2 flex-shrink-0; }
-        .button-edit { @apply bg-yellow-500 hover:bg-yellow-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2; }
-        .button-delete { @apply bg-red-500 hover:bg-red-700 text-white text-sm font-semibold py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2; }
-        .catalog-controls { @apply mt-8 flex justify-end space-x-4; }
+.product-type-label { @apply inline-block bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700 mr-2; }
         .button-add-item { @apply bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
         .button-add-proyecto { @apply bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; margin-left:auto; margin-right:auto;position:relative;display:block; margin-top:2%;}
         .button-finish { @apply bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2; }
