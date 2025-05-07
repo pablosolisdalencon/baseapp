@@ -147,7 +147,7 @@ export default  function CatalogoClient(){
             { dataList?.length as number > 0 ?  (
                     <div className="container mx-auto py-8">
                           {dataList?.map((item) => (
-                                <div className="app-card"  key={item._id}>
+                                <div className="app-card item-card"  key={item._id}>
                                     <div className="app-card-image-container">
                                         <img src={item.foto} alt={item.nombre} className="app-card-image" />
                                     </div>
