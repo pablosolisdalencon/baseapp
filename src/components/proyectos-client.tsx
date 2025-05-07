@@ -97,6 +97,7 @@ export default function ProyectosClient() {
     if (userReady && dataList && dataList.length > 0) {
       return (
         <div className="container mx-auto py-8">
+
           {dataList.map(proyecto => (
 
               
@@ -120,7 +121,7 @@ export default function ProyectosClient() {
             </div>
         </div>
 
-        
+
 
           ))}
         </div>
