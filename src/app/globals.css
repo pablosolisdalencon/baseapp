@@ -290,7 +290,7 @@ input[type=button]{
     @apply font-bold text-xl text-gray-800;
 }
 .nav-logo img{
-   max-height: 100px;
+   max-height: 50px;
 }
 
 .nav-links {
