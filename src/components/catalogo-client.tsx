@@ -2,6 +2,8 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 
 
 interface DataType {
@@ -143,23 +145,27 @@ export default  function CatalogoClient(){
             <h2 className="catalog-subtitle">Gestión del Catálogo del Proyecto</h2>
 
             { dataList?.length as number > 0 ?  (
-                    <ul className="catalog-list">
+                    <div className="container mx-auto py-8">
                           {dataList?.map((item) => (
-                                <li className="catalog-item" key={item._id}>
-                                    <div className="catalog-item-content">
-                                        <img src={item.foto} alt="Producto 1" className="product-image"/>
-                                        <div className="product-info">
-                                            <h3 className="product-name">{item.nombre}</h3>
-                                            <span className="product-type-label">{item.tipo}</span>
+                                <div className="app-card"  key={item._id}>
+                                    <div className="app-card-image-container">
+                                        <img src={item.foto} alt={item.nombre} className="app-card-image" />
+                                    </div>
+                                    <div className="app-card-content">
+                                        <div>
+                                            <h2 className="app-card-title">{item.nombre}</h2>
+                                            <p className="app-card-description"><span className="product-type-label">{item.tipo}</span></p>
                                         </div>
-                                        <div className="catalog-actions">
-                                            <Link href={`updateitem?id=${item._id}&nombreProyecto=${nombreProyecto}&idProyecto=${idProyecto}`} > <button className="button-edit" >Editar</button></Link>
-                                            <button onClick={()=>goEliminar(item._id)} className="button-delete">Eliminar</button>
+                                        <div className="app-card-buttons">
+                                            <a href={`updateitem?id=${item._id}&nombreProyecto=${nombreProyecto}&idProyecto=${idProyecto}`} className="app-card-button boton-ficha"><FontAwesomeIcon icon={faEdit} className="mr-2" /> Editar</a>
+                                            <a href="#" onClick={()=>goEliminar(item._id)} className="app-card-button boton-eliminar"><FontAwesomeIcon icon={faTrashCan} className="mr-2"/> Eliminar</a>
                                         </div>
                                     </div>
-                                </li>
+                                </div>
+
+
                         ))}
-                    </ul>
+                    </div>
             ) :(
 
                 <p>sin datos </p> 

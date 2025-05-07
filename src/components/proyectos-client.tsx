@@ -120,6 +120,8 @@ export default function ProyectosClient() {
             </div>
         </div>
 
+        
+
           ))}
         </div>
       );
