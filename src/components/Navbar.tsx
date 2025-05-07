@@ -12,7 +12,7 @@ function Navbar(){
             <a href="#contacto" className="cta-link">¡Oferta Lanzamiento! Contáctanos Ahora!</a>
         </div>
         <div className="nav-container">
-            <a href="/" className="nav-logo"><img src="logo.png"/></a>
+            <a href="/" className="nav-logo"><img src="logo.jpg"/></a>
             
                 
                 {session?.user ? (
