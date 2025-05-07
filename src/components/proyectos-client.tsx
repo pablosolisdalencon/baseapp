@@ -113,8 +113,8 @@ export default function ProyectosClient() {
                 </div>
                 <div className="app-card-buttons">
                     <a href={`catalogo/?id=${proyecto._id}`} className="app-card-button boton-gestion"><FontAwesomeIcon icon={faBoxesPacking} /><br />Catálogo</a>
-                    <a href={`appviewer/?id=${proyecto._id}`} className="app-card-button boton-app"><FontAwesomeIcon icon={faMobileScreenButton} /><br />Ver App</a>
-                    <a href={`mktviewer/?id=${proyecto._id}`} className="app-card-button boton-mkt">Ver MKT</a>
+                    <a href={`appviewer/?id=${proyecto._id}`} className="app-card-button boton-app"><FontAwesomeIcon icon={faMobileScreenButton} /><br />eWaveApp</a>
+                    <a href={`mktviewer/?id=${proyecto._id}`} className="app-card-button boton-mkt"><FontAwesomeIcon icon={faBullhorn} /><br />Marketing</a>
                     <a href={`updateproyecto/?id=${proyecto._id}`} className="app-card-button boton-ficha"><FontAwesomeIcon icon={faEdit} /><br />Editar</a>
                     <a href="#" onClick={()=>goEliminar(proyecto._id)} className="app-card-button boton-eliminar"><FontAwesomeIcon icon={faTrashCan}/><br />Eliminar</a>
                 </div>
