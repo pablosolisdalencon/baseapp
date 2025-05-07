@@ -97,6 +97,7 @@ export default function ProyectosClient() {
     if (userReady && dataList && dataList.length > 0) {
       return (
         <div className="container mx-auto py-8">
+
           {dataList.map(proyecto => (
 
               
@@ -111,16 +112,16 @@ export default function ProyectosClient() {
                     <p className="app-card-description">{proyecto.descripcion}</p>
                 </div>
                 <div className="app-card-buttons">
-                    <a href={`catalogo/?id=${proyecto._id}`} className="app-card-button boton-gestion"><FontAwesomeIcon icon={faBoxesPacking} /> Catálogo</a>
-                    <a href={`appviewer/?id=${proyecto._id}`} className="app-card-button boton-app"><FontAwesomeIcon icon={faMobileScreenButton} /> Ver App</a>
+                    <a href={`catalogo/?id=${proyecto._id}`} className="app-card-button boton-gestion"><FontAwesomeIcon icon={faBoxesPacking} /><br />Catálogo</a>
+                    <a href={`appviewer/?id=${proyecto._id}`} className="app-card-button boton-app"><FontAwesomeIcon icon={faMobileScreenButton} /><br />Ver App</a>
                     <a href={`mktviewer/?id=${proyecto._id}`} className="app-card-button boton-mkt">Ver MKT</a>
-                    <a href={`updateproyecto/?id=${proyecto._id}`} className="app-card-button boton-ficha"><FontAwesomeIcon icon={faEdit} className="mr-2" /> Editar</a>
-                    <a href="#" onClick={()=>goEliminar(proyecto._id)} className="app-card-button boton-eliminar"><FontAwesomeIcon icon={faTrashCan} className="mr-2"/> Eliminar</a>
+                    <a href={`updateproyecto/?id=${proyecto._id}`} className="app-card-button boton-ficha"><FontAwesomeIcon icon={faEdit} /><br />Editar</a>
+                    <a href="#" onClick={()=>goEliminar(proyecto._id)} className="app-card-button boton-eliminar"><FontAwesomeIcon icon={faTrashCan}/><br />Eliminar</a>
                 </div>
             </div>
         </div>
 
-        
+
 
           ))}
         </div>

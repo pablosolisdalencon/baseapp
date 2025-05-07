@@ -157,8 +157,8 @@ export default  function CatalogoClient(){
                                             <p className="app-card-description"><span className="product-type-label">{item.tipo}</span></p>
                                         </div>
                                         <div className="app-card-buttons">
-                                            <a href={`updateitem?id=${item._id}&nombreProyecto=${nombreProyecto}&idProyecto=${idProyecto}`} className="app-card-button boton-ficha"><FontAwesomeIcon icon={faEdit} className="mr-2" /> Editar</a>
-                                            <a href="#" onClick={()=>goEliminar(item._id)} className="app-card-button boton-eliminar"><FontAwesomeIcon icon={faTrashCan} className="mr-2"/> Eliminar</a>
+                                            <a href={`updateitem?id=${item._id}&nombreProyecto=${nombreProyecto}&idProyecto=${idProyecto}`} className="app-card-button boton-ficha"><FontAwesomeIcon icon={faEdit}/><br />Editar</a>
+                                            <a href="#" onClick={()=>goEliminar(item._id)} className="app-card-button boton-eliminar"><FontAwesomeIcon icon={faTrashCan}/><br />Eliminar</a>
                                         </div>
                                     </div>
                                 </div>
