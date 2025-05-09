@@ -170,7 +170,7 @@ export default function ProyectosClient() {
             {itemToDelete && (
               <div className="mt-2 p-3 bg-gray-100 rounded">
                 <p><strong>ID:</strong>{itemToDelete._id}</p>
-                <p><strong>Nombre:</strong>{itemToDelete.nombre}</p>
+                <p><strong>Nombre:</strong><h2>{itemToDelete.nombre}</h2></p>
               </div>
             )}
             <p className="mt-2 text-sm text-gray-500">Esta acción no se puede deshacer.</p>

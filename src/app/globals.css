@@ -449,7 +449,7 @@ input[type=button]{
 }
 
 .contact-form {
-    @apply max-w-md mx-auto flex rounded-full overflow-hidden shadow-lg;
+    @apply max-w-md mx-auto flex rounded-full overflow-hidden;
 }
 
 .contact-input {
