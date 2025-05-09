@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit,  faBoxesPacking, faTrashCan, faBullhorn, faMobileScreenButton } from '@fortawesome/free-solid-svg-icons';
+import ConfirmModal from "@/components/ConfirmModal";
 
 
 
@@ -21,6 +22,29 @@ export default function ProyectosClient() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userReady, setUserReady] = useState(false);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<ItemType | null>(null);
+
+  const handleDeleteClick = (item: ItemType) => {
+    setItemToDelete(item);
+    setIsDeleteModalOpen(true);
+  };
+  
+  const  handelConfirmDelete = () => {
+    if(itemToDelete){
+      // borrado
+      eliminar(itemToDelete);
+      // cerrar modal y limpiar estado
+      closeDeleteModal();
+    }
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+  }
+
+
 
   const router = useRouter();
 
@@ -60,10 +84,11 @@ export default function ProyectosClient() {
       setDataList(null);
     }
   }, [session?.user?.email, status]);
-  // ELIMINAR 
 
-  const eliminar = async (id:string) => {
-    const res = await fetch('api/proyecto/'+id, {
+
+  // ELIMINAR 
+  const eliminar = async (item:ItemType) => {
+    const res = await fetch('api/proyecto/'+item._id, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json"
@@ -79,10 +104,6 @@ export default function ProyectosClient() {
     
   }
   
-  const goEliminar = async (id:string) => {
-    await eliminar(id);
-  }
-
 
   // Método para generar el JSX del retorno basado en el estado
   const renderContent = () => {
@@ -116,7 +137,7 @@ export default function ProyectosClient() {
                     <a href={`appviewer/?id=${proyecto._id}`} className="app-card-button boton-app"><FontAwesomeIcon icon={faMobileScreenButton} /><br />eWaveApp</a>
                     <a href={`mktviewer/?id=${proyecto._id}`} className="app-card-button boton-mkt"><FontAwesomeIcon icon={faBullhorn} /><br />Marketing</a>
                     <a href={`updateproyecto/?id=${proyecto._id}`} className="app-card-button boton-ficha"><FontAwesomeIcon icon={faEdit} /><br />Editar</a>
-                    <a href="#" onClick={()=>goEliminar(proyecto._id)} className="app-card-button boton-eliminar"><FontAwesomeIcon icon={faTrashCan}/><br />Eliminar</a>
+                    <a href="#" onClick={()=>handleDeleteClick(proyecto)} className="app-card-button boton-eliminar"><FontAwesomeIcon icon={faTrashCan}/><br />Eliminar</a>
                 </div>
             </div>
         </div>
@@ -137,6 +158,26 @@ export default function ProyectosClient() {
       {renderContent()}
       <hr />
       <Link href="addproyecto"><button className="button-add-proyecto"> + Agregar Nuevo Proyecto</button></Link>
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handelConfirmDelete}
+        title="Confirmar Eliminacion"
+        message={
+          <>
+            <p>¿Realmente deseas eliminar este elemento?</p>
+            {itemToDelete && (
+              <div className="mt-2 p-3 bg-gray-100 rounded">
+                <p><strong>ID:</strong>{itemToDelete._id}</p>
+                <p><strong>Nombre:</strong>{itemToDelete.nombre}</p>
+              </div>
+            )}
+            <p className="mt-2 text-sm text-gray-500">Esta acción no se puede deshacer.</p>
+          </>
+        }
+      />
+
     </div>
   );
 }
