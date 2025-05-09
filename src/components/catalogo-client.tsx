@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import ConfirmModal from "@/components/ConfirmModal";
 
 
 interface DataType {
@@ -31,6 +32,29 @@ export default  function CatalogoClient(){
     const [errorP, setErrorP] = useState<string | null>(null);
 
     const [idProyecto, setIdProyecto] = useState<string | null>(null);
+
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<ItemType | null>(null);
+
+    const handleDeleteClick = (item: ItemType) => {
+    setItemToDelete(item);
+    setIsDeleteModalOpen(true);
+    };
+    
+    const  handelConfirmDelete = () => {
+    if(itemToDelete){
+        // borrado
+        eliminar(itemToDelete);
+        // cerrar modal y limpiar estado
+        closeDeleteModal();
+    }
+    };
+
+    const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    }
+
+
    
     const router = useRouter();
     router.refresh();
@@ -98,27 +122,22 @@ export default  function CatalogoClient(){
     },[router]);
 
     // ELIMINAR 
-
-    const eliminar = async (id:string) => {
-        
-        const res = await fetch('api/item/'+id, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-        const data = await res.json()
-        if(data){
-            alert("Eliminado correctamente");
-            console.log(data)
-            router.push(`catalogo/?id=${idProyecto}`)
+  const eliminar = async (item:ItemType) => {
+    const res = await fetch('api/item/'+item._id, {
+        method: "DELETE",
+        headers: {
+            "Content-Type": "application/json"
         }
-        
+    })
+    const data = await res.json()
+    if(data){
+        alert("Eliminado correctamente");
+        console.log(data)
+        router.refresh()
+        router.push(`proyectos`)
     }
-
-    const goEliminar = async (id:string) => {
-        await eliminar(id);
-    }
+    
+  }
 
     
     
@@ -158,7 +177,7 @@ export default  function CatalogoClient(){
                                         </div>
                                         <div className="app-card-buttons">
                                             <a href={`updateitem?id=${item._id}&nombreProyecto=${nombreProyecto}&idProyecto=${idProyecto}`} className="app-card-button boton-ficha"><FontAwesomeIcon icon={faEdit}/><br />Editar</a>
-                                            <a href="#" onClick={()=>goEliminar(item._id)} className="app-card-button boton-eliminar"><FontAwesomeIcon icon={faTrashCan}/><br />Eliminar</a>
+                                            <a href="#" onClick={()=>handleDeleteClick(item)}className="app-card-button boton-eliminar"><FontAwesomeIcon icon={faTrashCan}/><br />Eliminar</a>
                                         </div>
                                     </div>
                                 </div>
@@ -174,6 +193,24 @@ export default  function CatalogoClient(){
             }
         <hr />
             <Link href={`additem/?idProyecto=${idProyecto}`}><button className="button-add-proyecto"> + Agregar Nuevo Item al Catalogo</button></Link>
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={closeDeleteModal}
+                onConfirm={handelConfirmDelete}
+                title="Confirmar Eliminacion"
+                message={
+                <>
+                    <p>¿Realmente deseas eliminar este elemento?</p>
+                    {itemToDelete && (
+                    <div className="mt-2 p-3 bg-gray-100 rounded">
+                        <p><strong>ID:</strong>{itemToDelete._id}</p>
+                        <p><strong>Nombre:</strong><h2>{itemToDelete.nombre}</h2></p>
+                    </div>
+                    )}
+                    <p className="mt-2 text-sm text-gray-500">Esta acción no se puede deshacer.</p>
+                </>
+                }
+            />
         </div>
     );
 }
