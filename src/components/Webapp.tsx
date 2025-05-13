@@ -59,16 +59,6 @@ export default function Webapp() {
 
         },[]);
 
-  const proyecto = {
-    nombre: "Kick Starter Media Kit",  
-    descripcion: "¿Sueñas con lanzar tu app y hacerla crecer? El Kick Starter Media Kit es tu solución integral. ✨  Obtén un potente generador de apps intuitivo y una colección curada de recursos de marketing esenciales, todo en un solo lugar. Ideal para emprendedores que buscan una manera fácil y efectiva de dar sus primeros pasos en el mundo digital. ¡Tu viaje emprendedor nunca ha sido tan accesible!" ,
-    mision: "Nuestra Misión: Empoderar a la próxima generación de emprendedores, eliminando las barreras económicas para convertir sus sueños en realidad. 💡  Creemos en un mundo donde la innovación no se vea limitada por el presupuesto. Estamos comprometidos a ofrecer soluciones accesibles que permitan a cada emprendedor alcanzar su máximo potencial. Estamos aquí para democratizar el emprendimiento, ofreciendo las herramientas necesarias al costo más accesible. 🛠️  Nuestra misión es allanar el camino para que las ideas brillantes florezcan, sin que el factor económico sea un obstáculo. Queremos ver cómo tu pasión transforma el mundo.",
-    vision: "Nuestra Visión: Derribar la barrera tecnológica en el emprendimiento a través de la automatización inteligente, creando un entorno donde el costo ya no sea un impedimento para la innovación y el crecimiento. 💥  Estamos construyendo un futuro donde la tecnología empodera a cada emprendedor, permitiendo que sus ideas transformen el mundo sin las limitaciones económicas del pasado.",
-    logo: "logo.png"    
-   
-  }
-
-
     if(isLoadingP){
     return <p>Cargando WebApp Data...</p>;
     }
@@ -132,19 +122,17 @@ export default function Webapp() {
         <div className="catalog-container">
             <h2 className="catalog-title">Nuestro Catálogo</h2>
             <div className="catalog-grid">
- {/* AQUI DEBIERAMOS RECORRER EL CATALOGO E IMPRIMIR UNA TARJETA SIMPLE con el nombre del item */}
-    {AppCatalogo && AppCatalogo.length > 0 ? (
-              AppCatalogo.map((item) => (
-                <div className="product-card" key={item._id}>
-                    <img src={item.foto} alt={item.nombre} className="product-image" />
-                    <div className="product-info">
-                        <h3 className="product-name">{item.nombre}</h3>
-                        <p className="product-description">{item.descripcion}</p>
-                        
-                        <a href="#" className="product-button">{item.precio}</a>
-                    </div>
-                </div>
-                   
+                {AppCatalogo && AppCatalogo.length > 0 ? (
+                    AppCatalogo.map((item) => (
+                        <div className="product-card" key={item._id}>
+                            <img src={item.foto} alt={item.nombre} className="product-image" />
+                            <div className="product-info">
+                                <h3 className="product-name">{item.nombre}</h3>
+                                <p className="product-description">{item.descripcion}</p>
+                                
+                                <a href="#" className="product-button">{item.precio}</a>
+                            </div>
+                        </div>
               ))
             ) : (
               <p>No hay items en el catálogo.</p>
@@ -152,16 +140,12 @@ export default function Webapp() {
             </div>
         </div>
     </section>
-  
-   
 
-    {/* Sección Footer con Mini Form de Contacto */}
     <footer id="contacto" className="contact-footer">
         <div className="contact-container">
             <h2 className="contact-title">¿Listo para Empezar?</h2>
             <p className="contact-subtitle">Déjanos un mensaje y nos pondremos en contacto contigo.</p>
-            <div className="contact-form">
-                
+            <div className="contact-form">             
                 <a href="https://wa.me/56920905973?text=Quiero%20hablar%20del%20eWave%20Pack"><button className="contact-button">Hablemos!</button></a>
             </div>
             <p className="copyright-text">© 2025 {nombreProyecto}. Todos los derechos reservados.</p>
