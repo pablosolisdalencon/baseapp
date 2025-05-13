@@ -16,9 +16,8 @@ function Navbar(){
             
                 
                 {session?.user ? (
-                    <div className="nav-links">
-                    <a href="./proyectos" className="nav-button">Proyectos</a>
-                    </div>
+                    <h1>
+                    Proyectos</h1>
                 ):(
                     <div className="nav-links"> 
                     <a href="./#nosotros" className="nav-link">Nosotros</a>

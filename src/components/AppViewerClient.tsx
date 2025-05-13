@@ -114,10 +114,10 @@ export default function AppViewerClient() {
     {/* Sección Descripción de la Empresa */}
     <section id="nosotros" className="about-us-section">
         <div className="about-us-container">
-            <h2 className="about-us-title">Sobre Nosotros</h2>
+            <h2 className="about-us-title">{nombreProyecto}</h2>
             <div className="about-us-grid">
                 <div className="about-us-item">
-                    <h3 className="about-us-subtitle">Lo que nos define</h3>
+                    <h3 className="about-us-subtitle">Nosotros</h3>
                     <p className="about-us-text">{descripcionProyecto}</p>
                 </div>
                 <div className="about-us-item">
