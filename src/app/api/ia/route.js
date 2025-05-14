@@ -1,18 +1,21 @@
 import { Anthropic } from '@anthropic-ai/sdk';
+import { NextResponse } from 'next/server';
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
+// Manejador para solicitudes POST
+export async function POST(request) {
   try {
-    const { message } = req.body;
+    // Parsear el cuerpo de la solicitud
+    const body = await request.json();
+    const { message } = body;
     
     if (!message) {
-      return res.status(400).json({ error: 'Message is required' });
+      return NextResponse.json(
+        { error: 'Message is required' },
+        { status: 400 }
+      );
     }
 
-    // Inicializar el cliente de Anthropic con tu clave API
+    // Inicializar el cliente de Anthropic con la clave API
     const anthropic = new Anthropic({
       apiKey: process.env.CLAUDE_API_KEY,
     });
@@ -27,7 +30,7 @@ export default async function handler(req, res) {
     });
 
     // Devolver la respuesta de Claude
-    return res.status(200).json({ 
+    return NextResponse.json({
       response: completion.content[0].text,
       usage: {
         prompt_tokens: completion.usage.input_tokens,
@@ -35,11 +38,24 @@ export default async function handler(req, res) {
         total_tokens: completion.usage.input_tokens + completion.usage.output_tokens
       }
     });
+    
   } catch (error) {
     console.error('Error calling Claude API:', error);
-    return res.status(500).json({ 
-      error: 'Failed to communicate with AI service',
-      details: error.message 
-    });
+    
+    return NextResponse.json(
+      { 
+        error: 'Failed to communicate with AI service',
+        details: error.message 
+      },
+      { status: 500 }
+    );
   }
+}
+
+// Manejador para solicitudes GET (opcional, para verificar si la API está funcionando)
+export async function GET() {
+  return NextResponse.json(
+    { status: 'API is running' },
+    { status: 200 }
+  );
 }
