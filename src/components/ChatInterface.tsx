@@ -1,3 +1,4 @@
+"use client";
 import { useState, FormEvent } from 'react';
 import { Message } from '@/types/Chat';
 
