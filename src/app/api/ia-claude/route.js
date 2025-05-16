@@ -7,8 +7,9 @@ export async function POST(request) {
     // Parsear el cuerpo de la solicitud
     const body = await request.json();
     const { message } = body;
-    
+    console.log(body)
     if (!message) {
+      
       return NextResponse.json(
         { error: 'Message is required' },
         { status: 400 }

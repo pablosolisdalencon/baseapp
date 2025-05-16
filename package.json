@@ -12,11 +12,13 @@
     "@anthropic-ai/sdk": "^0.41.0",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@google/generative-ai": "^0.24.1",
     "axios": "^1.9.0",
     "mongoose": "^8.13.2",
     "next": "15.3.0",
     "next-auth": "^4.24.11",
     "next-cloudinary": "^6.16.0",
+    "openai": "^4.98.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
