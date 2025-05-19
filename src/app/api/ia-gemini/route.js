@@ -1,49 +1,41 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-// Asegúrate de tener tu clave de API de Google configurada como una variable de entorno
-const apiKey = process.env.GOOGLE_API_KEY;
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || "");
+const model = genAI.getGenerativeModel({
+  model: "gemini-2.0-flash-001",
+  tools: [
+    {
+      codeExecution: {},
+    },
+  ],
+});
 
-if (!apiKey) {
-  console.error("La clave de API de Google (GOOGLE_API_KEY) no está configurada.");
-}
+/**
+ * API route for generating content using Gemini AI model.
+ */
+export async function POST(req) {
+  /**
+   * Get the prompt from the request body.
+   */
+  const data = await req.json();
+  const prompt = data.text || "Explain how AI works";
 
-async function generateResponse(prompt) {
-  if (!apiKey) {
-    return { error: "Clave de API de Google no configurada." };
-  }
-
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.GenerativeModel({ model: "gemini-pro" });
-
+  /**
+   * Use the Gemini AI model to generate content from the prompt.
+   */
   try {
     const result = await model.generateContent(prompt);
-    const responseText = result.response?.candidates?.[0]?.content?.parts?.[0]?.text;
-    return { result: responseText };
+
+    /**
+     * Return the generated content as a JSON response.
+     */
+    console.log(result.response.text())
+    return NextResponse.json({
+      summary: result.response.text(),
+    });
   } catch (error) {
-    console.error("Error al generar respuesta con Gemini:", error);
-    return { error: "Error al generar respuesta con Gemini." };
-  }
-}
-
-export async function POST(request) {
-  try {
-    const { prompt } = await request.json();
-
-    if (!prompt) {
-      return NextResponse.json({ error: "Se requiere un prompt." }, { status: 400 });
-    }
-
-    const aiResponse = await generateResponse(prompt);
-
-    if (aiResponse.error) {
-      return NextResponse.json({ error: aiResponse.error }, { status: 500 });
-    }
-
-    return NextResponse.json({ result: aiResponse.result });
-
-  } catch (error) {
-    console.error("Error al procesar la solicitud:", error);
-    return NextResponse.json({ error: "Error interno del servidor." }, { status: 500 });
+    console.error("Error generating content:", error);
+    return NextResponse.json({ error: "Failed to generate content" }, { status: 500 });
   }
 }

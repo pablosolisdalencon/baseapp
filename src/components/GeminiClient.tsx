@@ -17,7 +17,7 @@ export default function GeminiClient() {
       const res = await fetch('/api/ia-gemini', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ prompt: input }),
       });
 
       const data = await res.json();

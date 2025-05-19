@@ -1,10 +1,10 @@
-import OpenAiClient from "@/components/OpenAiClient";
+import GeminiClient from "@/components/GeminiClient";
 export default async function Willi() {
 
    return(
        
        <div>
-        <OpenAiClient/>
+        <GeminiClient/>
         </div>
 
    );
