@@ -29,26 +29,31 @@ const EstudioMercadoComponent = () => {
       try {
         // Consulta inicial para verificar la existencia del estudio de mercado
         const existenciaResponse = await fetch(`/api/estudio-mercado?p=${idProyecto}`);
-        
+        console.log("========== Type Response");
+        console.log(typeof existenciaResponse)
         const existenciaData = await existenciaResponse.json();
-
-        console.log(existenciaData);
 
         if (existenciaData.id_proyecto == null) {
           console.log("==== IN NULL ")
-          if (existenciaResponse.status === 404) {
+          //if (existenciaResponse.status === 404) {
+          if (existenciaData.id_proyecto != idProyecto) {
             // No existe, entonces llamamos a /api/maker
             console.log("==== 404 ")
             const makerResponse = await fetch(`/api/maker?p=${idProyecto}`);
+            console.log("=== Maker response ")
+            console.log(makerResponse)
 
             if (!makerResponse.ok) {
-              const makerError = await makerResponse.text();
-              setError(`Error al llamar a /api/maker: ${makerError}`);
+              
+              setError(`Error al llamar a /api/maker: ${makerResponse}`);
               setIsLoading(false);
               return;
             }
 
             const makerData = await makerResponse.json();
+
+            console.log("======= maker DATA =====")
+            console.log(makerData)
 
             // Llamamos a /api/estudio-mercado con el prompt de maker
             const estudioResponse = await fetch(`/api/willi/estudio-mercado?p=${idProyecto}`, {
@@ -60,9 +65,9 @@ const EstudioMercadoComponent = () => {
             });
 
             if (!estudioResponse.ok) {
-              const estudioError = await estudioResponse.text();
-              console.log(`Error al llamar a /api/willi/estudio-mercado (con id_proyecto): ${estudioError}`)
-              setError(`Error al llamar a /api/willi/estudio-mercado (con id_proyecto): ${estudioError}`);
+         
+              console.log(`Error al llamar a /api/willi/estudio-mercado (con id_proyecto): ${idProyecto}`)
+              setError(`Error al llamar a /api/willi/estudio-mercado (con id_proyecto): ${idProyecto}`);
               setIsLoading(false);
               return;
             }
@@ -70,8 +75,7 @@ const EstudioMercadoComponent = () => {
             const estudioData = await estudioResponse.json();
             setDataEstudioMercado(estudioData);
           } else {
-            const existenciaError = await existenciaResponse.text();
-            setError(`Error al verificar existencia del estudio de mercado: ${existenciaError}`);
+            setError(`Error al verificar existencia del estudio de mercado: ${existenciaResponse}`);
           }
         } else {
           // El estudio de mercado ya existe
