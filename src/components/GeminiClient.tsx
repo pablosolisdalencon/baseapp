@@ -17,14 +17,18 @@ export default function GeminiClient() {
       const res = await fetch('/api/ia-gemini', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: input }),
+        body: JSON.stringify(
+          { 
+            prompt: input 
+          }
+        ),
       });
 
       const data = await res.json();
       if (res.ok) {
-        setResponse(data.message);
+        setResponse(data.ia);
       } else {
-        setResponse(`Error: ${data.error?.message || 'Algo salió mal'}`);
+        setResponse(`Error: ${data.error?.message}`);
       }
     } catch (error: any) {
       setResponse(`Error de conexión: ${error.message}`);
