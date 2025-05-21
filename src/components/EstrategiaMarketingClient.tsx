@@ -77,7 +77,7 @@ const EstrategiaMarketingComponent = () => {
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({ maker: makerData, estudio_mercado: estudioData }),
+              body: JSON.stringify({ maker: textMaker, estudio_mercado: textEstudio }),
             });
 
             if (!estrategiaResponse.ok) {
