@@ -1,15 +1,16 @@
-import EstudioMercadoComponent from "@/components/EstudioMercadoClient";
+import EstrategiaMarketingComponent from "@/components/EstrategiaMarketingClient";
 import { Suspense } from "react";
 
 export default function MktViewer(){
 
     const idProyecto = "67f99da9f7b90ff068b870b2"
-
+// <Suspense><EstudioMercadoComponent/></Suspense>
     return(
     <div className="mkt-viewer-container">
         <h1 className="project-title">[Nombre del Proyecto]</h1>
         <h2 className="mkt-subtitle">Estudio de Mercado</h2>
-        <Suspense><EstudioMercadoComponent/></Suspense>
+       
+        <Suspense><EstrategiaMarketingComponent/></Suspense>
         
         <h2 className="mkt-subtitle">Marketing Digital</h2>
 
