@@ -1,16 +1,16 @@
-import EstrategiaMarketingComponent from "@/components/EstrategiaMarketingClient";
+import Willi from "@/components/Willi";
 import { Suspense } from "react";
 
 export default function MktViewer(){
 
-    const idProyecto = "67f99da9f7b90ff068b870b2"
+    //const idProyecto = "67f99da9f7b90ff068b870b2"
 // <Suspense><EstudioMercadoComponent/></Suspense>
     return(
     <div className="mkt-viewer-container">
         <h1 className="project-title">[Nombre del Proyecto]</h1>
         <h2 className="mkt-subtitle">Estudio de Mercado</h2>
        
-        <Suspense><EstrategiaMarketingComponent/></Suspense>
+        <Suspense><Willi/></Suspense>
         
         <h2 className="mkt-subtitle">Marketing Digital</h2>
 
@@ -41,7 +41,8 @@ export default function MktViewer(){
             <div className="bg-white rounded-lg shadow-md overflow-hidden p-6">
                 <h3 className="card-title mb-4">Nuestros Productos Destacados</h3>
                 <div className="product-grid">
-                    {/* Producto 1 */}
+
+
                     <div className="product-post">
                         <div className="product-image-container">
                             <img src="https://via.placeholder.com/300x200/FFCDD2/B71C1C?Text=Prod+A" alt="Producto A" className="product-image"/>
@@ -53,7 +54,6 @@ export default function MktViewer(){
                         </div>
                     </div>
 
-                    {/* Producto 2 */}
                     <div className="product-post">
                         <div className="product-image-container">
                             <img src="https://via.placeholder.com/300x200/BBDEFB/1A237E?Text=Prod+B" alt="Producto B" className="product-image"/>
@@ -65,7 +65,7 @@ export default function MktViewer(){
                         </div>
                     </div>
 
-                    {/* Producto 3 */}
+
                     <div className="product-post">
                         <div className="product-image-container">
                             <img src="https://via.placeholder.com/300x200/D1C4E9/4A148C?Text=Prod+C" alt="Producto C" className="product-image"/>

@@ -584,3 +584,80 @@ body {
     max-width: 90%;
   }
 }
+
+
+
+/* WILLI */
+.wcontainer {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .wcontainer h1 {
+    color: #333;
+    font-size: 2em;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  
+  .wsummary {
+    background-color: #f0f8ff;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  
+  .wsection {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #eee;
+  }
+  
+  .wsection:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+  
+  .wsection h2 {
+    color: #555;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    border-left: 4px solid #007bff;
+    padding-left: 10px;
+  }
+  
+  .wlist {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .wlistItem {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .wlistItem h3 {
+    color: #007bff;
+    font-size: 1.2em;
+    margin-top: 0;
+    margin-bottom: 8px;
+  }
+  
+  .wlistItem p {
+    line-height: 1.5;
+    margin-bottom: 5px;
+  }
+  
+  .wlistItem p strong {
+    color: #333;
+  }
