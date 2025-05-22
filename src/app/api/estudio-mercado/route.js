@@ -29,9 +29,25 @@ export async function GET(request){
 export async function POST(request){
 
     connectDB();
-    
+    const searchParams = new URL(request.url).searchParams;
+    const idProyecto = await searchParams.get('p'); 
     const data = await request.json();
-    const newEstudioMercado = new EstudioMercado(data)
-    const savedEstudioMercado = await newEstudioMercado.save()    
-   return NextResponse.json({"message": `holas EstudioMercado POST: ${savedEstudioMercado}`});
+
+    if(data){
+        console.log("=============   DATA    ==================")
+        const Estudio = JSON.parse(data);
+        Estudio['id_proyecto']=idProyecto;
+        console.log(Estudio)
+
+
+        const newEstudioMercado = new EstudioMercado(Estudio)
+        const savedEstudioMercado = await newEstudioMercado.save()    
+        return NextResponse.json({"message": `holas EstudioMercado POST: ${savedEstudioMercado}`});
+    }   else    {
+        console.log("=============   DATA NULL !!   ==================")
+        console.log(data)
+        return NextResponse.json({ message: "Error al rescatar la data de EstudioMercado en el Request" }, { status: 500 });
+    }
+
+    
 }

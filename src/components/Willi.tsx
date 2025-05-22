@@ -2,16 +2,41 @@
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import JsonToPrompt from "@/utils/JsonToPrompt";
 import EstudioMercadoDisplay from "./EstudioMercadoDisplay";
+import jsonPure from "@/utils/jsonPure";
 
+interface Tendencia {
+  nombre: string;
+  descripcion: string;
+  relevancia: string;
+}
 
+interface Oportunidad {
+  nombre: string;
+  descripcion: string;
+  alineacion: string;
+}
+
+interface Desafio {
+  nombre: string;
+  descripcion: string;
+}
+
+// Estructura completa del objeto EstudioMercado
+interface EstudioMercado {
+  nombre_del_estudio: string;
+  resumen_competitivo: string;
+  tendencias_clave_mercado: Tendencia[];
+  oportunidades_principales: Oportunidad[];
+  desafios_clave: Desafio[];
+  recomendaciones_iniciales: string;
+}
 
 const Willi = () => {
   const router = useRouter()
   const searchParams = useSearchParams();
   const idProyecto = searchParams.get('id');
-  const [dataEstudioMercado, setDataEstudioMercado] = useState<string | null>(null);
+  const [dataEstudioMercado, setDataEstudioMercado] = useState<EstudioMercado | null>(null);
   const [dataEstrategiaMarketing, setDataEstrategiaMarketing] = useState<string | null>(null);
   const [dataCampaniaMarketing, setDataCampaniaMarketing] = useState<string | null>(null);
 
@@ -30,10 +55,17 @@ const Willi = () => {
 
       try {
         // Consulta inicial para verificar la existencia del estudio de mercado
+
         const existenciaResponse = await fetch(`/api/estudio-mercado?p=${idProyecto}`);
         const existenciaData = await existenciaResponse.json();
 
-        if (existenciaData.id_proyecto == null){
+        console.log('###########  SE VA A VERIFICAR EXISTENCIA DE Estudio en BD   ###############')
+        console.log('------ existenciaData ------')
+        //console.log(existenciaData)
+        console.log('------ existenciaData Lenght ------')
+        console.log(existenciaData.data.length)
+
+        if (existenciaData.data.length <= 0){
 
         
           //if (existenciaResponse.status === 404) {
@@ -73,7 +105,31 @@ const Willi = () => {
                     return;
                 }
                 const estudioData = await estudioResponse.json();
+                
                 setDataEstudioMercado(estudioData);
+                //guardar estudio en BD
+
+                //console.log('###########  SE VA A GUARDAR EL ESTUDIO EN BD   ###############')
+                //console.log('------ dataEstudioMercado ------')
+                //console.log(dataEstudioMercado)
+                //console.log('------ destudioData ------')
+                //console.log(estudioData)
+                //console.log('------ jsonPure destudioData ------')
+                const cleanStudio = jsonPure(estudioData);
+
+                const saveEstudioMercado = async () => {
+                  const res = await fetch('api/estudio-mercado?p='+idProyecto, {
+                    method: "POST",
+                    body: JSON.stringify(cleanStudio),
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  });
+                };
+                saveEstudioMercado();
+
+
+
                 // end ######### ESTUDIO  #########
                 // ---------------------------------------//
 
@@ -112,8 +168,7 @@ const Willi = () => {
           }
         } else {
           // El estudio de mercado ya existe
-          const estudioData = await existenciaResponse.json();
-          setDataEstudioMercado(estudioData);
+          setDataEstudioMercado(existenciaData.data);
         }
       } catch (err: any) {
         setError(`Ocurrió un error inesperado: ${err.message}`);
@@ -126,26 +181,26 @@ const Willi = () => {
   }, [idProyecto]);
 
   if (isLoading) {
-    return <div>Cargando datos del Estrategia de Marketing...</div>;
+    return <div>Cargando datos del dataEstudioMercado  ...</div>;
   }
 
   if (error) {
-    return <div>Error al cargar los datos Estrategia de Marketing: {error}</div>;
+    return <div>Error al cargar los datos dataEstudioMercado  : {error}</div>;
   }
 
   if (dataEstudioMercado) {
     
     return (
         <div>
-            <h2>Datos Estudio Mercado para el Proyecto: {idProyecto}</h2>
+            <h1>Estudio Mercado</h1>
             <div>
-                <EstudioMercadoDisplay Jestudio={`${dataEstudioMercado}`} />
+                <EstudioMercadoDisplay Jestudio={dataEstudioMercado} />
             </div>
         </div>
     )
 
     }
-  return <div>No se encontraron datos del estudio de mercado para este proyecto.</div>;
+  return <div>No se encontraron datos generados por Willi para este proyecto.</div>;
 }
 
 export default Willi;

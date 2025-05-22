@@ -29,8 +29,6 @@ export async function POST(req) {
   const estrategiaData = JsonToPrompt(data.estrategia);
   const finalPrompt = getPrompt(makerData,estudioData,estrategiaData);
 
-  console.log(finalPrompt)
-
   try {
     const result = await model.generateContent(finalPrompt);    
 

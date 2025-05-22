@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import styles from './EstudioMercadoDisplay.module.css'; // Opcional: si usas módulos CSS
+import jsonPure from '@/utils/jsonPure';
+
 
 // --- Interfaces para definir la estructura de los datos ---
 
@@ -34,14 +35,23 @@ interface EstudioMercado {
 
 // Definición de las props que el componente EstudioMercadoDisplay espera recibir
 interface EstudioMercadoDisplayProps {
-  Jestudio: string | null; // Puede ser un objeto EstudioMercado o null
+  Jestudio: EstudioMercado | null; // Puede ser un objeto EstudioMercado o null
 }
 
+
+
 const EstudioMercadoDisplay: React.FC<EstudioMercadoDisplayProps> = ({ Jestudio }) => {
-  if (!Jestudio) {
+
+  const stringStudio = Jestudio as any as String
+  
+  const cleanStudio = jsonPure(stringStudio);
+  //console.log(cleanStudio)
+  
+  const estudio = JSON.parse(cleanStudio);
+  if (!estudio) {
     return <p>Cargando estudio de mercado o no hay datos...</p>;
   }
-  const estudio = Jestudio as any;
+  //const estudio = estudio as any;
   return (
     <div className="wcontainer">
       <h1>{estudio.nombre_del_estudio}</h1>

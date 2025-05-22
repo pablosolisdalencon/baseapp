@@ -1,4 +1,5 @@
 import {schemaEstudioMercado, schemaEstrategiaMarketing, schemaCampaniaMarketing} from "@/ia-utils/schemas-Responses";
+import JsonToPrompt from "@/utils/JsonToPrompt";
 
 function promptEpicMode(){
     return(`
@@ -7,7 +8,7 @@ function promptEpicMode(){
         
       INSTRUCCIONES CLAVE:
         1.  Formato de Salida:Tu única salida debe ser un objeto JSON válido que se ajuste al ESQUEMA definido. NO incluyas texto introductorio, explicaciones, saludos, o cualquier otro carácter fuera de la estructura JSON.
-        2.  Precisión y Conclusión: Asegúrate de que el JSON sea completo, válido y cierre correctamente, utiliza el ESQUEMA como schemaJson no como template.
+        2.  Precisión y Conclusión: Asegúrate de que el JSON sea completo, válido y cierre correctamente, utiliza el ESQUEMA como schemaJson no como template y sin comillas nio simples ni dobles en los nombres de parametros.
         3.  Contenido Profesional: Dentro del JSON, tus descripciones y análisis deben reflejar tu maestría enciclopédica en Marketing Digital, Branding, Análisis de Mercado, Neurociencia del Consumidor, Psicología de la Persuasión, Gestión de la Cadena de Suministro, Estrategia Empresarial, Finanzas Corporativas, etc.
         4.  Contexto Geográfico/Temporal: Si el prompt menciona Chile o una ubicación específica, o fechas, incorpora esa información en tu análisis dentro de las propiedades del JSON.
         
@@ -17,6 +18,7 @@ function promptEpicMode(){
 
 
 function promptEstudioMercado(makerData){
+    const textEstudioMercado = JsonToPrompt(schemaEstudioMercado);
     return(`
       INSTRUCCION GENERAL:
       ${promptEpicMode}
@@ -25,7 +27,7 @@ function promptEstudioMercado(makerData){
       Realiza un estudio de mercado exhaustivo utilizando todas tus capacidades y respondiendo en espanol y con la estructura establecida basandote en la descripcion de contexto de la INFORMACION DEL PROYECTO.
       
       ESQUEMA JSON:
-      ${schemaEstudioMercado}
+      ${textEstudioMercado}
 
       INFORMACION DEL PROYECTO:
       ${makerData}
@@ -33,6 +35,8 @@ function promptEstudioMercado(makerData){
 }
 
 function promptEstrategiaMarketing(makerData,estudioData){
+    
+    const textEstrategiaMarketing = JsonToPrompt(schemaEstrategiaMarketing);
     return(`
         INSTRUCCION GENERAL:
         ${promptEpicMode}
@@ -41,7 +45,7 @@ function promptEstrategiaMarketing(makerData,estudioData){
         Realiza una estrategia super efectiva, eficaz y eficiente utilizando todas tus capacidades y respondiendo en espanol y con la estructura establecida basandote en la descripcion de contexto de la INFORMACION DEL PROYECTO y ESTUDIO MERCADO.
               
         ESQUEMA JSON:
-        ${schemaEstudioMercado}
+        ${textEstrategiaMarketing}
   
         INFORMACION DEL PROYECTO:
         ${makerData}
@@ -52,6 +56,8 @@ function promptEstrategiaMarketing(makerData,estudioData){
 }
 
 function promptCampaniaMarketing(makerData,estudioData,estrategiaData){
+    
+    const textCampaniaMarketing = JsonToPrompt(schemaCampaniaMarketing);
     return(`
         INSTRUCCION GENERAL:
         ${promptEpicMode}
@@ -60,7 +66,7 @@ function promptCampaniaMarketing(makerData,estudioData,estrategiaData){
         Realiza una campania de marketing digital detallada super efectiva, eficaz y eficiente utilizando todas tus capacidades y respondiendo en espanol y con la estructura establecida basandote en la descripcion de contexto de la INFORMACION DEL PROYECTO, ESTUDIO MERCADO y ESTRATEGIA MARKETING.
               
         ESQUEMA JSON:
-        ${schemaCampaniaMarketing}
+        ${textCampaniaMarketing}
 
         INFORMACION DEL PROYECTO:
         ${makerData}
@@ -77,11 +83,11 @@ function promptCampaniaMarketing(makerData,estudioData,estrategiaData){
 
 export default function getPrompt(makerData,estudioData,estrategiaData){
 
-    if(makerData && !estudioData && !estrategiaData){
+    if(makerData && estudioData=='undefined' && estrategiaData=='undefined'){
         return(promptEstudioMercado(makerData))
     }
     
-    if(makerData && estudioData && !estrategiaData){
+    if(makerData && estudioData && estrategiaData=='undefined'){
         return(promptEstrategiaMarketing(makerData,estudioData))
     }
 

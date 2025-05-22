@@ -27,7 +27,7 @@ const estudioMercadoSchema = new Schema({
     ],
     resumen_competitivo: String
   },
-  tendencias_del_mercado_de_renovacion_de_fachadas: {
+  tendencias_del_mercado: {
     descripcion_general: String,
     tendencias: [
       {

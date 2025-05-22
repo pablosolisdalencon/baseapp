@@ -19,5 +19,10 @@ export default function jsonToPrompt(jsonObject) {
     });
   
     // Unimos todas las líneas con un salto de línea
-    return lines.join('\n').replace(/"/g, '').replace(/{/g, '').replace(/}/g, '');
+    return lines.join(`
+      `).replace(/"/g, '').replace(/{/g, `
+      `).replace(/}/g, `
+      `).replace(/.,/g, `
+      `).replace(/],/g, `
+      `).replace(/```json/g, "");
   }
