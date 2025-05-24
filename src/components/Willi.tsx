@@ -64,12 +64,15 @@ const Willi = () => {
         //console.log(existenciaData)
         console.log('------ existenciaData Lenght ------')
         console.log(existenciaData.data.length)
+        console.log(existenciaData.data[0])
 
         if (existenciaData.data.length <= 0){
+          console.log("--------------- existenciaData.data.length <=  -------------")
 
         
           //if (existenciaResponse.status === 404) {
           if (existenciaData.id_proyecto != idProyecto) {
+            console.log("--------------- existenciaData.id_proyecto != idProyecto <=  -------------")
             // Flujo > [ 1 ] No existe, CREAR ESTUDIO MERCADO
 
                 // ---------------------------------------//
@@ -104,6 +107,7 @@ const Willi = () => {
                     setIsLoading(false);
                     return;
                 }
+                
                 const estudioData = await estudioResponse.json();
                 
                 setDataEstudioMercado(estudioData);
@@ -164,11 +168,13 @@ const Willi = () => {
 
             */
           } else {
+            console.log("--------------- existenciaData.id_proyecto == idProyecto <=  -------------")
             setError(`Error al verificar existencia del estudio de mercado: ${existenciaResponse}`);
           }
         } else {
+          console.log("--------------- existenciaData.data.length mayor = a 1  -------------")
           // El estudio de mercado ya existe
-          setDataEstudioMercado(existenciaData.data);
+          setDataEstudioMercado(existenciaData.data[0]);
         }
       } catch (err: any) {
         setError(`Ocurrió un error inesperado: ${err.message}`);
