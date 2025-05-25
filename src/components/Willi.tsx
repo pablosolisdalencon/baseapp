@@ -71,7 +71,7 @@ const Willi = () => {
 
         
           //if (existenciaResponse.status === 404) {
-          if (existenciaData.id_proyecto != idProyecto) {
+          
             console.log("--------------- existenciaData.id_proyecto != idProyecto <=  -------------")
             // Flujo > [ 1 ] No existe, CREAR ESTUDIO MERCADO
 
@@ -90,7 +90,7 @@ const Willi = () => {
                 // ---------------------------------------//
 
 
-
+                const makerDataPure = jsonPure(makerData)
                 // ######### ESTUDIO  #########
                 // Llamamos a /api/willi para solicitar el estudio de mercado con el prompt de maker
                 const estudioResponse = await fetch(`/api/willi`, {
@@ -98,7 +98,7 @@ const Willi = () => {
                     headers: {
                     'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ maker: makerData }),
+                    body: JSON.stringify({ maker: makerDataPure }),
                 });
 
                 if (!estudioResponse.ok) {
@@ -167,14 +167,18 @@ const Willi = () => {
             setDataEstrategiaMarketing(estrategiaData);
 
             */
-          } else {
+          
+        } else {
+          if (!existenciaData.data[0].id_proyecto) {
             console.log("--------------- existenciaData.id_proyecto == idProyecto <=  -------------")
             setError(`Error al verificar existencia del estudio de mercado: ${existenciaResponse}`);
-          }
-        } else {
-          console.log("--------------- existenciaData.data.length mayor = a 1  -------------")
+          } else {
+            console.log("--------------- existenciaData.data.length mayor = a 1  -------------")
           // El estudio de mercado ya existe
           setDataEstudioMercado(existenciaData.data[0]);
+            
+          }
+          
         }
       } catch (err: any) {
         setError(`Ocurrió un error inesperado: ${err.message}`);

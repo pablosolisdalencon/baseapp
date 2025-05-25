@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from '../../../utils/mongoose';
 import { closeDB } from '../../../utils/mongoose';
 import EstudioMercado from '@/models/EstudioMercado';
+import JsonPure from '@/utils/jsonPure';
 import { URL } from 'url';
 
 export async function GET(request){
@@ -34,13 +35,14 @@ export async function POST(request){
     const data = await request.json();
 
     if(data){
-        console.log("=============   DATA    ==================")
-        const Estudio = JSON.parse(data);
-        Estudio['id_proyecto']=idProyecto;
-        console.log(Estudio)
-
-
-        const newEstudioMercado = new EstudioMercado(Estudio)
+      console.log("=============   DATA    ==================")
+      console.log(data)
+         /* const PureEstudio = JsonPure(data)
+        const Estudio = JSON.stringify(PureEstudio);
+        console.log(data)
+      */  
+        const Jdata = JSON.parse(data)
+        const newEstudioMercado = new EstudioMercado(Jdata)
         const savedEstudioMercado = await newEstudioMercado.save()    
         return NextResponse.json({"message": `holas EstudioMercado POST: ${savedEstudioMercado}`});
     }   else    {

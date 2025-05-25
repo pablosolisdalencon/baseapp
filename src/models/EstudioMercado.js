@@ -1,69 +1,82 @@
 import {Schema, model, models} from 'mongoose';
-
-const estudioMercadoSchema = new Schema({
+const EstudioMercadoSchema = new Schema({
   id_proyecto: {
     type: String,
-    required: [true,'El id_proyecto es requerido'],
+    required: true,
+    description: "valor de _id en INFORMACION PROYECTO"
   },
-  nombre_del_estudio: String,
-  fecha_de_realizacion: Date,
-  analisis_de_la_competencia: {
-    descripcion_general: String,
-    competidores: [
-      {
-        nombre: String,
-        descripcion_oferta: String,
-        fortalezas: [String],
-        debilidades: [String],
-        presencia_online: {
-          sitio_web: String,
-          redes_sociales: [String],
-          estrategias_digitales_observadas: [String]
-        },
-        presencia_offline: String,
-        cuota_de_mercado_estimada: String
-      }
-     
-    ],
-    resumen_competitivo: String
+  resumen_competitivo: {
+    type: String,
+    required: true,
+    trim: true,
+    description: "Resumen de las principales tendencias y la intensidad de la competencia."
   },
-  tendencias_del_mercado: {
-    descripcion_general: String,
-    tendencias: [
-      {
-        nombre: String,
-        descripcion: String,
-        relevancia_para_el_proyecto: String
-      }
-      
-    ],
-    proyecciones_futuras: String
+  tendencias_clave_mercado: [{
+    nombre: {
+      type: String,
+      required: true,
+      trim: true,
+      description: "Nombre de la tendencia."
+    },
+    descripcion: {
+      type: String,
+      required: true,
+      trim: true,
+      description: "Descripción de la tendencia."
+    },
+    relevancia: {
+      type: String,
+      required: true,
+      trim: true,
+      description: "Relevancia para el proyecto."
+    }
+  }],
+  oportunidades_principales: [{
+    nombre: {
+      type: String,
+      required: true,
+      trim: true,
+      description: "Nombre de la oportunidad."
+    },
+    descripcion: {
+      type: String,
+      required: true,
+      trim: true,
+      description: "Descripción de la oportunidad."
+    },
+    alineacion: {
+      type: String,
+      required: true,
+      trim: true,
+      description: "Cómo se alinea con el proyecto."
+    }
+  }],
+  desafios_clave: [{
+    nombre: {
+      type: String,
+      required: true,
+      trim: true,
+      description: "Nombre del desafío."
+    },
+    descripcion: {
+      type: String,
+      required: true,
+      trim: true,
+      description: "Descripción del desafío."
+    }
+  }],
+  target_objetivo: {
+    type: String,
+    required: true,
+    trim: true,
+    description: "Definicion de targets principales basados en el análisis."
   },
-  oportunidades_para_el_proyecto: {
-    descripcion_general: String, 
-    oportunidades: [
-      {
-        nombre: String, 
-        descripcion: String, 
-        alineacion_con_el_proyecto: String 
-      }
-    
-    ],
-    priorizacion_de_oportunidades: String 
-  },
-  posibles_desafios_para_el_proyecto: {
-    descripcion_general: String, 
-    desafios: [
-      {
-        nombre: String,
-        descripcion: String, 
-        estrategias_de_mitigacion_sugeridas: [String]
-      }
-      
-    ],
-    evaluacion_de_la_severidad_de_los_desafios: String 
-  },
-  resumen_general_del_mercado: String,
-  recomendaciones_iniciales: String
-});
-export default models.EstudioMercado || model('EstudioMercado', estudioMercadoSchema)
+  recomendaciones_iniciales: {
+    type: String,
+    required: true,
+    trim: true,
+    description: "Recomendaciones iniciales basadas en el análisis."
+  }
+}, { timestamps: true }); // `timestamps` añade `createdAt` y `updatedAt` automáticamente
+
+export default models.EstudioMercado || model('EstudioMercado', EstudioMercadoSchema)

@@ -1,5 +1,8 @@
 const schemaEstudioMercado = {
-
+    id_proyecto: {
+    type: "string",
+    description: "valor de _id en INFORMACION PROYECTO"
+    },
     resumen_competitivo: {
     type: "string",
     description: "Resumen de las principales tendencias y la intensidad de la competencia."
