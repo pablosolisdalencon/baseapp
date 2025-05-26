@@ -1,4 +1,4 @@
-'use client';
+/*'use client';
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -122,7 +122,6 @@ const EstrategiaMarketingComponent = () => {
       <div>
         <h2>Datos Estrategia de Marketing para el Proyecto: {idProyecto}</h2>
         <textarea>{JSON.stringify(dataEstrategiaMarketing, null, 2)}</textarea>
-        {/* Aquí puedes renderizar los datos del estudio de mercado de forma más visual */}
       </div>
     );
   }
@@ -131,3 +130,69 @@ const EstrategiaMarketingComponent = () => {
 };
 
 export default EstrategiaMarketingComponent;
+
+
+
+
+
+
+// Componente para mostrar la Estrategia de Marketing
+const EstrategiaMarketingDisplay = ({ EstrategiaInput, onSave, showSaveButton = false }) => {
+  if (!EstrategiaInput) return null;
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <h3 className="text-xl font-semibold text-gray-800 mb-4">Estrategia de Marketing</h3>
+      <div className="bg-gray-50 p-4 rounded-md">
+        <pre className="text-sm text-gray-700 whitespace-pre-wrap">
+          {JSON.stringify(EstrategiaInput, null, 2)}
+        </pre>
+      </div>
+      {showSaveButton && (
+        <button
+          onClick={onSave}
+          className="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+        >
+          Guardar Estrategia de Marketing
+        </button>
+      )}
+    </div>
+  );
+};
+*/
+'use client';
+
+import React from 'react'; // Necesario para .tsx
+import {
+  EstrategiaMarketingData,
+  DisplayProps,
+} from '../types/marketingWorkflowTypes'; // Asegúrate de ajustar la ruta
+
+
+
+
+
+const EstrategiaMarketingDisplay: React.FC<DisplayProps<EstrategiaMarketingData>> = ({ Input: EstrategiaInput, onSave, showSaveButton = false }) => {
+  if (!EstrategiaInput) return null;
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <h3 className="text-xl font-semibold text-gray-800 mb-4">Estrategia de Marketing</h3>
+      <div className="bg-gray-50 p-4 rounded-md">
+        <pre className="text-sm text-gray-700 whitespace-pre-wrap">
+          {JSON.stringify(EstrategiaInput, null, 2)}
+        </pre>
+      </div>
+      {showSaveButton && onSave && (
+        <button
+          onClick={() => onSave(EstrategiaInput)}
+          className="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+        >
+          Guardar Estrategia de Marketing
+        </button>
+      )}
+    </div>
+  );
+};
+
+export default EstrategiaMarketingDisplay

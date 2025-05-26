@@ -1,10 +1,16 @@
 import Willi from "@/components/Willi";
 import { Suspense } from "react";
+import StepByStepWilli from '@/components/StepByStepWilli'
 
 export default function MktViewer(){
 
+    return (
+            <Suspense><StepByStepWilli/></Suspense>
+    )
+}
     //const idProyecto = "67f99da9f7b90ff068b870b2"
 // <Suspense><EstudioMercadoComponent/></Suspense>
+/*
     return(
     <div className="mkt-viewer-container">     
         <Suspense><Willi/></Suspense>
@@ -12,7 +18,6 @@ export default function MktViewer(){
         <h2 className="mkt-subtitle">Marketing Digital</h2>
 
         <div className="main-cards-container">
-            {/* Tarjeta 1: Post de Presentación de Marca (Elegante) */}
             <div className="elegant-card">
                 <div className="card-header">
                     <h3 className="card-title">Presentamos Nuestra Nueva Imagen de Marca</h3>
@@ -24,7 +29,6 @@ export default function MktViewer(){
                 </div>
             </div>
 
-            {/* Tarjeta 2: Post de Contenido (Artículo Horizontal) */}
             <div className="horizontal-card">
                 <img src="https://via.placeholder.com/400x300/C8E6C9/1B5E20?Text=Artículo" alt="Imagen del Artículo" className="horizontal-card-image"/>
                 <div className="horizontal-card-content">
@@ -34,7 +38,6 @@ export default function MktViewer(){
                 </div>
             </div>
 
-            {/* Tarjeta 3: Posts de Productos (Grid de 3 Columnas Horizontal) */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden p-6">
                 <h3 className="card-title mb-4">Nuestros Productos Destacados</h3>
                 <div className="product-grid">
@@ -79,3 +82,5 @@ export default function MktViewer(){
     </div>
     )
 }
+
+*/
