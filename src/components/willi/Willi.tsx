@@ -2,7 +2,7 @@
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import EstudioMercadoDisplay from "./EstudioMercadoDisplay";
+import EstudioMercadoDisplay from "./../EstudioMercadoDisplay";
 import jsonPure from "@/utils/jsonPure";
 
 interface Tendencia {
