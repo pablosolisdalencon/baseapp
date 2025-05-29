@@ -1,11 +1,10 @@
-import Willi from "@/components/Willi";
 import { Suspense } from "react";
-import StepByStepWilli from '@/components/StepByStepWilli'
+import MarketingWorkflow from "./../../components/willi/williWorkFlow";
 
 export default function MktViewer(){
 
     return (
-            <Suspense><StepByStepWilli/></Suspense>
+            <Suspense><MarketingWorkflow/></Suspense>
     )
 }
     //const idProyecto = "67f99da9f7b90ff068b870b2"
