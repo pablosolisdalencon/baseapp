@@ -83,15 +83,15 @@ function promptCampaniaMarketing(makerData,estudioData,estrategiaData){
 
 export default function getPrompt(makerData,estudioData,estrategiaData){
 
-    if(makerData && estudioData=='undefined' && estrategiaData=='undefined'){
+    if(makerData!='undefined' && estudioData=='undefined' && estrategiaData=='undefined'){
         return(promptEstudioMercado(makerData))
     }
     
-    if(makerData && estudioData && estrategiaData=='undefined'){
+    if(makerData!='undefined' && estudioData!='undefined' && estrategiaData=='undefined'){
         return(promptEstrategiaMarketing(makerData,estudioData))
     }
 
-    if(makerData && estudioData && estrategiaData){
+    if(makerData!='undefined' && estudioData!='undefined' && estrategiaData!='undefined'){
         return(promptCampaniaMarketing(makerData,estudioData,estrategiaData))
     }
 }

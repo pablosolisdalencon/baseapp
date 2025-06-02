@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import EstudioMercado from "@/models/EstudioMercado";
 import JsonToPrompt from "@/utils/JsonToPrompt";
 import getPrompt from "@/ia-utils/templates-Prompts";
+import jsonPure from "@/utils/jsonPure";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || "");
 const model = genAI.getGenerativeModel({
@@ -24,15 +25,19 @@ const model = genAI.getGenerativeModel({
 
 export async function POST(req) {
   const data = await req.json();
-  const makerData = JsonToPrompt(data.maker);
-  const estudioData = JsonToPrompt(data.estudio);
-  const estrategiaData = JsonToPrompt(data.estrategia);
+  const makerData = data.maker;
+  const estudioData = data.estudio;
+  const estrategiaData = data.estrategia;
   const finalPrompt = getPrompt(makerData,estudioData,estrategiaData);
+  console.log("++++++++ WILLI SAY +++++++++")
+  console.log(`GET PROMPT: ${makerData},${estudioData},${estrategiaData}`)
 
   try {
-    const result = await model.generateContent(finalPrompt);    
+    const result = await model.generateContent(finalPrompt); 
+    console.log("++++++++ WILLI Generate content say +++++++++")
+    console.log(`reult ${jsonPure(JSON.stringify(result.response.text()))}`)   
 
-    return NextResponse.json(result.response.text());
+    return NextResponse.json(jsonPure(result.response.text()));
 
   } catch (error) {
     console.error("Error generating content:", error);

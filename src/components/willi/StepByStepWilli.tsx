@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from "next/navigation";
+
 import React from 'react'; // Necesario para .tsx
 import GWV from '@/utils/GWV';
 import {
@@ -21,7 +23,11 @@ interface MarketingWorkflowProps {
   idProyecto?: string;
 }
 
-const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyecto = "proyecto-123" }) => {
+  
+  
+const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
+  const searchParams = useSearchParams();
+  const idProyecto = searchParams.get('id');
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -69,25 +75,26 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyecto = "pro
     const checkExistence = async () => {
       setIsLoading(true);
       setError(null);
+      
 
       try {
         if (currentStep === 1) {
-          setItemActual("estudio-mercado");
-          const estudioExistente = await GWV(projectId,itemActual);
+          setItemActual("estudio-mercado")
+          const estudioExistente = await GWV(projectId,"estudio-mercado");
           setExisteEstudio(!!estudioExistente);
           if (estudioExistente) {
             setDataEstudioMercado(estudioExistente);
           }
         } else if (currentStep === 2) {
-          setItemActual("estrategia-marketing");
-          const estrategiaExistente = await GWV(projectId,itemActual,dataEstrategiaMarketing);
+          setItemActual("estrategia-marketing")
+          const estrategiaExistente = await GWV(projectId,"estrategia-marketing",dataEstrategiaMarketing);
           setExisteEstrategia(!!estrategiaExistente);
           if (estrategiaExistente) {
             setDataEstrategiaMarketing(estrategiaExistente);
           }
         } else if (currentStep === 3) {
-          setItemActual("campania-marketing");
-          const campaniaExistente = await GWV(projectId,itemActual,dataCampaniaMarketing);
+          setItemActual("campania-marketing")
+          const campaniaExistente = await GWV(projectId,"campania-marketing",dataCampaniaMarketing);
           setExisteCampania(!!campaniaExistente);
           if (campaniaExistente) {
             setDataCampaniaMarketing(campaniaExistente);
@@ -130,7 +137,8 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyecto = "pro
       if (!dataEstudioMercado) {
         throw new Error("Estudio de mercado es requerido para generar estrategia.");
       }
-      const estrategiaData = await GWV(projectId,"estrategia-marketing",dataEstrategiaMarketing);
+      setItemActual("estrategia-marketing");
+      const estrategiaData = await GWV(projectId,"estrategia-marketing",dataEstudioMercado);
       setDataEstrategiaMarketing(estrategiaData as EstrategiaMarketingData);
     } catch (err: any) {
       setError("Error al generar estrategia de marketing: " + err.message);
@@ -148,7 +156,8 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyecto = "pro
       if (!dataEstrategiaMarketing) {
         throw new Error("Estrategia de marketing es requerida para generar campaña.");
       }
-      const campaniaData = await GWV(projectId,"campania-marketing");
+      setItemActual("campania-marketing");
+      const campaniaData = await GWV(projectId,"campania-marketing",dataEstudioMercado,dataEstrategiaMarketing);
       setDataCampaniaMarketing(campaniaData as CampaniaMarketingData);
     } catch (err: any) {
       setError("Error al generar campaña de marketing: " + err.message);
