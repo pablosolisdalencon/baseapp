@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import EstudioMercado from "@/models/EstudioMercado";
 import JsonToPrompt from "@/utils/JsonToPrompt";
 import getPrompt from "@/ia-utils/templates-Prompts";
+import jsonPure from "@/utils/jsonPure";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || "");
 const model = genAI.getGenerativeModel({
@@ -24,13 +25,12 @@ const model = genAI.getGenerativeModel({
 
 export async function POST(req) {
   const data = await req.json();
-<<<<<<< HEAD
   console.log("++++++++ WILLI SAY data +++++++++")
   console.log(data)
   let makerData= null
   let estudioData= null
   let estrategiaData= null
-  if(data.maker){
+  if(data.maker!=null){
     console.log("++++++++ WILLI SAY {hay maker}+++++++++")
     const makerData = data.maker;
   }
@@ -44,21 +44,14 @@ export async function POST(req) {
   }
    
   
-=======
-  const makerData = JsonToPrompt(data.maker);
-  const estudioData = JsonToPrompt(data.estudio);
-  const estrategiaData = JsonToPrompt(data.estrategia);
->>>>>>> 622eccce733ff14852b0ad547f45e5dead89d5bd
   const finalPrompt = getPrompt(makerData,estudioData,estrategiaData);
+  console.log("++++++++ WILLI SAY +++++++++")
+  console.log(`GET PROMPT: ${makerData},${estudioData},${estrategiaData}`)
 
   try {
-<<<<<<< HEAD
     const result = await model.generateContent(finalPrompt); 
     console.log("++++++++ WILLI Generate content say +++++++++")
     console.log(`reult ${result.response.text()}`)   
-=======
-    const result = await model.generateContent(finalPrompt);    
->>>>>>> 622eccce733ff14852b0ad547f45e5dead89d5bd
 
     return NextResponse.json(result.response.text());
 
