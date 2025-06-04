@@ -15,6 +15,7 @@ import EstudioMercadoDisplay from './../EstudioMercadoDisplay';
 import EstrategiaMarketingDisplay from './../EstrategiaMarketingDisplay';
 import CampaniaMarketingDisplay from './../CampaniaMarketingDisplay';
 import jsonPure from "@/utils/jsonPure";
+import JsonToPrompt from "@/utils/JsonToPrompt";
 
 // --- Componente principal del Flujo de Marketing ---
 interface MarketingWorkflowProps {
@@ -24,8 +25,9 @@ interface MarketingWorkflowProps {
 
 const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
   const searchParams = useSearchParams();
+  const idP = searchParams.get('id')
 
-  const [idProyecto,setIdProyecto] = useState("null") 
+  const [idProyecto,setIdProyecto] = useState(idP) 
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -137,7 +139,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
 
   const getMakerData = async (idProyecto: string): Promise<MakerData> => {
     // Llamamos a /api/willi para solicitar el estudio de mercado con el prompt de maker
-                     const response = await fetch(`/api/maker?p${idProyecto}`, {
+                     const response = await fetch(`/api/maker?p=${idProyecto}`, {
                          method: 'GET',
                          headers: {
                          'Content-Type': 'application/json',
@@ -145,13 +147,14 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
                      });
      
                      if (!response.ok) {
-                         console.log(`Error al llamar a /api/maker (con id_proyecto): ${idProyecto}`)
-                         setError(`Error al llamar a /api/maker (con id_proyecto): ${idProyecto}`);
+                         console.log(`Error al llamar a /api/maker (con id_proyecto): ${idProyecto} data ${response}`)
+                         setError(`Error al llamar a /api/maker (con id_proyecto): ${idProyecto} data ${response}`);
                          setIsLoading(false);
                      }
                      
                      const data = await response.json();
-                     
+                     const datos = JSON.stringify(data);
+                     setError(`Make Done ${idProyecto} data ${datos}`);
                      setDataMaker(data);
                      //guardar estudio en BD
         return data
@@ -172,10 +175,14 @@ console.log(bodyData)
                          body: JSON.stringify({ maker: bodyData.maker }),
                      });
      
+
                      if (!response.ok) {
-                         console.log(`Error al llamar a /api/willi/estudio-mercado (con id_proyecto): ${idProyecto}`)
-                         setError(`Error al llamar a /api/willi/estudio-mercado (con id_proyecto): ${idProyecto}`);
-                         setIsLoading(false);2
+                         console.log(`Error al llamar a /api/maker (con id_proyecto): ${idProyecto}`)
+                         setError(`Error al llamar a /api/maker (con id_proyecto): ${idProyecto}`);
+                         setIsLoading(false);
+                     }
+                     
+                     const data = await response.json();
                      
                      setDataEstudioMercado(data);
                      //guardar estudio en BD
@@ -317,10 +324,11 @@ console.log(bodyData)
     setError(null);
 
     try {
-      const makerData = await getMakerData(idProyecto);
+      const makerData = await getMakerData(idProyecto as string);
       setDataMaker(makerData);
+      const  makerDataP = JsonToPrompt(makerData)
 
-      const estudioData = await callWilliAPI({ maker: makerData });
+      const estudioData = await callWilliAPI({ maker: makerDataP as unknown as MakerData });
       // Aquí puedes añadir validación para asegurarte de que el tipo sea correcto
       setDataEstudioMercado(estudioData as EstudioMercadoData);
     } catch (err: any) {
