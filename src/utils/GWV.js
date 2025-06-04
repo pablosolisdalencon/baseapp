@@ -16,28 +16,36 @@ async function getDataItem(projectId,item){
           // La API debería devolver los datos del item directamente.
           const res  = await response.json();
           const data = res.data;
-          console.log(`verifyDataItem verify OK =======================`)
-          console.log(data)
-          //-------------------------/
-          //  FIN OK
-          //-------------------------/
-          return data;
-          //-------------------------/
+
+          if(data[0]){
+            console.log(`getDataItem verify OK =======================`)
+            console.log(data)
+
+            //-------------------------/
+            //  FIN OK
+            //-------------------------/
+            return data[0];
+            //-------------------------/
+          }else{
+            console.log(`getDataItem ${item}: idProyecto(${projectId} Not Found =======================`)
+          return null
+          }
+          
 
         } else if (response.status === 404) {
           // Si la API devuelve 404 Not Found, significa que no existe el estudio para ese proyecto.
-          console.log(`verifyDataItem verify 404 ${item}: idProyecto(${projectId} Not Found =======================`)
+          console.log(`getDataItem verify 404 ${item}: idProyecto(${projectId} Not Found =======================`)
           return null
         } else {
           // Manejo de otros posibles errores de la API
           const errorData = await response.json();
-          throw new Error(errorData.message || `verifyDataItem Error al verificar ${item}: idProyecto(${projectId}) = status[${response.status}] StatusText [${response.statusText}]`);
+          throw new Error(errorData.message || `getDataItem Error al verificar ${item}: idProyecto(${projectId}) = status[${response.status}] StatusText [${response.statusText}]`);
         }
 
     } catch (error) {
-        console.error(` verifyDataItem Fallo al verificar ${item}: idProyecto(${projectId})`, error);
+        console.error(` getDataItem Fallo al verificar ${item}: idProyecto(${projectId})`, error);
         // Relanza el error para que el componente lo maneje en el estado `error`
-        throw new Error(`verifyDataItem No se pudo verificar ${item}: idProyecto(${projectId}) ${error.message}`);
+        throw new Error(`getDataItem No se pudo verificar ${item}: idProyecto(${projectId}) ${error.message}`);
     }
 }
 
@@ -82,7 +90,7 @@ async function useWilli(projectId,item,maker,estudio,estrategia){
           //-------------------------/
 
         } else if (response.status === 404) {
-          // Si la API devuelve 404 Not Found, significa que no existe el estudio para ese proyecto.
+          // Si la API devuelve 404 Not Found, significa que no existe La api o seting para este artefacto?.
           console.log(`useWilli ${item}   404 Not Found =======================`)
           return null
         } else {
@@ -112,17 +120,18 @@ export default async function GWV(projectId,item,estudio,estrategia){
     if(verifyData==null){
 
         console.log(`=======  GWV  > is null?????))=======`)
-        const data = await useWilli(projectId,item,estudio[0],estrategia[0]);
+        const data = await useWilli(projectId,item,estudio,estrategia);
         if(data){
             // estudio creado
             console.log(`GWV.${item} OK!! generado !!`)
+            // si : save JOSN in Response...
             return jsonPure(data);
 
         }else{
             console.log(`GWV.${item} ERROR generando etsudio:${estudio} estrategia:${estrategia}`)
             return null
         }            
-        // si : save JOSN in Response
+        
     }else{
         // show JSON Response
         return verifyData;

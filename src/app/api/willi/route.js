@@ -25,9 +25,25 @@ const model = genAI.getGenerativeModel({
 
 export async function POST(req) {
   const data = await req.json();
-  const makerData = data.maker;
-  const estudioData = data.estudio;
-  const estrategiaData = data.estrategia;
+  console.log("++++++++ WILLI SAY data +++++++++")
+  console.log(data)
+  let makerData= null
+  let estudioData= null
+  let estrategiaData= null
+  if(data.maker){
+    console.log("++++++++ WILLI SAY {hay maker}+++++++++")
+    const makerData = data.maker;
+  }
+  if(data.estudio){
+    const estudioData = data.estudio;
+    console.log("++++++++ WILLI SAY {hay estudio}+++++++++")
+  }
+  if(data.estrategia){
+    const estrategiaData = data.estrategia;
+    console.log("++++++++ WILLI SAY {hay estrategia}+++++++++")
+  }
+   
+  
   const finalPrompt = getPrompt(makerData,estudioData,estrategiaData);
   console.log("++++++++ WILLI SAY +++++++++")
   console.log(`GET PROMPT: ${makerData},${estudioData},${estrategiaData}`)
@@ -35,9 +51,9 @@ export async function POST(req) {
   try {
     const result = await model.generateContent(finalPrompt); 
     console.log("++++++++ WILLI Generate content say +++++++++")
-    console.log(`reult ${jsonPure(JSON.stringify(result.response.text()))}`)   
+    console.log(`reult ${result.response.text()}`)   
 
-    return NextResponse.json(jsonPure(result.response.text()));
+    return NextResponse.json(result.response.text());
 
   } catch (error) {
     console.error("Error generating content:", error);
