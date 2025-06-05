@@ -1,6 +1,3 @@
-import jsonToPrompt from "./JsonToPrompt";
-import jsonPure from "./jsonPure";
-
 async function getDataItem(projectId,item){
     try 
     {
@@ -50,21 +47,22 @@ async function getDataItem(projectId,item){
 }
 
 async function useWilli(projectId,item,maker,estudio,estrategia){
-    
-    let bodyData;
+  let bodyData = JSON.stringify({  item: item, maker: maker, estudio: estudio, estrategia: estrategia });
+  /*  
+  let bodyData;
     if(item=='estudio-mercado'){
-        bodyData = JSON.stringify({  maker: maker });
+        bodyData = JSON.stringify({  item: item,maker: maker });
     }else if(item=='estrategia-marketing'){
-        bodyData = JSON.stringify({  maker: maker, estudio: estudio });
+        bodyData = JSON.stringify({  item: item,maker: maker, estudio: estudio });
     }else if(item=='campania-marketing'){
-        bodyData = JSON.stringify({  maker: maker, estudio: estudio, estrategia: estrategia });
+        bodyData = JSON.stringify({  item: item, maker: maker, estudio: estudio, estrategia: estrategia });
     }else{
         // SERA UN POST?
         console.log("LLEGAMOS AL POST!!! bodyData");
         console.log(bodyData);
         
     }
-    
+  */
     try 
     {
         const response = await fetch(`/api/willi`, {
@@ -80,13 +78,12 @@ async function useWilli(projectId,item,maker,estudio,estrategia){
           // La API debería devolver los datos del item directamente.
           const res  = await response.json();
 
-          const data = res.data;
-          console.log(`useWilli ${item} generado OK =======================`)
+          console.log(`useWilli ${item} generado OK ? =======================`)
           console.log(res)
           //-------------------------/
           //  FIN OK
           //-------------------------/
-          return data;
+          return res;
           //-------------------------/
 
         } else if (response.status === 404) {
@@ -106,35 +103,43 @@ async function useWilli(projectId,item,maker,estudio,estrategia){
     }
 }
 
-export default async function GWV(projectId,item,estudio,estrategia){
+export default async function GWV(mode,projectId,item,estudio,estrategia){
     console.log(`============  GWV  ===============`)
     console.log(`GWV.${item} id: !${projectId}! `)
     console.log(`GWV. estudio:!${estudio}!`)
     console.log(`GWV. estrategia !!${estudio}!!`)
 
 
-    console.log(`=======  GWV  > getDataItem(${projectId},${item})=======`)
-    const verifyData = await getDataItem(projectId,item)
+    
+    if(mode=='check'){
+      console.log(`=======  GWV  > getDataItem(${projectId},${item})=======`)
+      const verifyData = await getDataItem(projectId,item)
 
-    console.log(`=======  GWV  > if(${verifyData}==null))=======`)
-    if(verifyData==null){
-
-        console.log(`=======  GWV  > is null?????))=======`)
-        const data = await useWilli(projectId,item,estudio,estrategia);
-        if(data){
-            // estudio creado
-            console.log(`GWV.${item} OK!! generado !!`)
-            // si : save JOSN in Response...
-            return jsonPure(data);
-
-        }else{
-            console.log(`GWV.${item} ERROR generando etsudio:${estudio} estrategia:${estrategia}`)
-            return null
-        }            
-        
-    }else{
+      console.log(`=======  GWV  > if(${verifyData}==null))=======`)
+      if(verifyData==null){
+          return null
+      }else{
         // show JSON Response
         return verifyData;
+      }
+    }else if(mode=='generate'){
+      const maker = await getDataItem(projectId,'maker')
+      if(maker){  
+        const data = await useWilli(projectId,item,maker,estudio,estrategia);
+        if(data){
+          console.log(`GWV.${item} UseWilli data:`)
+          console.log(data)
+          return data
+        }else{
+          console.log(`GWV.${item} UseWilli else... no hay data:`)
+          console.log(data)
+          return null
+        }
+        
+      }else{
+        console.log(`GWV.${item} ERROR making for generate `)
+        return null
+      }  
     }
     
 

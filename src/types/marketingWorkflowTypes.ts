@@ -45,20 +45,47 @@ export interface MakerData {
 
 
  //////////  ESTRUCTURA ESTRATEGIA MARKETING
-  export interface EstrategiaMarketingData {
-    id?: string;
-    id_proyecto?: string;
-    objetivosPrincipales?: string;
-    publicoObjetivo?: string;
-    propuestaValor?: string;
-    canalesdistribucion?: string;
-    metricas?: string;
-    generadoPor?: string;
-    fecha?: string; // ISO string
-    // Propiedades simuladas para la BD:
-    objetivos?: string;
-    tacticas?: string;
-  }
+// Define los tipos para los objetos anidados
+export interface ObjetivoGeneral {
+  nombre: string;
+  descripcion: string;
+  metricas_clave: string[];
+}
+
+export interface AnalisisMercadoTarget {
+  base_estudio_mercado: string;
+  identificacion_target: string;
+}
+
+export interface PilarEstrategico {
+  nombre: string;
+  descripcion: string;
+  canales_principales: string[];
+}
+
+export interface CanalYTacticaInicial {
+  canal: string;
+  tacticas: string[];
+}
+
+export interface PlanDeAccionFase1Item {
+  dia: string;
+  descripcion: string;
+  responsable: string;
+}
+
+// Define el tipo principal para la Estrategia de Marketing
+export interface EstrategiaMarketingData {
+  nombre_estrategia: string;
+  objetivos_generales: ObjetivoGeneral[];
+  analisis_mercado_target: AnalisisMercadoTarget;
+  pilares_estrategicos: PilarEstrategico[];
+  canales_y_tacticas_iniciales: CanalYTacticaInicial[];
+  plan_de_accion_fase_1: PlanDeAccionFase1Item[];
+  consideraciones_adicionales: string[];
+}
+
+
    //////////  fin estructura estrategia marketing
 
 
@@ -82,10 +109,9 @@ export interface MakerData {
   // Tipos para las props de los componentes Display
   export interface DisplayProps<T> {
     Input: T | null; // El dato genérico puede ser de cualquier tipo definido arriba o null
-    onSave?: (data: T) => Promise<void>; // onSave es una función asíncrona que toma el dato T
+    onSave?: (data: T) => Promise<void> | void;// onSave es una función asíncrona que toma el dato T
     showSaveButton?: boolean;
   }
-  
   // Tipos para la respuesta general de callWilliAPI
   export type WilliAPIResponse = EstudioMercadoData | EstrategiaMarketingData | CampaniaMarketingData;
   

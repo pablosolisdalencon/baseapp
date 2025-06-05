@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import MarketingWorkflow from "@/components/willi/williWorkFlow";
+import MarketingWorkflow from "@/components/willi/StepByStepWilli";
 
 export default function MktViewer(){
 

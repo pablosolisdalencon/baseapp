@@ -132,6 +132,8 @@ import {
 const EstudioMercadoDisplay: React.FC<DisplayProps<EstudioMercadoData>> = ({ Input: EstudioMercadoInput, onSave, showSaveButton = false }) => {
   if (!EstudioMercadoInput) return null;
   const estudio =EstudioMercadoInput;
+  console.log("##########  EstudioMercado Display say EstudioMercadoInput")
+  console.log(EstudioMercadoInput)
   if (!estudio) {
     return <p>Cargando estudio de mercado o no hay datos...</p>;
   }
@@ -197,6 +199,15 @@ const EstudioMercadoDisplay: React.FC<DisplayProps<EstudioMercadoData>> = ({ Inp
         <h2>Recomendaciones Iniciales</h2>
         <p>{estudio.recomendaciones_iniciales}</p>
       </section>
+
+      {showSaveButton && onSave && (
+        <button
+          onClick={() => onSave(estudio)}
+          className="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+        >
+          Guardar Campaña de Marketing
+        </button>
+      )}
     </div>
   );
 };

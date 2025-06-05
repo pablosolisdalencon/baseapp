@@ -33,8 +33,13 @@ export async function GET(request) {
         proyecto: proyecto,
         catalogo: catalogo,
       };
-  
-      return NextResponse.json(response);
+      
+   let responseArray = new Array()
+   responseArray.push(response);
+   console.log(`$$$$$$$$$$$$$$$$$$$ MAKER RESPONSE`)
+   console.log(typeof responseArray)
+   let data = responseArray;
+      return NextResponse.json({data});
   
     } catch (error) {
       console.error("Error al generar la API 'maker':", error);

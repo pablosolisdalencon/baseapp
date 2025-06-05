@@ -28,6 +28,9 @@ export default function jsonPure(responseData) {
     processedData = processedData.replace(/\s*```$/, '');
   }
 
+   processedData = processedData.replace(/\r?\n|\r/g, '');
+    
+
   // Limpiar espacios en blanco al inicio y final
   processedData = processedData.trim();
 

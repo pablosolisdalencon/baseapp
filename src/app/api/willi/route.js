@@ -1,9 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import EstudioMercado from "@/models/EstudioMercado";
-import JsonToPrompt from "@/utils/JsonToPrompt";
 import getPrompt from "@/ia-utils/templates-Prompts";
 import jsonPure from "@/utils/jsonPure";
+import jsonToPrompt from "@/utils/JsonToPrompt";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || "");
 const model = genAI.getGenerativeModel({
@@ -24,7 +23,8 @@ const model = genAI.getGenerativeModel({
 });
 
 export async function POST(req) {
-  const data = await req.json();
+  const dataR = await req.json();
+  /*
   console.log("++++++++ WILLI SAY data +++++++++")
   console.log(data)
   let makerData= null
@@ -42,18 +42,33 @@ export async function POST(req) {
     const estrategiaData = data.estrategia;
     console.log("++++++++ WILLI SAY {hay estrategia}+++++++++")
   }
-   
+ 
   
   const finalPrompt = getPrompt(makerData,estudioData,estrategiaData);
-  console.log("++++++++ WILLI SAY +++++++++")
-  console.log(`GET PROMPT: ${makerData},${estudioData},${estrategiaData}`)
+   */
+  
 
   try {
+    //console.log(`++++++++ WILLI Generate trying ++++++++ ${data.maker},${data.estudio},${data.estrategia}`)
+    
+    
+    const finalPrompt = getPrompt(dataR.item,jsonToPrompt(dataR.maker),jsonToPrompt(dataR.estudio),jsonToPrompt(dataR.estrategia));
     const result = await model.generateContent(finalPrompt); 
-    console.log("++++++++ WILLI Generate content say +++++++++")
-    console.log(`reult ${result.response.text()}`)   
+    console.log("++++++++ WILLI Prompt?  +++++++++")
+    console.log(finalPrompt)
+    
 
-    return NextResponse.json(result.response.text());
+
+    
+    let williTxt = result.response.text()
+    let willJSON = jsonPure(williTxt)
+    //let williJsonString = JSON.stringify(williTxt);
+    let williArray = new Array();
+    williArray.push(JSON.parse(willJSON))
+    let data = williArray;
+    console.log("++++++++ WILLI Generate content say : data +++++++++")
+    console.log(data)
+    return NextResponse.json(data);
 
   } catch (error) {
     console.error("Error generating content:", error);

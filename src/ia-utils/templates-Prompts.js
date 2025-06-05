@@ -81,17 +81,17 @@ function promptCampaniaMarketing(makerData,estudioData,estrategiaData){
     `)
 }
 
-export default function getPrompt(makerData,estudioData,estrategiaData){
+export default function getPrompt(item,makerData,estudioData,estrategiaData){
 
-    if(makerData && estudioData=='undefined' && estrategiaData=='undefined'){
+    if(item=='estudio-mercado'){
         return(promptEstudioMercado(makerData))
     }
     
-    if(makerData && estudioData && estrategiaData=='undefined'){
+    if(item=='estrategia-marketing'){
         return(promptEstrategiaMarketing(makerData,estudioData))
     }
 
-    if(makerData && estudioData && estrategiaData){
+    if(item=='campania-marketing'){
         return(promptCampaniaMarketing(makerData,estudioData,estrategiaData))
     }
 }

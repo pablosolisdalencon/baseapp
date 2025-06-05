@@ -33,6 +33,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [itemActual, setItemActual] = useState<string | null>(null);
+  const [dataItemActual, setDataItemActual] = useState<object | null>(null);
 
   // Estados para los datos, ahora tipados con 'null' o el tipo de interfaz
   const [dataEstudioMercado, setDataEstudioMercado] = useState<EstudioMercadoData | null>(null);
@@ -45,33 +46,49 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
   const [existeCampania, setExisteCampania] = useState<boolean | null>(null);
 
   
-  const saveGenData = async (data: any) => {
-    const item = itemActual;
-      await fetch(`api/${item}?p=${idProyecto}`, {
-                      method: "POST",
-                      body: JSON.stringify(data),
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                    });
-      console.log(`Guardando ${data}: ${data}`);
-      alert(`Guardado ${data}: Exitoso!`);
-      if(item=="estudio-mercado"){
-        setExisteEstudio(true); // Marca como existente en BD tras guardar
-        setCurrentStep(2);
-      }else if(item=="estrategia-marketing"){
-        setExisteEstrategia(true); // Marca como existente en BD tras guardar
-        setCurrentStep(3);
-      }else if(item=="campania-marketing"){
-        setExisteCampania(true); // Marca como existente en BD tras guardar
+  const saveGenData = async () => {
+    let item = itemActual;
+    let bodyData = dataItemActual;
+    console.log(`######### saveGenData ItemActual #########`)
+    console.log(itemActual)
+    console.log(`######### saveGenData dataItemActual  #########`)
+    console.log(dataItemActual)
+      const res = await fetch(`api/${item}?p=${idProyecto}`,  {
+        method: "POST",
+        body: JSON.stringify(bodyData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      if(data){
+        console.log(data);
+        alert(item+' guardado correctamente!');
+        if(item=="estudio-mercado"){
+          setExisteEstudio(true); // Marca como existente en BD tras guardar
+          setCurrentStep(2);
+        }else if(item=="estrategia-marketing"){
+          setExisteEstrategia(true); // Marca como existente en BD tras guardar
+          setCurrentStep(3);
+        }else if(item=="campania-marketing"){
+          setExisteCampania(true); // Marca como existente en BD tras guardar
+        }
+      }else{
+        alert(item+' Oops! no se ha guardado '+item)
       }
+      
+      
       
     };
 
   // Efecto para verificar existencia de datos cuando cambia el paso
-  const projectId=idProyecto;
+  
   useEffect(() => {
-    
+    const projectId=idProyecto;
+
+    console.log(`######### useEffect  projectId  ${projectId}  #########`)
+        
+
     const checkExistence = async () => {
       setIsLoading(true);
       setError(null);
@@ -80,21 +97,23 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
       try {
         if (currentStep === 1) {
           setItemActual("estudio-mercado")
-          const estudioExistente = await GWV(projectId,"estudio-mercado");
+          const estudioExistente = await GWV('check',projectId,"estudio-mercado");
           setExisteEstudio(!!estudioExistente);
+          console.log(`######### checkExistence  estudioExistente  ${estudioExistente}  #########`)
           if (estudioExistente) {
+            console.log(`#$######## checkExistence  estudioExistente  ${estudioExistente}  #########`)
             setDataEstudioMercado(estudioExistente);
           }
         } else if (currentStep === 2) {
           setItemActual("estrategia-marketing")
-          const estrategiaExistente = await GWV(projectId,"estrategia-marketing");
+          const estrategiaExistente = await GWV('check',projectId,"estrategia-marketing");
           setExisteEstrategia(!!estrategiaExistente);
           if (estrategiaExistente) {
             setDataEstrategiaMarketing(estrategiaExistente);
           }
         } else if (currentStep === 3) {
           setItemActual("campania-marketing")
-          const campaniaExistente = await GWV(projectId,"campania-marketing");
+          const campaniaExistente = await GWV('check',projectId,"campania-marketing");
           setExisteCampania(!!campaniaExistente);
           if (campaniaExistente) {
             setDataCampaniaMarketing(campaniaExistente);
@@ -119,8 +138,10 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
 
     try {
 
-      
-      setDataEstudioMercado(dataEstudioMercado as EstudioMercadoData);
+      setItemActual("estudio-mercado");
+      const estudioData = await GWV('generate',idProyecto,"estudio-mercado");
+      setDataEstudioMercado(estudioData[0] as EstudioMercadoData);
+      setDataItemActual(estudioData[0] as EstudioMercadoData)
     } catch (err: any) {
       setError("Error al generar estudio de mercado: " + err.message);
     } finally {
@@ -138,8 +159,14 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
         throw new Error("Estudio de mercado es requerido para generar estrategia.");
       }
       setItemActual("estrategia-marketing");
-      const estrategiaData = await GWV(projectId,"estrategia-marketing",dataEstudioMercado);
-      setDataEstrategiaMarketing(estrategiaData as EstrategiaMarketingData);
+      const estrategiaData = await GWV('generate',idProyecto,"estrategia-marketing",dataEstudioMercado);
+      setDataEstrategiaMarketing(estrategiaData[0] as EstrategiaMarketingData);
+      setDataItemActual(estrategiaData[0] as EstrategiaMarketingData)
+      console.log("StepByStep Say> Generado. existeEstrategia?")
+      console.log(existeEstrategia)
+      console.log("StepByStep Say> Generado. estrategiaData?")
+      console.log(estrategiaData)
+
     } catch (err: any) {
       setError("Error al generar estrategia de marketing: " + err.message);
     } finally {
@@ -157,8 +184,9 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
         throw new Error("Estrategia de marketing es requerida para generar campaña.");
       }
       setItemActual("campania-marketing");
-      const campaniaData = await GWV(projectId,"campania-marketing",dataEstudioMercado,dataEstrategiaMarketing);
-      setDataCampaniaMarketing(campaniaData as CampaniaMarketingData);
+      const campaniaData = await GWV('generate',idProyecto,"campania-marketing",dataEstudioMercado,dataEstrategiaMarketing);
+      setDataCampaniaMarketing(campaniaData[0] as CampaniaMarketingData);
+      setDataItemActual(campaniaData[0] as CampaniaMarketingData)
     } catch (err: any) {
       setError("Error al generar campaña de marketing: " + err.message);
     } finally {
