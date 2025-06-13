@@ -5,6 +5,7 @@ import {Schema, model, models} from 'mongoose';
 
 // Esquema para ObjetivoGeneral
 const ObjetivoGeneralSchema = new Schema({
+  
   nombre: {
     type: String,
     required: [true, "El nombre del objetivo es requerido."],
@@ -103,6 +104,11 @@ const PlanDeAccionFase1ItemSchema = new Schema({
 // --- Esquema Principal para EstrategiaMarketing ---
 
 const EstrategiaMarketingSchema = new Schema({
+  id_proyecto: {
+    type: String,
+    required: true,
+    description: "valor de _id en INFORMACION PROYECTO"
+  },
   nombre_estrategia: {
     type: String,
     required: [true, "El nombre de la estrategia es requerido."],

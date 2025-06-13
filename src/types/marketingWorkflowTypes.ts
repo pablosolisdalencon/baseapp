@@ -76,6 +76,7 @@ export interface PlanDeAccionFase1Item {
 
 // Define el tipo principal para la Estrategia de Marketing
 export interface EstrategiaMarketingData {
+  id_proyecto: string,
   nombre_estrategia: string;
   objetivos_generales: ObjetivoGeneral[];
   analisis_mercado_target: AnalisisMercadoTarget;
@@ -88,23 +89,56 @@ export interface EstrategiaMarketingData {
 
    //////////  fin estructura estrategia marketing
 
+// Definición para la estructura de 'definicion_arte'
+export interface DefinicionArte {
+  estilo_narracion: string;
+  colores: string;
+  grafica_representativa_campania: string;
+}
 
+// Definición para la estructura de un 'post'
+export interface Post {
+  objetivo: string;
+  definicion_arte: string;
+  titulo: string;
+  tema: string;
+  texto: string;
+  cta: string;
+  imagen: string; // Descripción de la imagen representativa propuesta para el post
+  hora: string;   // Formato HH:MM
+  canal: string;
+  estado: string;
+  fundamento: string;
+  recomendacion_creacion: string;
+  recomendacion_publicacion_seguimiento: string;
+}
 
-  export interface CampaniaMarketingData {
-    id?: string;
-    id_proyecto?: string;
-    nombreCampania?: string;
-    fasesEjecucion?: string;
-    creatividad?: string;
-    presupuestoDetalle?: string;
-    cronograma?: string;
-    generadoPor?: string;
-    fecha?: string; // ISO string
-    // Propiedades simuladas para la BD:
-    nombre?: string;
-    canales?: string;
-    presupuesto?: string;
-  }
+// Definición para la estructura de un 'dia'
+export interface Dia {
+  nombre: string; // Nombre del día de la semana (ej. 'Lunes')
+  fecha: string;  // Formato YYYY-MM-DD
+  post: Post;     // Un objeto de tipo Post
+}
+
+// Definición para la estructura de una 'semana'
+export interface Semana {
+  numero: number;
+  dias: Dia[]; // Un array de objetos de tipo Dia
+}
+
+// Definición del esquema principal 'JsonFinalCampania'
+export interface CampaniaMarketingData {
+  id_proyecto: string,
+  nombre: string;
+  objetivo: string;
+  target: string;
+  tematica: string;
+  definicion_arte: DefinicionArte;
+  duracion: number; // Duración total en días
+  fecha_inicio: string; // Formato YYYY-MM-DD
+  fecha_fin: string;    // Formato YYYY-MM-DD
+  contenido: Semana[]; // Un array de objetos de tipo Semana
+}
   
   // Tipos para las props de los componentes Display
   export interface DisplayProps<T> {

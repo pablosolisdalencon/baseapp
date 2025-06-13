@@ -340,7 +340,7 @@ const EstrategiaMarketingDisplay: React.FC<DisplayProps<EstrategiaMarketingData>
           onClick={handleSaveClick}
           className="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
         >
-          Guardar Campaña de Marketing
+          Guardar Estrategia de Marketing
         </button>
       )}
     </div>

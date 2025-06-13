@@ -36,9 +36,10 @@ export async function GET(request) {
       
    let responseArray = new Array()
    responseArray.push(response);
-   console.log(`$$$$$$$$$$$$$$$$$$$ MAKER RESPONSE`)
-   console.log(typeof responseArray)
    let data = responseArray;
+
+   console.log(`$$$$$$$$$$$$$$$$$$$ MAKER DATA`)
+   console.log(data)
       return NextResponse.json({data});
   
     } catch (error) {

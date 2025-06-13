@@ -28,10 +28,6 @@ export async function GET(request){
 
 
 export async function POST(request){
-    console.log("=============   POST.api.estrategia request ==================")
-    console.log(request)
-
-
     connectDB();
     const data = await request.json();
     if(data){

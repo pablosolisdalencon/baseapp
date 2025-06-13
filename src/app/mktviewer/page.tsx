@@ -1,10 +1,27 @@
 import { Suspense } from "react";
 import MarketingWorkflow from "@/components/willi/StepByStepWilli";
+import MarketingContentManager from "@/components/willi/MarketingContentManager";
+//import  WilliFlow from "@/components/willi/WilliFlow";
 
 export default function MktViewer(){
 
     return (
-            <Suspense><MarketingWorkflow/></Suspense>
+        <div>
+
+            <div className="cardMKT williFlowItem">    
+                <h2 className="mkt-subtitle">Flujo de Trabajo Marketing Digital</h2>
+                <div className="cardMKTitemHidden">
+                <Suspense><MarketingWorkflow/></Suspense>
+                </div> 
+            </div>
+
+            <div className="cardMKT MarketingContentManager">    
+                <h2 className="mkt-subtitle">Generador y Gestor de Contenido con IA de Marketing Digital</h2>
+                <div className="cardMKTitemHidden">
+                    <Suspense><MarketingContentManager/></Suspense>
+                </div> 
+            </div>
+        </div>    
     )
 }
     //const idProyecto = "67f99da9f7b90ff068b870b2"

@@ -184,9 +184,15 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
         throw new Error("Estrategia de marketing es requerida para generar campaña.");
       }
       setItemActual("campania-marketing");
+      console.log("HandleGenerateEstrategia say: HEllo")
+
       const campaniaData = await GWV('generate',idProyecto,"campania-marketing",dataEstudioMercado,dataEstrategiaMarketing);
       setDataCampaniaMarketing(campaniaData[0] as CampaniaMarketingData);
       setDataItemActual(campaniaData[0] as CampaniaMarketingData)
+      console.log("StepByStep Say> Generado. existe campania-marketing?")
+      console.log(existeCampania)
+      console.log("StepByStep Say> Generado. campaniaData?")
+      console.log(campaniaData)
     } catch (err: any) {
       setError("Error al generar campaña de marketing: " + err.message);
     } finally {

@@ -1,4 +1,4 @@
-import {schemaEstudioMercado, schemaEstrategiaMarketing, schemaCampaniaMarketing} from "@/ia-utils/schemas-Responses";
+import {schemaEstudioMercado, schemaEstrategiaMarketing, schemaCampaniaMarketing, schemaPostFinal,schemaPostFinalImg} from "@/ia-utils/schemas-Responses";
 import JsonToPrompt from "@/utils/JsonToPrompt";
 
 function promptEpicMode(){
@@ -19,6 +19,7 @@ function promptEpicMode(){
 
 function promptEstudioMercado(makerData){
     const textEstudioMercado = JsonToPrompt(schemaEstudioMercado);
+    const textMakerData = JsonToPrompt(makerData);
     return(`
       INSTRUCCION GENERAL:
       ${promptEpicMode}
@@ -30,13 +31,15 @@ function promptEstudioMercado(makerData){
       ${textEstudioMercado}
 
       INFORMACION DEL PROYECTO:
-      ${makerData}
+        ${textMakerData}
       `)
 }
 
 function promptEstrategiaMarketing(makerData,estudioData){
     
     const textEstrategiaMarketing = JsonToPrompt(schemaEstrategiaMarketing);
+    const textMakerData = JsonToPrompt(makerData);
+    const textEstudioData = JsonToPrompt(estudioData);
     return(`
         INSTRUCCION GENERAL:
         ${promptEpicMode}
@@ -48,40 +51,91 @@ function promptEstrategiaMarketing(makerData,estudioData){
         ${textEstrategiaMarketing}
   
         INFORMACION DEL PROYECTO:
-        ${makerData}
-        
+        ${textMakerData}
+
         ESTUDIO MERCADO:
-        ${estudioData}
+        ${textEstudioData}
+
     `)
 }
 
 function promptCampaniaMarketing(makerData,estudioData,estrategiaData){
     
     const textCampaniaMarketing = JsonToPrompt(schemaCampaniaMarketing);
+    const textMakerData = JsonToPrompt(makerData);
+    const textEstudioData = JsonToPrompt(estudioData);
+    const textEstrategiaData = JsonToPrompt(estrategiaData);
+    
     return(`
         INSTRUCCION GENERAL:
         ${promptEpicMode}
         
         INSTRUCCION ESPECIFICA:
-        Realiza una campania de marketing digital detallada super efectiva, eficaz y eficiente utilizando todas tus capacidades y respondiendo en espanol y con la estructura establecida basandote en la descripcion de contexto de la INFORMACION DEL PROYECTO, ESTUDIO MERCADO y ESTRATEGIA MARKETING.
+        Realiza una campania de marketing digital detallada super efectiva,con una duracion de 4 semanas, en los post, debes proponer solo post de texto y en las imagenes debes proponer solo imagenes y nunca proponer videos, eficaz y eficiente utilizando todas tus capacidades y respondiendo en espanol y con la estructura establecida basandote en la descripcion de contexto de la INFORMACION DEL PROYECTO, ESTUDIO MERCADO y ESTRATEGIA MARKETING.
               
         ESQUEMA JSON:
         ${textCampaniaMarketing}
 
         INFORMACION DEL PROYECTO:
-        ${makerData}
+        ${textMakerData}
 
         ESTUDIO MERCADO:
-        ${estudioData}
+        ${textEstudioData}
 
         ESTRATEGIA MARKETING:
-        ${estrategiaData}
+        ${textEstrategiaData}
   
         
     `)
 }
 
-export default function getPrompt(item,makerData,estudioData,estrategiaData){
+function promptPostFinal(postData){
+    
+    const textPost = JsonToPrompt(schemaPostFinal);
+    const textPostInfo = JsonToPrompt(postData);
+    
+  
+    
+    return(`
+        INSTRUCCION GENERAL:
+        ${promptEpicMode}
+        
+        INSTRUCCION ESPECIFICA:
+        Realiza un Post Final campania de marketing digital super efectivo, eficaz y eficiente utilizando todas tus capacidades y respondiendo en espanol y con la estructura establecida basandote en la descripcion de contexto de la INFORMACION POST.
+              
+        ESQUEMA JSON:
+        ${textPost}
+
+        INFORMACION POST:
+        ${textPostInfo}
+ 
+        
+    `)
+}
+function promptPostFinalImg(postData){
+    
+    const textPostImg = JsonToPrompt(schemaPostFinalImg);
+    const textPostInfo = JsonToPrompt(postData);
+    
+  
+    
+    return(`
+        INSTRUCCION GENERAL:
+        ${promptEpicMode}
+        
+        INSTRUCCION ESPECIFICA:
+        Crea una imagen para un post de rrss super eficaz utilizando todas tus capacidades y respondiendo en espanol y con la estructura establecida basandote en la descripcion de contexto de la INFORMACION POST.
+              
+        ESQUEMA JSON:
+        ${textPostImg}
+
+        INFORMACION POST:
+        ${textPostInfo}
+ 
+        
+    `)
+}
+export default function getPrompt(item,makerData,estudioData,estrategiaData,postData){
 
     if(item=='estudio-mercado'){
         return(promptEstudioMercado(makerData))
@@ -93,6 +147,12 @@ export default function getPrompt(item,makerData,estudioData,estrategiaData){
 
     if(item=='campania-marketing'){
         return(promptCampaniaMarketing(makerData,estudioData,estrategiaData))
+    }
+    if(item=='post-final'){
+        return(promptPostFinal(postData))
+    }
+    if(item=='post-final-img'){
+        return(promptPostFinalImg(postData))
     }
 }
     

@@ -14,7 +14,9 @@ export async function GET(request){
         if (idProyecto){
             const data = await EstudioMercado.find({ id_proyecto: idProyecto });
             console.log("=============API ESTUDIO MERCADO SAY:   DATA    ==================")
-            console.log(typeof data)
+            console.log(idProyecto)
+            console.log(data)
+
             return NextResponse.json({data});
         }
       
@@ -30,14 +32,12 @@ export async function GET(request){
 export async function POST(request){
     connectDB();
     const data = await request.json();
-    console.log("=============   POST.api.estudio data ==================")
-   // console.log(data)
-
     if(data){
-      console.log("=============   DATA    ==================")
-   //   console.log(data)
+      console.log("=============   POST.api.EstudioMercado DATA:    ==================")
+      console.log(data)
 
-        const Jdata = JSON.parse(data)
+      //const Jdata = JSON.parse(data)
+      const Jdata = data
         const newEstudioMercado = new EstudioMercado(Jdata)
         const savedEstudioMercado = await newEstudioMercado.save()    
         return NextResponse.json({"message": `holas EstudioMercado POST: ${savedEstudioMercado}`});

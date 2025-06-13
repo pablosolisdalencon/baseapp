@@ -52,7 +52,7 @@ export async function POST(req) {
     //console.log(`++++++++ WILLI Generate trying ++++++++ ${data.maker},${data.estudio},${data.estrategia}`)
     
     
-    const finalPrompt = getPrompt(dataR.item,jsonToPrompt(dataR.maker),jsonToPrompt(dataR.estudio),jsonToPrompt(dataR.estrategia));
+    const finalPrompt = getPrompt(dataR.item,jsonToPrompt(dataR.maker),jsonToPrompt(dataR.estudio),jsonToPrompt(dataR.estrategia),jsonToPrompt(dataR.post));
     const result = await model.generateContent(finalPrompt); 
     console.log("++++++++ WILLI Prompt?  +++++++++")
     console.log(finalPrompt)

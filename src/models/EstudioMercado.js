@@ -3,6 +3,7 @@ const EstudioMercadoSchema = new Schema({
   id_proyecto: {
     type: String,
     required: true,
+    trim: false,
     description: "valor de _id en INFORMACION PROYECTO"
   },
   resumen_competitivo: {

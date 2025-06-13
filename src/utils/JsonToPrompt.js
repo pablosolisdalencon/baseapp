@@ -22,7 +22,6 @@ export default function jsonToPrompt(jsonObject) {
     return lines.join(`
       `).replace(/"/g, '').replace(/{/g, `
       `).replace(/}/g, `
-      `).replace(/.,/g, `
       `).replace(/],/g, `
       `).replace(/```json/g, "");
   }
