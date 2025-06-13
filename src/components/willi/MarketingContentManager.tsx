@@ -107,7 +107,7 @@ const MarketingContentManager: React.FC = () => {
             body: bodyData,
         });
 
-        /*
+        
         const response_imagen = await fetch(`/api/willi`, {
           method: 'POST',
           headers: {
@@ -115,7 +115,7 @@ const MarketingContentManager: React.FC = () => {
           },
           body: bodyData_img,
       });
-      */
+      
     
         if (response.ok) {
           // Si la respuesta es 200 OK, asumimos que el item fue encontrado.
@@ -124,14 +124,14 @@ const MarketingContentManager: React.FC = () => {
           //  FIN OK
           //-------------------------/
           const texto_final = res[0].texto;
-          /*
+          
           if (response_imagen.ok) {
             // Si la respuesta es 200 OK, asumimos que el item fue encontrado.
             // La API debería devolver los datos del item directamente.
             const res_img  = await response_imagen.json();
             //  FIN OK
             //-------------------------/
-            const imagen_final = res_img[0].imagen;
+            const imagen_final = res_img[0].data;
             const response_final = {
               texto: texto_final,
               imagen: imagen_final
@@ -148,13 +148,7 @@ const MarketingContentManager: React.FC = () => {
             throw new Error(errorData.message || `generatePostImagen Error al crear  idProyecto(${idProyecto}) = status[${response.status}] StatusText [${response.statusText}]`);
           }
           //-------------------------/
-          */
-
-          const response_final = {
-            texto: texto_final,
-            imagen: "imagen_final"
-          }
-          return response_final as GeneratedContent
+          
 
         } else if (response.status === 404) {
           // Si la API devuelve 404 Not Found, significa que no existe La api o seting para este artefacto?.
@@ -341,7 +335,7 @@ const MarketingContentManager: React.FC = () => {
                           ) : generatedContent ? (
                             <>
                               <img
-                                src={generatedContent.imagen}
+                                src={`data:image/png;base64,${generatedContent.imagen}`}
                                 alt={`Imagen generada para ${post.titulo}`}
                                 className="w-full h-auto max-h-48 object-cover rounded-md mb-3"
                               />

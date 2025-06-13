@@ -4,7 +4,22 @@ import JsonToPrompt from "@/utils/JsonToPrompt";
 function promptEpicMode(){
     return(`
       INSTRUCCION GENERAL:
-      Eres una IA experta en Marketing, Neuroventas, Psicología, Optimización de Recursos y Administración de Empresas. Tu misión es generar exclusivamente estudios de mercado en formato JSON que cumplan rigurosamente con el ESQUEMA proporcionado.
+      Eres una IA experta en Marketing, Neuroventas, Psicología, Optimización de Recursos y Administración de Empresas. Tu misión es generar exclusivamente en formato JSON que cumplan rigurosamente con el ESQUEMA JSON proporcionado.
+        
+      INSTRUCCIONES CLAVE:
+        1.  Formato de Salida:Tu única salida debe ser un objeto JSON válido que se ajuste al ESQUEMA JSON definido. NO incluyas texto introductorio, explicaciones, saludos, o cualquier otro carácter fuera de la estructura JSON.
+        2.  Precisión y Conclusión: Asegúrate de que el JSON sea completo, válido y cierre correctamente, utiliza el ESQUEMA como schemaJson no como template y sin comillas nio simples ni dobles en los nombres de parametros.
+        3.  Contenido Profesional: Dentro del JSON, tus descripciones y análisis deben reflejar tu maestría enciclopédica en Marketing Digital, Branding, Análisis de Mercado, Neurociencia del Consumidor, Psicología de la Persuasión, Gestión de la Cadena de Suministro, Estrategia Empresarial, Finanzas Corporativas, etc.
+        4.  Contexto Geográfico/Temporal: Si el prompt menciona Chile o una ubicación específica, o fechas, incorpora esa información en tu análisis dentro de las propiedades del JSON.
+        
+        Tu respuesta DEBE comenzar con '{' y terminar con '}'. Absolutamente NADA de texto adicional antes o después del JSON.
+      `)
+}
+
+function promptEpicModeImg(){
+    return(`
+      INSTRUCCION GENERAL:
+      Eres una Artista experta en Marketing, Neuroventas, Psicología. Tu misión es generar exclusivamente estudios de mercado en formato JSON que cumplan rigurosamente con el ESQUEMA proporcionado.
         
       INSTRUCCIONES CLAVE:
         1.  Formato de Salida:Tu única salida debe ser un objeto JSON válido que se ajuste al ESQUEMA definido. NO incluyas texto introductorio, explicaciones, saludos, o cualquier otro carácter fuera de la estructura JSON.
@@ -15,8 +30,6 @@ function promptEpicMode(){
         Tu respuesta DEBE comenzar con '{' y terminar con '}'. Absolutamente NADA de texto adicional antes o después del JSON.
       `)
 }
-
-
 function promptEstudioMercado(makerData){
     const textEstudioMercado = JsonToPrompt(schemaEstudioMercado);
     const textMakerData = JsonToPrompt(makerData);
@@ -117,20 +130,27 @@ function promptPostFinalImg(postData){
     const textPostImg = JsonToPrompt(schemaPostFinalImg);
     const textPostInfo = JsonToPrompt(postData);
     
-  
-    
-    return(`
-        INSTRUCCION GENERAL:
-        ${promptEpicMode}
+    /*
+    INSTRUCCION GENERAL:
+        ${promptEpicModeImg}
         
         INSTRUCCION ESPECIFICA:
-        Crea una imagen para un post de rrss super eficaz utilizando todas tus capacidades y respondiendo en espanol y con la estructura establecida basandote en la descripcion de contexto de la INFORMACION POST.
+        Crea una imagen para un post de rrss super eficaz utilizando todas tus capacidades y respondiendo en espanol y con la estructura establecida basandote estrictamente en la INFORMACION POST.
               
         ESQUEMA JSON:
         ${textPostImg}
 
         INFORMACION POST:
+    */
+  
+    
+    return(`
+        Crea una imagen sin textos representativa del atributo imagen en INFORMACION:
+        
+        INFORMACION
         ${textPostInfo}
+
+        Sin texto, sin palabras, sin tipografía, imagen limpia sin caracteres ni símbolos.
  
         
     `)

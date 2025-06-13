@@ -7,14 +7,12 @@ export default function MktViewer(){
 
     return (
         <div>
-
-            <div className="cardMKT williFlowItem">    
-                <h2 className="mkt-subtitle">Flujo de Trabajo Marketing Digital</h2>
+            <div className="cardMKT MarketingContentManager">    
+                <h2 className="mkt-subtitle">Generador y Gestor de Contenido con IA de Marketing Digital</h2>
                 <div className="cardMKTitemHidden">
-                <Suspense><MarketingWorkflow/></Suspense>
+                    <Suspense><MarketingContentManager/></Suspense>
                 </div> 
             </div>
-
         </div>    
     )
 }
