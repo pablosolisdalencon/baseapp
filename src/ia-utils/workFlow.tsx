@@ -1,3 +1,4 @@
+/*
 import {
   MakerData,
   EstudioMercadoData,
@@ -11,3 +12,4 @@ export const steps: WorkflowStep[] = [
     { number: 2, title: "Estrategia de Marketing", completed: !!dataEstrategiaMarketing },
     { number: 3, title: "Campaña de Marketing", completed: !!dataCampaniaMarketing }
   ];
+  */
