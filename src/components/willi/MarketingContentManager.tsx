@@ -108,7 +108,7 @@ const MarketingContentManager: React.FC = () => {
         });
 
         
-        const response_imagen = await fetch(`/api/willi`, {
+        const response_imagen = await fetch(`/api/willi?p=${idProyecto}`, {
           method: 'POST',
           headers: {
           'Content-Type': 'application/json',
