@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import  useTokens  from '../tokens/simpleTokens';
 // Import only the necessary types from the central types file
 import {
   CampaniaMarketingData,
@@ -9,6 +10,8 @@ import {
 } from '../../types/marketingWorkflowTypes';
 import GWV from '@/utils/GWV';
 import { useSearchParams } from "next/navigation";
+
+import { useSession } from "next-auth/react";
 
 // Define type for generated content, which is the output format from 'Generar'
 interface GeneratedContent {
@@ -32,6 +35,12 @@ const renderTags = (items: string[] | undefined, label: string = '', baseClass: 
 };
 
 const MarketingContentManager: React.FC = () => {
+
+    const { data: session, status } = useSession();
+
+const [currentUserEmail, setCurrentUserEmail] = useState<any | null>(session?.user?.email);
+
+
   const searchParams = useSearchParams();
     const idProyecto = searchParams.get('id');
   const [campaignData, setCampaignData] = useState<CampaniaMarketingData | null>(null);
@@ -251,6 +260,99 @@ const MarketingContentManager: React.FC = () => {
     );
   }
 
+
+// Define los tipos para las props del ActionButton
+interface ActionButtonProps {
+  onClick: () => void;
+  actionName: string;
+  cost: string;
+  isLoading: boolean;
+  isErrorTest?: boolean;
+}
+// Simula el email del usuario en sesión
+//const { executeTokenAction, isLoading, errorT, successMessage, userTokensBalance } = useTokens(currentUserEmail as string);
+//const [actionResult, setActionResult] = useState<any | null>(null); // Puedes tipar 'any' de forma más específica si conoces la estructura de tus resultados
+/*
+const handleActionClick = async (actionName: string, data: any) => {
+  setCurrentUserEmail(session?.user?.email)
+    setActionResult(null); // Limpiar resultado anterior
+    console.log(`Attempting to execute action: ${actionName}`);
+    const result = await executeTokenAction(actionName, data);
+
+    if (result.success) {
+        console.log(`Action "${actionName}" successful:`, result.data);
+        setActionResult(result.data);
+    } else {
+        console.error(`Action "${actionName}" failed:`, result.message);
+        setActionResult({ status: 'failed', message: result.message });
+    }
+};
+
+const ActionButton: React.FC<ActionButtonProps> = ({ onClick, actionName, cost, isLoading, isErrorTest = false }) => {
+  return (
+      <button
+          onClick={onClick}
+          disabled={isLoading}
+          className={`
+              w-full px-6 py-3 rounded-lg text-white font-semibold text-lg
+              transition duration-300 ease-in-out transform hover:scale-105
+              ${isLoading ? 'bg-gray-400 cursor-not-allowed' : (isErrorTest ? 'bg-red-500 hover:bg-red-600' : 'bg-indigo-600 hover:bg-indigo-700')}
+              focus:outline-none focus:ring-4 focus:ring-indigo-300 focus:ring-opacity-75
+          `}
+      >
+          {isLoading ? 'Cargando...' : `${actionName} (${cost})`}
+      </button>
+  );
+};
+
+
+
+
+ <ActionButton
+                            onClick={() => handleActionClick('genEstudio', { topic: 'Mercado AI' })}
+                            actionName="Generar Estudio"
+                            cost="0.50 tokens"
+                            isLoading={isLoading}
+                          />
+                          <ActionButton
+                              onClick={() => handleActionClick('genEstrategia', { type: 'Lanzamiento' })}
+                              actionName="Generar Estrategia"
+                              cost="0.75 tokens"
+                              isLoading={isLoading}
+                          />
+
+
+
+                               {isLoading && (
+                                            <div className="text-center text-blue-600 text-lg font-semibold animate-pulse">
+                                                Procesando acción... por favor espera.
+                                            </div>
+                                        )}
+
+                                        {error && (
+                                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                                                <strong className="font-bold">Error: </strong>
+                                                <span className="block sm:inline">{error}</span>
+                                            </div>
+                                        )}
+
+                                        {successMessage && (
+                                            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                                                <strong className="font-bold">Éxito: </strong>
+                                                <span className="block sm:inline">{successMessage}</span>
+                                            </div>
+                                        )}
+
+                                        {actionResult && (
+                                            <div className="bg-gray-50 p-4 rounded-md shadow-inner mt-6">
+                                                <h3 className="text-xl font-bold text-gray-800 mb-3">Resultado de la Acción:</h3>
+                                                <pre className="whitespace-pre-wrap break-words bg-gray-100 p-3 rounded-md text-sm text-gray-700">
+                                                    {JSON.stringify(actionResult, null, 2)}
+                                                </pre>
+                                            </div>
+                                        )}
+*/
+
   return (
     <div className={commonClasses.container}>
       <h1 className="text-4xl font-extrabold text-center text-gray-900 mb-8 pb-4 border-b-4 border-indigo-400">
@@ -358,8 +460,20 @@ const MarketingContentManager: React.FC = () => {
                             className={`${commonClasses.buttonBase} ${commonClasses.buttonGenerate} ${isGenerating ? commonClasses.buttonDisabled : ''}`}
                             disabled={isGenerating}
                           >
+                          
                             {isGenerating ? 'Generando...' : 'Generar'}
                           </button>
+
+
+                          <button
+                            onClick={() => useTokens("generate-post",{week:weekIndex, day:dayIndex, post:post})}
+                            className={`${commonClasses.buttonBase} ${commonClasses.buttonGenerate} ${isGenerating ? commonClasses.buttonDisabled : ''}`}
+                            disabled={isGenerating}
+                          >
+                           {isGenerating ? 'Generando...' : 'Generar New'}
+                          </button>
+
+
                           <button
                             onClick={() => handleSavePost(weekIndex, dayIndex)}
                             className={`${commonClasses.buttonBase} ${commonClasses.buttonSave} ${!generatedContent ? commonClasses.buttonDisabled : ''}`}
@@ -374,6 +488,11 @@ const MarketingContentManager: React.FC = () => {
                           >
                             Publicar
                           </button>
+
+
+                         
+
+
                         </div>
                       </div>
                     );
@@ -388,6 +507,9 @@ const MarketingContentManager: React.FC = () => {
       </section>
     </div>
   );
+
+
 };
+
 
 export default MarketingContentManager;

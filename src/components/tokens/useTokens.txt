@@ -1,0 +1,174 @@
+"use client"
+import { useState, useCallback } from 'react';
+import tokenService from './tokenService';
+
+// --- Interfaces para los datos de la API y el hook ---
+
+// Tipos para las respuestas del tokenService (simplificados para este ejemplo)
+interface GetPricingResponse {
+    price: number;
+}
+
+interface UserTokensBalanceResponse {
+    tokens: number;
+}
+
+interface UseTokensResponse {
+    success: boolean;
+    newBalance: number;
+}
+
+interface RecordOperationResponse {
+    operationId: string;
+}
+
+interface RevertOperationResponse {
+    success: boolean;
+    revertedPrice: number;
+}
+
+interface AddTokensResponse {
+    success: boolean;
+    newBalance: number;
+}
+
+// Interfaz para la respuesta de una acción de Willi (puede ser más específica según tus APIs de Willi)
+interface WilliApiResponse {
+    status: string;
+    data: string; // O un tipo más complejo si Willi devuelve objetos estructurados
+    id?: string;
+    message?: string; // Para errores o mensajes adicionales
+}
+
+// Interfaz para el objeto de retorno de executeTokenAction
+interface ExecuteTokenActionResult {
+    success: boolean;
+    data?: WilliApiResponse; // Datos de la respuesta de Willi si fue exitoso
+    newBalance?: number;     // Nuevo balance si la operación afectó tokens
+    message?: string;        // Mensaje de éxito o error
+}
+
+/**
+ * Hook personalizado para gestionar el consumo de tokens y la ejecución de acciones.
+ * @param {string} userEmail - El email del usuario en sesión.
+ * @returns {object} Un objeto con:
+ * - `executeTokenAction`: Función para llamar y ejecutar una acción con coste de tokens.
+ * - `isLoading`: Estado de carga de la operación.
+ * - `error`: Mensaje de error si ocurre alguno.
+ * - `successMessage`: Mensaje de éxito si la operación fue satisfactoria.
+ * - `userTokensBalance`: El balance actual de tokens del usuario (actualizado tras una operación).
+ */
+
+
+export const useTokens = (userEmail: string) => {
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+const [errorT, setError] = useState<string | null>(null);
+const [successMessage, setSuccessMessage] = useState<string | null>(null);
+const [userTokensBalance, setUserTokensBalance] = useState<number | null>(null);
+
+
+    // Función para actualizar el balance de tokens del usuario
+    const fetchUserBalance = useCallback(async (): Promise<void> => {
+        if (!userEmail) return;
+        try {
+            const balance: number = await tokenService.getUserTokens(userEmail);
+            setUserTokensBalance(balance);
+        } catch (err: any) {
+            console.error("Error fetching user token balance:", err);
+            // No establecemos error aquí para no sobrescribir errores de acciones
+        }
+    }, [userEmail]);
+
+    // Función para manejar el rollback de tokens
+    const rollBackTokens = useCallback(async (operationId: string, actionName: string, originalPrice: number): Promise<void> => {
+        console.warn(`Attempting to roll back tokens for operation: ${operationId}`);
+        try {
+            // 1. Marcar la operación como revertida
+            const revertedPrice: number = await tokenService.revertOperation(operationId, userEmail);
+            if (revertedPrice === undefined || revertedPrice === null) {
+                throw new Error("Could not retrieve reverted price from operation.");
+            }
+            console.log(`Operation ${operationId} marked as reverted. Price to re-add: ${revertedPrice}`);
+
+            // 2. Volver a cargar los tokens al usuario
+            const addResponse: AddTokensResponse = await tokenService.addTokens(userEmail, revertedPrice);
+            setUserTokensBalance(addResponse.newBalance);
+            setError(`Fallo en la acción "${actionName}". Se han devuelto ${revertedPrice} tokens a su cuenta. Nuevo balance: ${addResponse.newBalance}.`);
+            setSuccessMessage(null); // Clear any prior success message
+        } catch (rollbackError: any) {
+            console.error(`CRITICAL ERROR: Failed to rollback tokens for operation ${operationId}:`, rollbackError);
+            setError(`Fallo crítico en la acción "${actionName}" y no se pudieron devolver los tokens. Por favor, contacte a soporte. Error de rollback: ${rollbackError.message}`);
+            setSuccessMessage(null);
+        }
+    }, [userEmail]);
+
+    // Función principal para ejecutar la acción de token
+    const executeTokenAction = useCallback(async (actionName: string, actionData: any): Promise<ExecuteTokenActionResult> => {
+        setIsLoading(true);
+        setError(null);
+        setSuccessMessage(null);
+        let operationId: string | null = null; // Para almacenar el ID de la operación de tokens
+
+        try {
+            // 1. Consultar el precio de la acción
+            const price: number = await tokenService.getPricing(actionName, userEmail);
+            console.log(`Action "${actionName}" costs: ${price} tokens.`);
+
+            // 2. Validar solvencia
+            const currentUserTokens: number = await tokenService.getUserTokens(userEmail);
+            setUserTokensBalance(currentUserTokens); // Actualizar el balance mostrado
+            console.log(`User ${userEmail} has ${currentUserTokens} tokens.`);
+
+            if (currentUserTokens < price) {
+                setError(`Tokens insuficientes. Necesitas ${price} tokens, tienes ${currentUserTokens}.`);
+                setIsLoading(false);
+                return { success: false, message: "Insufficient tokens" };
+            }
+
+            // 3. Descontar tokens
+            const useResponse: UseTokensResponse = await tokenService.useTokens(userEmail, price);
+            setUserTokensBalance(useResponse.newBalance); // Actualizar balance inmediatamente
+            console.log(`Tokens discounted. New balance: ${useResponse.newBalance}`);
+
+            // 4. Guardar el registro de la operación
+            operationId = await tokenService.recordOperation(userEmail, price, actionName);
+            console.log(`Operation recorded with ID: ${operationId}`);
+
+            // 5. Llamar a la función goAction (Willi API)
+            console.log(`Calling goAction for "${actionName}"...`);
+            const williResponse: WilliApiResponse = await tokenService.callWilliAPI(actionName, actionData, userEmail);
+
+            // Si la API de Willi fue exitosa, retornar el resultado
+            setSuccessMessage(`Acción "${actionName}" completada exitosamente. Se descontaron ${price} tokens.`);
+            return { success: true, data: williResponse, newBalance: useResponse.newBalance };
+
+        } catch (err: any) {
+            console.error(`Error during token action "${actionName}":`, err);
+
+            // Si hubo un error después de descontar/registrar, intentar rollback
+            if (operationId) {
+                // Asumimos que err.originalPrice es una propiedad que puede venir del error
+                // Si no, siempre usamos el 'price' original consultado.
+                await rollBackTokens(operationId, actionName, err.originalPrice);
+            } else if (err.message && err.message.includes("Insufficient tokens")) {
+                // El error de tokens ya se manejó arriba.
+            } else {
+                setError(`Error inesperado al ejecutar la acción "${actionName}": ${err.message || "An unknown error occurred"}`);
+            }
+            return { success: false, message: err.message || "An unknown error occurred" };
+        } finally {
+            setIsLoading(false);
+            // Fetch the final balance, especially useful if errors occurred or initial balance was not fetched
+            fetchUserBalance();
+        }
+    }, [userEmail, rollBackTokens, fetchUserBalance]); // Asegura que las dependencias estén correctas
+
+    return {
+        executeTokenAction,
+        isLoading,
+        errorT,
+        successMessage,
+        userTokensBalance,
+    };
+};
