@@ -14,32 +14,43 @@ export async function POST(request: Request) {
 
     const userId = (session.user as any).id;
 
+    const body = await request.json();
+    const { tokensToDecrement } = body;
+
+    if (typeof tokensToDecrement !== 'number' || tokensToDecrement <= 0) {
+      return NextResponse.json({ message: 'Invalid tokensToDecrement value. Must be a positive number.' }, { status: 400 });
+    }
+
     const { client, db } = await connectToDatabase();
     const usersCollection = db.collection('users');
 
-    // Find the user and ensure they have tokens to decrement
+    // Find the user to check current token count before attempting atomic update
     const user = await usersCollection.findOne({ _id: new ObjectId(userId) });
 
     if (!user) {
       return NextResponse.json({ message: 'User not found.' }, { status: 404 });
     }
 
-    if (user.tokens === undefined || user.tokens <= 0) {
-      // This check is more of a safeguard, primary check should be client-side before calling
-      return NextResponse.json({ message: 'No tokens to decrement or tokens already at zero.' }, { status: 400 });
+    if (user.tokens === undefined || user.tokens < tokensToDecrement) {
+      return NextResponse.json({ message: 'Insufficient tokens.' }, { status: 402 }); // Payment Required
     }
 
-    // Decrement tokens
+    // Atomically decrement tokens if sufficient
     const updateResult = await usersCollection.findOneAndUpdate(
-      { _id: new ObjectId(userId), tokens: { $gt: 0 } }, // Ensure tokens are greater than 0 before decrementing
-      { $inc: { tokens: -1 } },
+      { _id: new ObjectId(userId), tokens: { $gte: tokensToDecrement } },
+      { $inc: { tokens: -tokensToDecrement } },
       { returnDocument: 'after' } // Return the updated document
     );
 
     if (!updateResult.value) {
-      // This could happen if tokens were exactly 0 and another request already decremented them,
-      // or if the user was not found with tokens > 0.
-      return NextResponse.json({ message: 'Failed to decrement tokens or user has no tokens left.' }, { status: 409 }); // Conflict or precondition failed
+      // This could happen if tokens were just below tokensToDecrement due to a concurrent request,
+      // or if the user was not found (though checked above, this is a safeguard for the atomic operation).
+      // Re-check current tokens to give a more specific error.
+      const currentUserState = await usersCollection.findOne({ _id: new ObjectId(userId) });
+      if (currentUserState && currentUserState.tokens < tokensToDecrement) {
+        return NextResponse.json({ message: 'Insufficient tokens due to concurrent update.' }, { status: 402 });
+      }
+      return NextResponse.json({ message: 'Failed to decrement tokens. User may not have enough tokens or user not found.' }, { status: 409 }); // Conflict or precondition failed
     }
 
     return NextResponse.json({

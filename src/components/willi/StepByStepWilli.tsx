@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from "next/navigation";
+import { useSession, getSession } from 'next-auth/react'; // Added
 
 import React from 'react'; // Necesario para .tsx
 import GWV from '@/utils/GWV';
@@ -28,8 +29,19 @@ interface MarketingWorkflowProps {
 const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
   const searchParams = useSearchParams();
   const idProyecto = searchParams.get('id');
+  const { data: session } = useSession(); // update: updateSession can be used if needed
+
+  const [userTokens, setUserTokens] = useState<number | null>(null);
+  const [prices, setPrices] = useState<{ [key: string]: number | null }>({
+    'generar estudio': null,
+    'generar estrategia': null,
+    'generar campania': null,
+  });
+  const [priceError, setPriceError] = useState<string | null>(null);
+  const [pricesLoading, setPricesLoading] = useState<boolean>(true);
+
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false); // This is for individual generation loading
   const [error, setError] = useState<string | null>(null);
 
   const [itemActual, setItemActual] = useState<string | null>(null);
@@ -84,39 +96,77 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
   // Efecto para verificar existencia de datos cuando cambia el paso
   
   useEffect(() => {
-    const projectId=idProyecto;
+    if (session && session.user && (session.user as any).tokens !== undefined) {
+      setUserTokens((session.user as any).tokens);
+    }
+  }, [session]);
 
-    console.log(`######### useEffect  projectId  ${projectId}  #########`)
-        
-
-    const checkExistence = async () => {
-      setIsLoading(true);
-      setError(null);
-      
-
+  useEffect(() => {
+    const fetchPrices = async () => {
+      setPricesLoading(true);
+      setPriceError(null);
       try {
-        if (currentStep === 1) {
-          setItemActual("estudio-mercado")
-          const estudioExistente = await GWV('check',projectId,"estudio-mercado");
-          setExisteEstudio(!!estudioExistente);
-          console.log(`######### checkExistence  estudioExistente  ${estudioExistente}  #########`)
-          if (estudioExistente) {
-            console.log(`#$######## checkExistence  estudioExistente  ${estudioExistente}  #########`)
-            setDataEstudioMercado(estudioExistente);
+        const actionNames = ['generar estudio', 'generar estrategia', 'generar campania'];
+        const fetchedPricesUpdate: { [key: string]: number | null } = {};
+        for (const actionName of actionNames) {
+          const res = await fetch(`/api/precios?actionName=${encodeURIComponent(actionName)}`);
+          if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            throw new Error(errorData.message || `Failed to fetch price for ${actionName}: ${res.statusText}`);
           }
-        } else if (currentStep === 2) {
-          setItemActual("estrategia-marketing")
-          const estrategiaExistente = await GWV('check',projectId,"estrategia-marketing");
-          setExisteEstrategia(!!estrategiaExistente);
-          if (estrategiaExistente) {
-            setDataEstrategiaMarketing(estrategiaExistente);
+          const data = await res.json();
+          // Assuming API returns a single object if actionName is provided and found, or an array if not specific.
+          if (Array.isArray(data)) {
+            const priceDetail = data.find(p => p.actionName === actionName);
+            fetchedPricesUpdate[actionName] = priceDetail ? priceDetail.price : null;
+          } else if (data && data.price !== undefined && data.actionName === actionName) {
+            fetchedPricesUpdate[actionName] = data.price;
+          } else {
+            // If API returns all prices even with actionName query, filter here
+            const allPrices = await (await fetch('/api/precios')).json();
+            if(Array.isArray(allPrices)){
+                const priceDetail = allPrices.find(p => p.actionName === actionName);
+                fetchedPricesUpdate[actionName] = priceDetail ? priceDetail.price : null;
+            } else {
+                fetchedPricesUpdate[actionName] = null;
+            }
           }
-        } else if (currentStep === 3) {
-          setItemActual("campania-marketing")
-          const campaniaExistente = await GWV('check',projectId,"campania-marketing");
-          setExisteCampania(!!campaniaExistente);
-          if (campaniaExistente) {
-            setDataCampaniaMarketing(campaniaExistente);
+          if (fetchedPricesUpdate[actionName] === null) console.warn(`Price for ${actionName} not found or in unexpected format.`);
+        }
+        setPrices(fetchedPricesUpdate);
+      } catch (err) {
+        console.error("Error fetching prices:", err);
+        setPriceError(err instanceof Error ? err.message : "Could not load action prices.");
+      } finally {
+        setPricesLoading(false);
+      }
+    };
+    fetchPrices();
+  }, []);
+
+  useEffect(() => {
+    const projectId = idProyecto;
+    const checkExistence = async () => {
+      setIsLoading(true); // This isLoading seems to be for the step loading, not price loading.
+      setError(null);
+      try {
+        let currentItemKey = "";
+        if (currentStep === 1) currentItemKey = "estudio-mercado";
+        else if (currentStep === 2) currentItemKey = "estrategia-marketing";
+        else if (currentStep === 3) currentItemKey = "campania-marketing";
+
+        if (currentItemKey) {
+          setItemActual(currentItemKey);
+          const existingData = await GWV('check', projectId, currentItemKey);
+          if (currentStep === 1) {
+            setExisteEstudio(!!existingData);
+            if (existingData) setDataEstudioMercado(existingData);
+          } else if (currentStep === 2) {
+            setExisteEstrategia(!!existingData);
+            if (existingData) setDataEstrategiaMarketing(existingData);
+          } else if (currentStep === 3) {
+            setExisteCampania(!!existingData);
+            if (existingData) setDataCampaniaMarketing(existingData);
           }
         }
       } catch (err: any) {
@@ -126,22 +176,55 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
       }
     };
 
-    // Solo ejecuta la verificación si no estamos ya cargando
-    if (!isLoading) {
+    if (idProyecto) { // Only run if idProyecto is available
       checkExistence();
     }
-  }, [currentStep, idProyecto]); // Añadir isLoading a las dependencias si quieres re-ejecutar en cambios de carga
+  }, [currentStep, idProyecto]);
+
+
+  const handleTokenUpdate = async (responseData: any) => {
+    const resultData = Array.isArray(responseData) ? responseData[0] : responseData;
+    if (resultData && resultData.newTokens !== undefined) {
+      setUserTokens(resultData.newTokens);
+      // Optional: Update session more directly if needed, though getSession is safer
+      // await updateSession({ user: { ...(session?.user), tokens: resultData.newTokens } });
+      const updatedSession = await getSession(); // Refetch session to ensure sync
+      if (updatedSession && updatedSession.user && (updatedSession.user as any).tokens !== undefined) {
+        setUserTokens((updatedSession.user as any).tokens);
+      }
+    } else {
+      const updatedSession = await getSession();
+      if (updatedSession && updatedSession.user && (updatedSession.user as any).tokens !== undefined) {
+        setUserTokens((updatedSession.user as any).tokens);
+      }
+    }
+  };
 
   const handleGenerateEstudio = async () => {
+    const actionName = "generar estudio";
+    const currentPrice = prices[actionName];
+
+    if (pricesLoading) {
+      setError("Cargando precios, por favor espera...");
+      return;
+    }
+    if (priceError || currentPrice === null || currentPrice === undefined) {
+      setError(priceError || `No se pudo determinar el costo para ${actionName}.`);
+      return;
+    }
+    if (userTokens === null || userTokens < currentPrice) {
+      setError(`No tienes suficientes tokens para ${actionName}. Necesitas ${currentPrice}, tienes ${userTokens ?? 0}.`);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
-
     try {
-
       setItemActual("estudio-mercado");
-      const estudioData = await GWV('generate',idProyecto,"estudio-mercado");
-      setDataEstudioMercado(estudioData[0] as EstudioMercadoData);
-      setDataItemActual(estudioData[0] as EstudioMercadoData)
+      const estudioData = await GWV('generate', idProyecto, "estudio-mercado");
+      await handleTokenUpdate(estudioData);
+      setDataEstudioMercado(Array.isArray(estudioData) ? estudioData[0] as EstudioMercadoData : estudioData as EstudioMercadoData);
+      setDataItemActual(Array.isArray(estudioData) ? estudioData[0] as EstudioMercadoData : estudioData as EstudioMercadoData);
     } catch (err: any) {
       setError("Error al generar estudio de mercado: " + err.message);
     } finally {
@@ -150,23 +233,34 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
   };
 
   const handleGenerateEstrategia = async () => {
+    const actionName = "generar estrategia";
+    const currentPrice = prices[actionName];
+
+    if (pricesLoading) {
+      setError("Cargando precios, por favor espera...");
+      return;
+    }
+    if (priceError || currentPrice === null || currentPrice === undefined) {
+      setError(priceError || `No se pudo determinar el costo para ${actionName}.`);
+      return;
+    }
+    if (userTokens === null || userTokens < currentPrice) {
+      setError(`No tienes suficientes tokens para ${actionName}. Necesitas ${currentPrice}, tienes ${userTokens ?? 0}.`);
+      return;
+    }
+    if (!dataEstudioMercado) {
+      setError("Estudio de mercado es requerido para generar estrategia.");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
-
     try {
-      // Asegúrate de que dataEstudioMercado no sea null antes de pasarlo
-      if (!dataEstudioMercado) {
-        throw new Error("Estudio de mercado es requerido para generar estrategia.");
-      }
       setItemActual("estrategia-marketing");
-      const estrategiaData = await GWV('generate',idProyecto,"estrategia-marketing",dataEstudioMercado);
-      setDataEstrategiaMarketing(estrategiaData[0] as EstrategiaMarketingData);
-      setDataItemActual(estrategiaData[0] as EstrategiaMarketingData)
-      console.log("StepByStep Say> Generado. existeEstrategia?")
-      console.log(existeEstrategia)
-      console.log("StepByStep Say> Generado. estrategiaData?")
-      console.log(estrategiaData)
-
+      const estrategiaData = await GWV('generate', idProyecto, "estrategia-marketing", dataEstudioMercado);
+      await handleTokenUpdate(estrategiaData);
+      setDataEstrategiaMarketing(Array.isArray(estrategiaData) ? estrategiaData[0] as EstrategiaMarketingData : estrategiaData as EstrategiaMarketingData);
+      setDataItemActual(Array.isArray(estrategiaData) ? estrategiaData[0] as EstrategiaMarketingData : estrategiaData as EstrategiaMarketingData);
     } catch (err: any) {
       setError("Error al generar estrategia de marketing: " + err.message);
     } finally {
@@ -175,30 +269,41 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
   };
 
   const handleGenerateCampania = async () => {
+    const actionName = "generar campania";
+    const currentPrice = prices[actionName];
+
+    if (pricesLoading) {
+      setError("Cargando precios, por favor espera...");
+      return;
+    }
+    if (priceError || currentPrice === null || currentPrice === undefined) {
+      setError(priceError || `No se pudo determinar el costo para ${actionName}.`);
+      return;
+    }
+    if (userTokens === null || userTokens < currentPrice) {
+      setError(`No tienes suficientes tokens para ${actionName}. Necesitas ${currentPrice}, tienes ${userTokens ?? 0}.`);
+      return;
+    }
+    if (!dataEstrategiaMarketing) {
+      setError("Estrategia de marketing es requerida para generar campaña.");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
-
     try {
-      // Asegúrate de que dataEstrategiaMarketing no sea null
-      if (!dataEstrategiaMarketing) {
-        throw new Error("Estrategia de marketing es requerida para generar campaña.");
-      }
       setItemActual("campania-marketing");
-      console.log("HandleGenerateEstrategia say: HEllo")
-
-      const campaniaData = await GWV('generate',idProyecto,"campania-marketing",dataEstudioMercado,dataEstrategiaMarketing);
-      setDataCampaniaMarketing(campaniaData[0] as CampaniaMarketingData);
-      setDataItemActual(campaniaData[0] as CampaniaMarketingData)
-      console.log("StepByStep Say> Generado. existe campania-marketing?")
-      console.log(existeCampania)
-      console.log("StepByStep Say> Generado. campaniaData?")
-      console.log(campaniaData)
+      const campaniaData = await GWV('generate', idProyecto, "campania-marketing", dataEstudioMercado, dataEstrategiaMarketing);
+      await handleTokenUpdate(campaniaData);
+      setDataCampaniaMarketing(Array.isArray(campaniaData) ? campaniaData[0] as CampaniaMarketingData : campaniaData as CampaniaMarketingData);
+      setDataItemActual(Array.isArray(campaniaData) ? campaniaData[0] as CampaniaMarketingData : campaniaData as CampaniaMarketingData);
     } catch (err: any) {
       setError("Error al generar campaña de marketing: " + err.message);
     } finally {
       setIsLoading(false);
     }
   };
+
 
   const steps: WorkflowStep[] = [
     { number: 1, title: "Estudio de Mercado", completed: !!dataEstudioMercado },
@@ -212,6 +317,14 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
         <h1 className="text-3xl font-bold text-gray-800 mb-8">
           Flujo de Trabajo de Marketing
         </h1>
+
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md shadow-sm">
+          <p className="text-md font-semibold text-blue-700">
+            Tokens disponibles: {userTokens !== null ? userTokens : 'Cargando...'}
+          </p>
+          {pricesLoading && <p className="text-sm text-blue-600">Cargando costos de acciones...</p>}
+          {priceError && <p className="text-sm text-red-600">Error al cargar costos: {priceError}</p>}
+        </div>
 
         <div className="mb-8">
           <div className="text-sm text-gray-600 mb-2">
@@ -282,11 +395,16 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
             {existeEstudio === false && !dataEstudioMercado && !isLoading && (
               <div>
                 <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
-                  <p className="text-yellow-700">No se encontró estudio de mercado existente</p>
+                  <p className="text-yellow-700">No se encontró estudio de mercado existente.</p>
+                  {!pricesLoading && prices['generar estudio'] !== null && (
+                    <p className="text-yellow-600 text-sm">Costo: {prices['generar estudio']} tokens</p>
+                  )}
                 </div>
                 <button
                   onClick={handleGenerateEstudio}
-                  className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors"
+                  disabled={isLoading || pricesLoading || userTokens === null || userTokens < (prices['generar estudio'] ?? Infinity)}
+                  className={`bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors
+                    ${(isLoading || pricesLoading || userTokens === null || userTokens < (prices['generar estudio'] ?? Infinity)) ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   Generar Estudio de Mercado
                 </button>
@@ -332,14 +450,17 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
             {existeEstrategia === false && !dataEstrategiaMarketing && !isLoading && (
               <div>
                 <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
-                  <p className="text-yellow-700">No se encontró estrategia de marketing existente</p>
+                  <p className="text-yellow-700">No se encontró estrategia de marketing existente.</p>
+                  {!pricesLoading && prices['generar estrategia'] !== null && (
+                    <p className="text-yellow-600 text-sm">Costo: {prices['generar estrategia']} tokens</p>
+                  )}
                 </div>
                 <button
                   onClick={handleGenerateEstrategia}
-                  disabled={!dataEstudioMercado || isLoading}
+                  disabled={!dataEstudioMercado || isLoading || pricesLoading || userTokens === null || userTokens < (prices['generar estrategia'] ?? Infinity)}
                   className={`px-6 py-2 rounded-md transition-colors ${
-                    !dataEstudioMercado || isLoading
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    (!dataEstudioMercado || isLoading || pricesLoading || userTokens === null || userTokens < (prices['generar estrategia'] ?? Infinity))
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'
                       : 'bg-green-600 text-white hover:bg-green-700'
                   }`}
                 >
@@ -347,7 +468,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
                 </button>
                 {!dataEstudioMercado && (
                   <p className="text-sm text-gray-500 mt-2">
-                    Necesitas completar el Estudio de Mercado primero
+                    Necesitas completar el Estudio de Mercado primero.
                   </p>
                 )}
               </div>
@@ -389,14 +510,17 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
             {existeCampania === false && !dataCampaniaMarketing && !isLoading && (
               <div>
                 <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
-                  <p className="text-yellow-700">No se encontró campaña de marketing existente</p>
+                  <p className="text-yellow-700">No se encontró campaña de marketing existente.</p>
+                  {!pricesLoading && prices['generar campania'] !== null && (
+                    <p className="text-yellow-600 text-sm">Costo: {prices['generar campania']} tokens</p>
+                  )}
                 </div>
                 <button
                   onClick={handleGenerateCampania}
-                  disabled={!dataEstrategiaMarketing || isLoading}
+                  disabled={!dataEstrategiaMarketing || isLoading || pricesLoading || userTokens === null || userTokens < (prices['generar campania'] ?? Infinity)}
                   className={`px-6 py-2 rounded-md transition-colors ${
-                    !dataEstrategiaMarketing || isLoading
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    (!dataEstrategiaMarketing || isLoading || pricesLoading || userTokens === null || userTokens < (prices['generar campania'] ?? Infinity))
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-50'
                       : 'bg-green-600 text-white hover:bg-green-700'
                   }`}
                 >
@@ -404,7 +528,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
                 </button>
                 {!dataEstrategiaMarketing && (
                   <p className="text-sm text-gray-500 mt-2">
-                    Necesitas completar la Estrategia de Marketing primero
+                    Necesitas completar la Estrategia de Marketing primero.
                   </p>
                 )}
               </div>

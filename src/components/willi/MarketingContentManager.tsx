@@ -43,6 +43,8 @@ const MarketingContentManager: React.FC = () => {
   const [generatedPosts, setGeneratedPosts] = useState<Map<string, GeneratedContent>>(new Map());
   // Using a Map to track loading state for each generate button
   const [generatingStates, setGeneratingStates] = useState<Map<string, boolean>>(new Map());
+  const [postPrice, setPostPrice] = useState<number | null>(null);
+  const [priceError, setPriceError] = useState<string | null>(null);
 
   // Common Tailwind CSS classes for consistent styling
   const commonClasses = {
@@ -88,6 +90,42 @@ const MarketingContentManager: React.FC = () => {
     };
 
     fetchCampaignData();
+  }, [idProyecto]); // Added idProyecto as dependency, though GWV might not need it in useEffect's dep array if it's stable
+
+  useEffect(() => {
+    const fetchPostPrice = async () => {
+      try {
+        // Assuming /api/precios can filter by actionName query parameter
+        // and returns either a single price object or an array with one item.
+        const res = await fetch('/api/precios?actionName=generar post');
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({})); // Try to parse error, default if not parsable
+          throw new Error(errorData.message || `Failed to fetch price: ${res.statusText}`);
+        }
+        const data = await res.json();
+
+        if (Array.isArray(data) && data.length > 0) {
+          // If it's an array, find the specific action or take the first if only one is expected
+          const priceDetail = data.find(p => p.actionName === "generar post") || data[0];
+          if (priceDetail && typeof priceDetail.price === 'number') {
+            setPostPrice(priceDetail.price);
+          } else {
+            throw new Error("Price data for 'generar post' is not in expected format or actionName not found in array.");
+          }
+        } else if (!Array.isArray(data) && data && typeof data.price === 'number') {
+          // If it's a single object directly (e.g. API filtered perfectly)
+          setPostPrice(data.price);
+        } else {
+          // If data is an empty array or not the expected object structure
+          setPriceError("Price data for 'generar post' not found or in unexpected format.");
+          console.warn("Received data for price:", data);
+        }
+      } catch (err) {
+        console.error("Error fetching post price:", err);
+        setPriceError(err instanceof Error ? err.message : "Could not load post price.");
+      }
+    };
+    fetchPostPrice();
   }, []);
 
   const generatePost = async (originalPost:any) => {
@@ -187,60 +225,64 @@ const MarketingContentManager: React.FC = () => {
 
   const handleGeneratePost = async (weekIndex: number, dayIndex: number, originalPost: Post) => {
     const key = getKey(weekIndex, dayIndex);
+    setGeneratingStates(prev => new Map(prev).set(key, true));
 
-    // Check for session and tokens
+    // Check for session
     if (!session || !session.user || (session.user as any).tokens === undefined) {
-      alert("No se pudo verificar tu sesión o saldo de tokens. Por favor, intenta recargar la página.");
-      setGeneratingStates(prev => new Map(prev).set(key, false)); // Reset if generating was set
+      alert("No se pudo verificar tu sesión. Por favor, intenta recargar la página.");
+      setGeneratingStates(prev => new Map(prev).set(key, false));
       return;
     }
-
     const userTokens = (session.user as any).tokens;
 
-    if (userTokens <= 0) {
-      alert("No tienes suficientes tokens para generar un post.");
-      setGeneratingStates(prev => new Map(prev).set(key, false)); // Reset generating state
+    // Client-Side Token Check using fetched postPrice
+    if (postPrice === null && !priceError) {
+      alert("Cargando precio del post. Inténtalo de nuevo en un momento.");
+      setGeneratingStates(prev => new Map(prev).set(key, false));
+      return;
+    }
+    if (priceError) {
+      alert(`No se pudo determinar el costo del post: ${priceError}`);
+      setGeneratingStates(prev => new Map(prev).set(key, false));
+      return;
+    }
+    // Add ! to postPrice because we've checked for null/error above
+    if (userTokens < postPrice!) {
+      alert(`No tienes suficientes tokens. Necesitas ${postPrice} tokens, tienes ${userTokens}.`);
+      setGeneratingStates(prev => new Map(prev).set(key, false));
       return;
     }
 
-    setGeneratingStates(prev => new Map(prev).set(key, true));
-    console.log(`Generating content for post: "${originalPost.titulo}" (Tema: ${originalPost.tema}). User has ${userTokens} tokens.`);
+    console.log(`Generating content for post: "${originalPost.titulo}" (Tema: ${originalPost.tema}). User has ${userTokens} tokens. Cost: ${postPrice} tokens.`);
 
     try {
-      // Simulate AI API call for content generation
-      const generated: any =  await generatePost(originalPost);
+      const generated: any = await generatePost(originalPost); // generatePost now only calls /api/willi
 
       setGeneratedPosts(prev => new Map(prev).set(key, generated));
       console.log(`Content generated for ${key}:`, generated);
 
-      // Call API to decrement token
-      try {
-        const tokenResponse = await fetch('/api/user/decrement-tokens', {
-          method: 'POST',
-        });
-
-        if (!tokenResponse.ok) {
-          const errorData = await tokenResponse.json();
-          // Log the error, but don't necessarily block the user if generation itself was successful
-          console.error('Failed to decrement tokens:', errorData.message);
-          alert(`Contenido generado, pero hubo un problema al actualizar tus tokens: ${errorData.message}`);
-        } else {
-          const result = await tokenResponse.json();
-          console.log('Tokens updated:', result);
-          // Update session data locally if possible/needed, or rely on next session refetch
-          if (session && session.user) {
-            (session.user as any).tokens = result.tokens; // Update local session token count
+      // Assuming 'generated' might now contain { texto: ..., imagen: ..., newTokens: ... }
+      // The backend (/api/willi -> ia-* routes) should handle token deduction and ideally return the new balance.
+      if (session && session.user && generated.newTokens !== undefined) {
+        (session.user as any).tokens = generated.newTokens;
+        // No specific alert for token update here, session will reflect it.
+        // Or, if you want to be explicit:
+        // alert(`Post generado exitosamente. Tokens restantes: ${generated.newTokens}`);
+      } else {
+        // If newTokens is not returned, user might need to refresh or session polling would update it.
+        // Fetch new token count manually as a fallback if not returned by generatePost
+        const tokenInfoResponse = await fetch('/api/auth/session'); // Or your specific endpoint to get updated session
+        if (tokenInfoResponse.ok) {
+          const updatedSession = await tokenInfoResponse.json();
+          if (updatedSession && updatedSession.user && updatedSession.user.tokens !== undefined) {
+            (session.user as any).tokens = updatedSession.user.tokens;
           }
-          alert('Post generado y un token ha sido consumido. Tokens restantes: ' + result.tokens);
         }
-      } catch (apiError) {
-        console.error('Error calling token decrement API:', apiError);
-        alert('Contenido generado, pero hubo un error al comunicar con el servicio de tokens.');
       }
+      alert('Post generado exitosamente.'); // Simpler success message
 
-    } catch (err) { // This is the original catch for content generation errors
+    } catch (err) {
       console.error(`Error generating content for ${key}:`, err);
-      // Handle generation error (e.g., display error message to user)
       alert(`Error al generar el contenido: ${err instanceof Error ? err.message : "Error desconocido"}`);
     } finally {
       setGeneratingStates(prev => new Map(prev).set(key, false));
@@ -311,6 +353,12 @@ const MarketingContentManager: React.FC = () => {
           <p className="text-lg font-semibold text-blue-700">
             Tokens restantes: <span className="font-bold text-xl">{(session.user as any).tokens}</span>
           </p>
+          {postPrice !== null && (
+            <p className="text-sm text-blue-600">Costo por generar post: {postPrice} tokens</p>
+          )}
+          {priceError && (
+            <p className="text-sm text-red-600">Error al cargar precio del post: {priceError}</p>
+          )}
         </div>
       )}
 

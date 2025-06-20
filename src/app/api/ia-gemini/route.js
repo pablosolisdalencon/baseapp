@@ -1,5 +1,12 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { connectDB } from '../../../utils/mongoose'; // For Price model
+import Price from '@/models/Price'; // Import Price model
+import { getServerSession } from 'next-auth/next'; // Import for session
+import { authOptions } from '../auth/[...nextauth]/route'; // Import authOptions
+
+// Define the action name for price lookup
+const actionName = "generar post gemini";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || "");
 const model = genAI.getGenerativeModel({
@@ -52,19 +59,53 @@ const model = genAI.getGenerativeModel({
  * API route for generating content using Gemini AI model.
  */
 export async function POST(req) {
-  /**
-   * Get the prompt from the request body.
-   */
-  
-  const data = await req.json();
-  
-  const prompt = data.prompt;
-  
-
-  /**
-   * Use the Gemini AI model to generate content from the prompt.
-   */
   try {
+    // 0. Connect to DB (for Price model)
+    await connectDB();
+
+    // 1. Authenticate user
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || !(session.user).id) {
+      return new Response(JSON.stringify({ message: 'Unauthorized: User not authenticated.' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    // 2. Fetch the price for the action
+    const priceEntry = await Price.findOne({ actionName });
+    if (!priceEntry) {
+      return new Response(JSON.stringify({ message: `Price not found for action: ${actionName}` }), { status: 404, headers: { 'Content-Type': 'application/json' } });
+    }
+    const tokensToDecrement = priceEntry.price;
+    if (typeof tokensToDecrement !== 'number' || tokensToDecrement <= 0) {
+      return new Response(JSON.stringify({ message: `Invalid price configured for action: ${actionName}` }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    // 3. Call token decrement endpoint
+    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+    const host = req.headers.get('host');
+    const absoluteUrl = `${protocol}://${host}/api/user/decrement-tokens`;
+
+    const tokenDecrementResponse = await fetch(absoluteUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': req.headers.get('cookie') || "", // Forward cookies
+      },
+      body: JSON.stringify({ tokensToDecrement }),
+    });
+
+    if (!tokenDecrementResponse.ok) {
+      const errorData = await tokenDecrementResponse.json().catch(() => ({ message: 'Failed to parse error response from token decrement service.' }));
+      return new Response(JSON.stringify({ message: errorData.message || 'Failed to decrement tokens.' }), { status: tokenDecrementResponse.status, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    // 4. If token deduction is successful, proceed with original Gemini API logic
+    const data = await req.json();
+    const prompt = data.prompt;
+
+    if (!prompt) {
+      return NextResponse.json({ error: 'Prompt is required for Gemini API' }, { status: 400 });
+    }
+
     const result = await model.generateContent(prompt);
 
     /**
@@ -178,8 +219,17 @@ export async function POST(req) {
     return NextResponse.json({
       ia: result.response.text(),
     });
+
   } catch (error) {
-    console.error("Error generating content:", error);
-    return NextResponse.json({ error: "Failed to generate content" }, { status: 500 });
+    console.error("Error in POST /api/ia-gemini:", error); // Added more specific logging
+    // Check if the error is a Response object (from our custom error handling)
+    if (error instanceof Response) {
+        return error;
+    }
+    let errorMessage = 'Failed to generate content or process request.';
+    if (error.message) {
+        errorMessage = error.message;
+    }
+    return NextResponse.json({ error: errorMessage, details: error.toString() }, { status: 500 });
   }
 }
