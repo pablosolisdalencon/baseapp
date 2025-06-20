@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import { useSession } from "next-auth/react"; // Added for session management
 // Import only the necessary types from the central types file
 import {
   CampaniaMarketingData,
@@ -34,6 +35,7 @@ const renderTags = (items: string[] | undefined, label: string = '', baseClass: 
 const MarketingContentManager: React.FC = () => {
   const searchParams = useSearchParams();
     const idProyecto = searchParams.get('id');
+  const { data: session } = useSession(); // Added for session data
   const [campaignData, setCampaignData] = useState<CampaniaMarketingData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -185,8 +187,24 @@ const MarketingContentManager: React.FC = () => {
 
   const handleGeneratePost = async (weekIndex: number, dayIndex: number, originalPost: Post) => {
     const key = getKey(weekIndex, dayIndex);
+
+    // Check for session and tokens
+    if (!session || !session.user || (session.user as any).tokens === undefined) {
+      alert("No se pudo verificar tu sesión o saldo de tokens. Por favor, intenta recargar la página.");
+      setGeneratingStates(prev => new Map(prev).set(key, false)); // Reset if generating was set
+      return;
+    }
+
+    const userTokens = (session.user as any).tokens;
+
+    if (userTokens <= 0) {
+      alert("No tienes suficientes tokens para generar un post.");
+      setGeneratingStates(prev => new Map(prev).set(key, false)); // Reset generating state
+      return;
+    }
+
     setGeneratingStates(prev => new Map(prev).set(key, true));
-    console.log(`Generating content for post: "${originalPost.titulo}" (Tema: ${originalPost.tema})...`);
+    console.log(`Generating content for post: "${originalPost.titulo}" (Tema: ${originalPost.tema}). User has ${userTokens} tokens.`);
 
     try {
       // Simulate AI API call for content generation
@@ -194,9 +212,36 @@ const MarketingContentManager: React.FC = () => {
 
       setGeneratedPosts(prev => new Map(prev).set(key, generated));
       console.log(`Content generated for ${key}:`, generated);
-    } catch (err) {
+
+      // Call API to decrement token
+      try {
+        const tokenResponse = await fetch('/api/user/decrement-tokens', {
+          method: 'POST',
+        });
+
+        if (!tokenResponse.ok) {
+          const errorData = await tokenResponse.json();
+          // Log the error, but don't necessarily block the user if generation itself was successful
+          console.error('Failed to decrement tokens:', errorData.message);
+          alert(`Contenido generado, pero hubo un problema al actualizar tus tokens: ${errorData.message}`);
+        } else {
+          const result = await tokenResponse.json();
+          console.log('Tokens updated:', result);
+          // Update session data locally if possible/needed, or rely on next session refetch
+          if (session && session.user) {
+            (session.user as any).tokens = result.tokens; // Update local session token count
+          }
+          alert('Post generado y un token ha sido consumido. Tokens restantes: ' + result.tokens);
+        }
+      } catch (apiError) {
+        console.error('Error calling token decrement API:', apiError);
+        alert('Contenido generado, pero hubo un error al comunicar con el servicio de tokens.');
+      }
+
+    } catch (err) { // This is the original catch for content generation errors
       console.error(`Error generating content for ${key}:`, err);
       // Handle generation error (e.g., display error message to user)
+      alert(`Error al generar el contenido: ${err instanceof Error ? err.message : "Error desconocido"}`);
     } finally {
       setGeneratingStates(prev => new Map(prev).set(key, false));
     }
@@ -259,6 +304,15 @@ const MarketingContentManager: React.FC = () => {
       <p className="text-center text-gray-600 mb-10 text-lg italic">
         Objetivo: {campaignData.objetivo || "No definido."} | Target: {campaignData.target || "No definido."}
       </p>
+
+      {/* Display Token Count */}
+      {session && session.user && (session.user as any).tokens !== undefined && (
+        <div className="my-4 p-3 bg-blue-100 border border-blue-300 rounded-md shadow text-center">
+          <p className="text-lg font-semibold text-blue-700">
+            Tokens restantes: <span className="font-bold text-xl">{(session.user as any).tokens}</span>
+          </p>
+        </div>
+      )}
 
       <section className={commonClasses.section}>
         <h2 className={commonClasses.sectionTitle}>Planificación de Contenido</h2>
