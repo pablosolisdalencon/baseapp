@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import  useTokens  from '../tokens/simpleTokens';
+import useTokens from '../tokens/simpleTokens';
 // Import only the necessary types from the central types file
 import {
   CampaniaMarketingData,
@@ -35,10 +35,11 @@ const renderTags = (items: string[] | undefined, label: string = '', baseClass: 
 };
 
 const MarketingContentManager: React.FC = () => {
+  const {data: session } = useSession()
 
-    const { data: session, status } = useSession();
+   
 
-const [currentUserEmail, setCurrentUserEmail] = useState<any | null>(session?.user?.email);
+const [currentUserEmail, setCurrentUserEmail] = useState<any | null>();
 
 
   const searchParams = useSearchParams();
@@ -77,8 +78,8 @@ const [currentUserEmail, setCurrentUserEmail] = useState<any | null>(session?.us
     postDetails: "text-sm text-gray-700 mt-1",
     generatedTextArea: "w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 text-sm resize-none"
   };
-
   useEffect(() => {
+    
     const fetchCampaignData = async () => {
       setLoading(true);
       setError(null);
@@ -86,6 +87,7 @@ const [currentUserEmail, setCurrentUserEmail] = useState<any | null>(session?.us
         // Simulating API call to fetch campaign data using the new structure
         const response = await GWV('check',idProyecto,"campania-marketing");
         setCampaignData(response);
+        
       } catch (err) {
         setError("Failed to fetch campaign data.");
         console.error(err);
@@ -93,95 +95,9 @@ const [currentUserEmail, setCurrentUserEmail] = useState<any | null>(session?.us
         setLoading(false);
       }
     };
-
+    
     fetchCampaignData();
   }, []);
-
-  const generatePost = async (originalPost:any) => {
-    
-    setError(null);
-    try 
-
-    
-    {
-
-      let bodyData = JSON.stringify({  item: 'post-final', post: originalPost });
-
-      let bodyData_img = JSON.stringify({  item: 'post-final-img', post: originalPost });
-        const response = await fetch(`/api/willi`, {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: bodyData,
-        });
-
-        
-        const response_imagen = await fetch(`/api/willi?p=${idProyecto}`, {
-          method: 'POST',
-          headers: {
-          'Content-Type': 'application/json',
-          },
-          body: bodyData_img,
-      });
-      
-    
-        if (response.ok) {
-          // Si la respuesta es 200 OK, asumimos que el item fue encontrado.
-          // La API debería devolver los datos del item directamente.
-          const res  = await response.json();
-          //  FIN OK
-          //-------------------------/
-          const texto_final = res[0].texto;
-          
-          if (response_imagen.ok) {
-            // Si la respuesta es 200 OK, asumimos que el item fue encontrado.
-            // La API debería devolver los datos del item directamente.
-            const res_img  = await response_imagen.json();
-            //  FIN OK
-            //-------------------------/
-            const imagen_final = res_img[0].data;
-            const response_final = {
-              texto: texto_final,
-              imagen: imagen_final
-            }
-            //-------------------------/
-            return response_final as GeneratedContent
-  
-          } else if (response_imagen.status === 404) {
-            // Si la API devuelve 404 Not Found, significa que no existe La api o seting para este artefacto?.
-            return null
-          } else {
-            // Manejo de otros posibles errores de la API
-            const errorData = await response_imagen.json();
-            throw new Error(errorData.message || `generatePostImagen Error al crear  idProyecto(${idProyecto}) = status[${response.status}] StatusText [${response.statusText}]`);
-          }
-          //-------------------------/
-          
-
-        } else if (response.status === 404) {
-          // Si la API devuelve 404 Not Found, significa que no existe La api o seting para este artefacto?.
-          return null
-        } else {
-          // Manejo de otros posibles errores de la API
-          const errorData = await response.json();
-          throw new Error(errorData.message || `generatePost Error al crear  idProyecto(${idProyecto}) = status[${response.status}] StatusText [${response.statusText}]`);
-        }
-
-
-        
-
-        
-
-
-        
-
-    } catch (error) {
-        console.error(` generatePost    Fallo al crear : idProyecto(${idProyecto})`, error);
-        // Relanza el error para que el componente lo maneje en el estado `error`
-        throw new Error(`generatePost   No se pudo crear  : idProyecto(${idProyecto})`);
-    }
-  };
 
   
 
@@ -192,24 +108,7 @@ const [currentUserEmail, setCurrentUserEmail] = useState<any | null>(session?.us
   const getKey = (weekIndex: number, dayIndex: number) =>
     `${weekIndex}_${dayIndex}`;
 
-  const handleGeneratePost = async (weekIndex: number, dayIndex: number, originalPost: Post) => {
-    const key = getKey(weekIndex, dayIndex);
-    setGeneratingStates(prev => new Map(prev).set(key, true));
-    console.log(`Generating content for post: "${originalPost.titulo}" (Tema: ${originalPost.tema})...`);
-
-    try {
-      // Simulate AI API call for content generation
-      const generated: any =  await generatePost(originalPost);
-
-      setGeneratedPosts(prev => new Map(prev).set(key, generated));
-      console.log(`Content generated for ${key}:`, generated);
-    } catch (err) {
-      console.error(`Error generating content for ${key}:`, err);
-      // Handle generation error (e.g., display error message to user)
-    } finally {
-      setGeneratingStates(prev => new Map(prev).set(key, false));
-    }
-  };
+  
 
   const handleSavePost = (weekIndex: number, dayIndex: number) => {
     const key = getKey(weekIndex, dayIndex);
@@ -234,6 +133,27 @@ const [currentUserEmail, setCurrentUserEmail] = useState<any | null>(session?.us
       alert("No hay contenido generado para publicar.");
     }
   };
+
+  const handleUseTokens = async (action: string, objectAction:any,email:string) => {
+    const key = getKey(objectAction.week, objectAction.day);
+    setGeneratingStates(prev => new Map(prev).set(key, true));
+    let generated:GeneratedContent =  {
+      texto: "Error en texto",
+      imagen: "error en imagen"
+    }
+     const exec = await useTokens(action,objectAction,email)
+     console.log("@@@@@@  EXEC   @@@@@@@@@@@@")
+    console.log(exec)
+
+     if(exec!=null){
+      setGeneratedPosts(prev => new Map(prev).set(key, exec.generated));
+      setGeneratingStates(prev => new Map(prev).set(key, false));
+     }else{
+      setGeneratingStates(prev => new Map(prev).set(key, false));
+     }
+     
+
+  }
 
   if (loading) {
     return (
@@ -261,97 +181,6 @@ const [currentUserEmail, setCurrentUserEmail] = useState<any | null>(session?.us
   }
 
 
-// Define los tipos para las props del ActionButton
-interface ActionButtonProps {
-  onClick: () => void;
-  actionName: string;
-  cost: string;
-  isLoading: boolean;
-  isErrorTest?: boolean;
-}
-// Simula el email del usuario en sesión
-//const { executeTokenAction, isLoading, errorT, successMessage, userTokensBalance } = useTokens(currentUserEmail as string);
-//const [actionResult, setActionResult] = useState<any | null>(null); // Puedes tipar 'any' de forma más específica si conoces la estructura de tus resultados
-/*
-const handleActionClick = async (actionName: string, data: any) => {
-  setCurrentUserEmail(session?.user?.email)
-    setActionResult(null); // Limpiar resultado anterior
-    console.log(`Attempting to execute action: ${actionName}`);
-    const result = await executeTokenAction(actionName, data);
-
-    if (result.success) {
-        console.log(`Action "${actionName}" successful:`, result.data);
-        setActionResult(result.data);
-    } else {
-        console.error(`Action "${actionName}" failed:`, result.message);
-        setActionResult({ status: 'failed', message: result.message });
-    }
-};
-
-const ActionButton: React.FC<ActionButtonProps> = ({ onClick, actionName, cost, isLoading, isErrorTest = false }) => {
-  return (
-      <button
-          onClick={onClick}
-          disabled={isLoading}
-          className={`
-              w-full px-6 py-3 rounded-lg text-white font-semibold text-lg
-              transition duration-300 ease-in-out transform hover:scale-105
-              ${isLoading ? 'bg-gray-400 cursor-not-allowed' : (isErrorTest ? 'bg-red-500 hover:bg-red-600' : 'bg-indigo-600 hover:bg-indigo-700')}
-              focus:outline-none focus:ring-4 focus:ring-indigo-300 focus:ring-opacity-75
-          `}
-      >
-          {isLoading ? 'Cargando...' : `${actionName} (${cost})`}
-      </button>
-  );
-};
-
-
-
-
- <ActionButton
-                            onClick={() => handleActionClick('genEstudio', { topic: 'Mercado AI' })}
-                            actionName="Generar Estudio"
-                            cost="0.50 tokens"
-                            isLoading={isLoading}
-                          />
-                          <ActionButton
-                              onClick={() => handleActionClick('genEstrategia', { type: 'Lanzamiento' })}
-                              actionName="Generar Estrategia"
-                              cost="0.75 tokens"
-                              isLoading={isLoading}
-                          />
-
-
-
-                               {isLoading && (
-                                            <div className="text-center text-blue-600 text-lg font-semibold animate-pulse">
-                                                Procesando acción... por favor espera.
-                                            </div>
-                                        )}
-
-                                        {error && (
-                                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                                                <strong className="font-bold">Error: </strong>
-                                                <span className="block sm:inline">{error}</span>
-                                            </div>
-                                        )}
-
-                                        {successMessage && (
-                                            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-                                                <strong className="font-bold">Éxito: </strong>
-                                                <span className="block sm:inline">{successMessage}</span>
-                                            </div>
-                                        )}
-
-                                        {actionResult && (
-                                            <div className="bg-gray-50 p-4 rounded-md shadow-inner mt-6">
-                                                <h3 className="text-xl font-bold text-gray-800 mb-3">Resultado de la Acción:</h3>
-                                                <pre className="whitespace-pre-wrap break-words bg-gray-100 p-3 rounded-md text-sm text-gray-700">
-                                                    {JSON.stringify(actionResult, null, 2)}
-                                                </pre>
-                                            </div>
-                                        )}
-*/
 
   return (
     <div className={commonClasses.container}>
@@ -378,8 +207,8 @@ const ActionButton: React.FC<ActionButtonProps> = ({ onClick, actionName, cost, 
                     const generatedContent = generatedPosts.get(key);
                     const isGenerating = generatingStates.get(key) || false;
 
-                    console.log(" +++++++++++ generatedContent  ============")
-                    console.log(generatedContent)
+                    //console.log(" +++++++++++ generatedContent  ============")
+                    //console.log(generatedContent)
 
                     return (
                       <div key={dia.fecha} className="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
@@ -455,23 +284,23 @@ const ActionButton: React.FC<ActionButtonProps> = ({ onClick, actionName, cost, 
 
                         {/* Contenedor de botones Generar, Guardar, Publicar */}
                         <div className={commonClasses.buttonGroup}>
-                          <button
-                            onClick={() => handleGeneratePost(weekIndex, dayIndex, post)}
-                            className={`${commonClasses.buttonBase} ${commonClasses.buttonGenerate} ${isGenerating ? commonClasses.buttonDisabled : ''}`}
-                            disabled={isGenerating}
-                          >
                           
-                            {isGenerating ? 'Generando...' : 'Generar'}
-                          </button>
 
-
-                          <button
-                            onClick={() => useTokens("generate-post",{week:weekIndex, day:dayIndex, post:post})}
-                            className={`${commonClasses.buttonBase} ${commonClasses.buttonGenerate} ${isGenerating ? commonClasses.buttonDisabled : ''}`}
-                            disabled={isGenerating}
-                          >
-                           {isGenerating ? 'Generando...' : 'Generar New'}
-                          </button>
+                            {session?.user ? (
+                                               <button
+                                               onClick={() => handleUseTokens("generate-post",{week:weekIndex, day:dayIndex, post:post},session?.user?.email as string )}
+                                               className={`${commonClasses.buttonBase} ${commonClasses.buttonGenerate} ${isGenerating ? commonClasses.buttonDisabled : ''}`}
+                                               disabled={isGenerating}
+                                             >
+                                              {isGenerating ? 'Generando...' : 'Generar New'}
+                                             </button>
+                                          ):(
+                                              <div className="nav-links"> 
+                                              Conectando tu almacen de Tokens
+                                          </div>
+                                              
+                                          )}
+                         
 
 
                           <button

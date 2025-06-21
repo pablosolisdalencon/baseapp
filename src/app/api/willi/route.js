@@ -34,6 +34,8 @@ const model = genAI.getGenerativeModel({
 
 export async function POST(req) {
   const dataR = await req.json();
+  console.log("@@@@@@@ POST POST ")
+  console.log(dataR)
   try {
     const fileMetaName = btoa(dataR.post.titulo);
     const finalPrompt = getPrompt(dataR.item,jsonToPrompt(dataR.maker),jsonToPrompt(dataR.estudio),jsonToPrompt(dataR.estrategia),jsonToPrompt(dataR.post));
@@ -49,17 +51,14 @@ export async function POST(req) {
         });
       }
 
-      async function savePostImg(data){
-        
+    /*  async function savePostImg(data){    
             connectDB();
-            
-
-            const newProyecto = new PostImage(data)
-            const savedProyecto = await newProyecto.save() 
-            console.log(savedProyecto);
-            
-           return NextResponse.json({"message": "holas proyecto POST"});
+            const newData = new PostImage(data)
+            const savedData = await newData.save() 
+            console.log(savedData);          
+            return NextResponse.json({"message": "holas proyecto POST"});
       }
+            */
       
       async function main() {
         const ai = new GoogleGenAI({
@@ -99,7 +98,7 @@ export async function POST(req) {
             const fileExtension = mime.getExtension(inlineData.mimeType || '');
             const buffer = Buffer.from(inlineData.data || '', 'base64');
             saveBinaryFile(`${fileName}.${fileExtension}`, buffer);
-            savePostImg(`${fileName}.${fileExtension}`)
+            //savePostImg(`${fileName}.${fileExtension}`)
             return inlineData
           }
           else {
