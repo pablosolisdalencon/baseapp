@@ -4,6 +4,8 @@ import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faBoxesPacking, faTrashCan, faBullhorn, faMobileScreenButton } from '@fortawesome/free-solid-svg-icons';
 import ConfirmModal from "@/components/ConfirmModal";
+import { useSession } from "next-auth/react";
+
 
 interface ItemType {
   _id: string;
@@ -13,6 +15,7 @@ interface ItemType {
 }
 
 const ProyectosClient: React.FC = () => {
+  const { data: session, status } = useSession();
   const [dataList, setDataList] = useState<ItemType[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,27 +52,34 @@ const ProyectosClient: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`/api/proyecto`);
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        const jsonData: any = await res.json();
-        setDataList(jsonData.data);
-      } catch (err: any) {
-        setError(`Error al cargar proyectos: ${err.message}`);
-        setDataList(null);
-      } finally {
-        setIsLoading(false);
+  const fetchProyectos = async (email: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/proyecto?user=${email}`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
       }
-    };
+      const jsonData: any = await res.json();
+      setDataList(jsonData.data);
+    } catch (err: any) {
+      setError(`Error al cargar proyectos: ${err.message}`);
+      setDataList(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchData();
-  }, []);
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (status === "authenticated" && session?.user?.email) {
+      fetchProyectos(session.user.email);
+    } else if (status === "unauthenticated") {
+      setError("No estás autenticado.");
+    }
+  }, [status, session?.user?.email]);
+
 
   const renderContent = () => {
     if (isLoading) {
