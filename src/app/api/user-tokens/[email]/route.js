@@ -1,5 +1,5 @@
-import { connectDB } from '../../utils/mongoose';
-import UserTokens from '../../models/UserTokens';
+import { connectDB } from '../../../../utils/mongoose';
+import UserTokens from '../../../../models/UserTokens';
 
 export default async function handler(req, res) {
   await connectDB();
