@@ -1,8 +1,6 @@
 "use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faBoxesPacking, faTrashCan, faBullhorn, faMobileScreenButton } from '@fortawesome/free-solid-svg-icons';
 import ConfirmModal from "@/components/ConfirmModal";
@@ -14,19 +12,12 @@ interface ItemType {
   logo: string;
 }
 
-interface ProyectosClientProps {}
-
-const ProyectosClient: React.FC<ProyectosClientProps> = () => {
-  const { data: session, status } = useSession();
+const ProyectosClient: React.FC = () => {
   const [dataList, setDataList] = useState<ItemType[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [userReady, setUserReady] = useState(false);
-
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<ItemType | null>(null);
-
-  const router = useRouter();
 
   const handleDeleteClick = (item: ItemType) => {
     setItemToDelete(item);
@@ -49,58 +40,36 @@ const ProyectosClient: React.FC<ProyectosClientProps> = () => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${session?.accessToken}`,
       },
     });
     const data = await res.json();
     if (data) {
       alert("Eliminado correctamente");
       console.log(data);
-      router.refresh();
-      router.push(`/proyectos`);
     }
   };
 
   useEffect(() => {
-    if (status === "loading") {
+    const fetchData = async () => {
       setIsLoading(true);
-      setUserReady(false);
-      return;
-    }
-
-    if (status === "unauthenticated") {
-      router.push(`/api/auth/signin?callbackUrl=${encodeURIComponent("/proyectos")}`);
-      return;
-    }
-
-    const user = session?.user?.email;
-    setUserReady(!!user);
-
-    if (user) {
-      const fetchData = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-          const res = await fetch(`/api/proyecto?user=${user}`);
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-          }
-          const jsonData: any = await res.json();
-          setDataList(jsonData.data);
-        } catch (err: any) {
-          setError(`Error al cargar proyectos: ${err.message}`);
-          setDataList(null);
-        } finally {
-          setIsLoading(false);
+      setError(null);
+      try {
+        const res = await fetch(`/api/proyecto`);
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
         }
-      };
+        const jsonData: any = await res.json();
+        setDataList(jsonData.data);
+      } catch (err: any) {
+        setError(`Error al cargar proyectos: ${err.message}`);
+        setDataList(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-      fetchData();
-    } else {
-      setIsLoading(false);
-      setDataList(null);
-    }
-  }, [session?.user?.email, status]);
+    fetchData();
+  }, []);
 
   const renderContent = () => {
     if (isLoading) {
@@ -117,7 +86,7 @@ const ProyectosClient: React.FC<ProyectosClientProps> = () => {
           {dataList.map((proyecto) => (
             <div className="app-card" key={proyecto._id}>
               <div className="app-card-image-container">
-                <img src={proyecto.logo} alt={proyecto.nombre} className="app-card-image" />
+                <img src={proyecto.logo} alt={proyecto.nombre} className="app-image" />
               </div>
               <div className="app-card-content">
                 <div>
@@ -166,7 +135,7 @@ const ProyectosClient: React.FC<ProyectosClientProps> = () => {
         </div>
       );
     } else {
-      return <p>{userReady ? "Sin datos" : "Esperando información del usuario..."}</p>;
+      return <p>No hay proyectos disponibles.</p>;
     }
   };
 
