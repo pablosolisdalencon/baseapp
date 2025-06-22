@@ -3,7 +3,7 @@ import React from 'react'; // Necesario para .tsx
 import { useState, useEffect } from 'react';
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { useSaldo } from '../../app/SaldoContext'; // Importa el contexto de saldo
+import { useSaldo } from '../../app/AppContext'; // Importa el contexto de saldo
 import {useTokens,validarSaldo,getPrice,devTool} from '../tokens/simpleTokens';
 
 import GWV from '@/utils/GWV';

@@ -10,7 +10,7 @@ import {
 } from '../../types/marketingWorkflowTypes';
 import GWV from '@/utils/GWV';
 import { useSearchParams } from "next/navigation";
-import { useSaldo } from '../../app/SaldoContext'; // Importa el contexto de saldo
+import { useSaldo } from '../../app/AppContext'; // Importa el contexto de saldo
 import { useSession } from "next-auth/react";
 
 // Define type for generated content, which is the output format from 'Generar'

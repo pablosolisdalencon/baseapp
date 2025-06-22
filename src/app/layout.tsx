@@ -1,31 +1,14 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import Navbar from '@/components/Navbar';
-import {Providers} from "./Providers";
-import { SaldoProvider } from "./SaldoContext";
+import Navbar from "@/components/Navbar";
+import { AppProvider } from "@/app/AppContext";
 
-
-
-
-export const metadata: Metadata = {
-  title: "eWave [ Epic Media Wave ]",
-  description: "Marketing Projects Manager",
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
       <body>
-        <Providers>
-          <SaldoProvider>
-            <Navbar/>
-            {children}
-          </SaldoProvider>
-        </Providers>
+        <AppProvider>
+          <Navbar />
+          {children}
+        </AppProvider>
       </body>
     </html>
   );
