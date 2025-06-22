@@ -1,18 +1,15 @@
 'use client';
 import React from 'react'; // Necesario para .tsx
 import { useState, useEffect } from 'react';
-import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { useSaldo } from '../../app/AppContext'; // Importa el contexto de saldo
-import {useTokens,validarSaldo,getPrice,devTool} from '../tokens/simpleTokens';
+import { useAppContext } from '../../app/AppContext'; // Importa el contexto de saldo
+import {useTokens,validarSaldo,getPrice} from '../tokens/simpleTokens';
 
 import GWV from '@/utils/GWV';
 import {
-  MakerData,
   EstudioMercadoData,
   EstrategiaMarketingData,
   CampaniaMarketingData,
-  WilliAPIResponse,
   WorkflowStep,
 } from '../../types/marketingWorkflowTypes'; // Asegúrate de ajustar la ruta
 
@@ -28,6 +25,7 @@ interface MarketingWorkflowProps {
   
   
 const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
+  const { session, saldo, setSaldo } = useAppContext();
 
   const searchParams = useSearchParams();
   const thisIDP = searchParams.get('id');
@@ -173,12 +171,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
   
   },[]);
 
-    
-
-
-  const { setSaldo } = useSaldo(); // Obtén la función para actualizar el saldo desde el contexto
-  const {data: session } = useSession()
-
+  
   
   const handleGenerateEstudio = async () => {
     setEmail(session?.user?.email as string)
