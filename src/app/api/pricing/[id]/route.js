@@ -1,6 +1,6 @@
 // pages/api/pricings/[id].js
-import { connectDB } from '../../../utils/mongoose';
-import Pricing from '@/models/Pricing'; 
+import { connectDB } from '@/utils/mongoose';
+import Pricing from '@/models/Prices'; 
 import mongoose from 'mongoose';
 
 export default async function handler(req, res) {
