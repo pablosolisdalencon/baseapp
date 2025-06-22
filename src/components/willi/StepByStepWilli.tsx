@@ -1,9 +1,11 @@
 'use client';
-
-import { useState, useEffect } from 'react';
-import { useSearchParams } from "next/navigation";
-
 import React from 'react'; // Necesario para .tsx
+import { useState, useEffect } from 'react';
+import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
+import { useSaldo } from '../../app/SaldoContext'; // Importa el contexto de saldo
+import {useTokens,validarSaldo,getPrice,devTool} from '../tokens/simpleTokens';
+
 import GWV from '@/utils/GWV';
 import {
   MakerData,
@@ -26,14 +28,21 @@ interface MarketingWorkflowProps {
   
   
 const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
+
   const searchParams = useSearchParams();
-  const idProyecto = searchParams.get('id');
+  const thisIDP = searchParams.get('id');
+  const [idProyecto, setIdProyecto] = useState<string | null>(thisIDP);
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const [itemActual, setItemActual] = useState<string | null>(null);
   const [dataItemActual, setDataItemActual] = useState<object | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+
+  const [priceEstudio, setPriceEstudio] = useState<number | null>(null);
+  const [priceEstrategia, setPriceEstrategia] = useState<number | null>(null);
+  const [priceCampania, setPriceCampania] = useState<number | null>(null);
 
   // Estados para los datos, ahora tipados con 'null' o el tipo de interfaz
   const [dataEstudioMercado, setDataEstudioMercado] = useState<EstudioMercadoData | null>(null);
@@ -84,9 +93,12 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
   // Efecto para verificar existencia de datos cuando cambia el paso
   
   useEffect(() => {
+     setIdProyecto(thisIDP)
+    
+
     const projectId=idProyecto;
 
-    console.log(`######### useEffect  projectId  ${projectId}  #########`)
+    //console.log(`######### useEffect  projectId  ${projectId}  #########`)
         
 
     const checkExistence = async () => {
@@ -96,12 +108,13 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
 
       try {
         if (currentStep === 1) {
+          
           setItemActual("estudio-mercado")
           const estudioExistente = await GWV('check',projectId,"estudio-mercado");
           setExisteEstudio(!!estudioExistente);
-          console.log(`######### checkExistence  estudioExistente  ${estudioExistente}  #########`)
+          //console.log(`######### checkExistence  estudioExistente  ${estudioExistente}  #########`)
           if (estudioExistente) {
-            console.log(`#$######## checkExistence  estudioExistente  ${estudioExistente}  #########`)
+            //console.log(`#$######## checkExistence  estudioExistente  ${estudioExistente}  #########`)
             setDataEstudioMercado(estudioExistente);
           }
         } else if (currentStep === 2) {
@@ -132,16 +145,69 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
     }
   }, [currentStep, idProyecto]); // Añadir isLoading a las dependencias si quieres re-ejecutar en cambios de carga
 
+  useEffect(() => {
+      const getEstudioPrice = async () => {
+        const responsePrice = await getPrice("generate-estudio")
+        if(responsePrice){
+          setPriceEstudio(responsePrice)
+        }
+      }
+      getEstudioPrice();
+    
+
+    const getEstrategiaPrice = async () => {
+      const responsePrice = await getPrice("generate-estrategia")
+      if(responsePrice){
+        setPriceEstrategia(responsePrice)
+      }
+    }
+    getEstrategiaPrice();
+
+    const getCampaniaPrice = async () => {
+      const responsePrice = await getPrice("generate-campania")
+      if(responsePrice){
+        setPriceCampania(responsePrice)
+      }
+    }
+    getCampaniaPrice();
+  
+  },[]);
+
+    
+
+
+  const { setSaldo } = useSaldo(); // Obtén la función para actualizar el saldo desde el contexto
+  const {data: session } = useSession()
+
+  
   const handleGenerateEstudio = async () => {
+    setEmail(session?.user?.email as string)
     setIsLoading(true);
     setError(null);
 
     try {
 
       setItemActual("estudio-mercado");
-      const estudioData = await GWV('generate',idProyecto,"estudio-mercado");
-      setDataEstudioMercado(estudioData[0] as EstudioMercadoData);
-      setDataItemActual(estudioData[0] as EstudioMercadoData)
+      // Obtener el precio de los tokens para esta acción
+      const price = await getPrice("generate-estudio");
+      if (!price) throw new Error("No se pudo obtener el precio de los tokens.");
+      setPriceEstudio(price)
+      // Consumir tokens y generar el estudio
+      const itemObjectEstudio = {
+        mode: 'generate',
+        id: idProyecto, 
+        item: "estudio-mercado"
+      }
+      const estudioData = await useTokens("generate-estudio",itemObjectEstudio,email)
+      setDataEstudioMercado(estudioData?.generated as EstudioMercadoData);
+      setDataItemActual(estudioData?.generated as EstudioMercadoData);
+
+      // Actualizar el saldo después de consumir tokens
+      
+      const updatedSaldo = await validarSaldo(session?.user?.email as string);
+      if (updatedSaldo !== null) {
+        setSaldo(updatedSaldo);
+      }
     } catch (err: any) {
       setError("Error al generar estudio de mercado: " + err.message);
     } finally {
@@ -159,14 +225,28 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
         throw new Error("Estudio de mercado es requerido para generar estrategia.");
       }
       setItemActual("estrategia-marketing");
-      const estrategiaData = await GWV('generate',idProyecto,"estrategia-marketing",dataEstudioMercado);
-      setDataEstrategiaMarketing(estrategiaData[0] as EstrategiaMarketingData);
-      setDataItemActual(estrategiaData[0] as EstrategiaMarketingData)
-      console.log("StepByStep Say> Generado. existeEstrategia?")
-      console.log(existeEstrategia)
-      console.log("StepByStep Say> Generado. estrategiaData?")
-      console.log(estrategiaData)
 
+      // Obtener el precio de los tokens para esta acción
+      const price = await getPrice("generate-estrategia");
+      if (!price) throw new Error("No se pudo obtener el precio de los tokens.");
+      setPriceEstrategia(price)
+      // Consumir tokens y generar la estrategia
+      const itemObjectEstrategia = {
+        mode: 'generate',
+        id: idProyecto, 
+        item: "estrategia-marketing", 
+        estudio: dataEstudioMercado
+      }
+      const estrategiaData = await useTokens("generate-estrategia",itemObjectEstrategia,email)
+
+      setDataEstrategiaMarketing(estrategiaData?.generated as EstrategiaMarketingData);
+      setDataItemActual(estrategiaData?.generated as EstrategiaMarketingData);
+  
+      // Actualizar el saldo después de consumir tokens
+      const updatedSaldo = await validarSaldo(email);
+      if (updatedSaldo !== null) {
+        setSaldo(updatedSaldo);
+      }
     } catch (err: any) {
       setError("Error al generar estrategia de marketing: " + err.message);
     } finally {
@@ -184,15 +264,27 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
         throw new Error("Estrategia de marketing es requerida para generar campaña.");
       }
       setItemActual("campania-marketing");
-      console.log("HandleGenerateEstrategia say: HEllo")
+      // Obtener el precio de los tokens para esta acción
+      const price = await getPrice("generate-campania");
+      if (!price) throw new Error("No se pudo obtener el precio de los tokens.");
+      setPriceCampania(price)
+      // Consumir tokens y generar la campaña
+      const itemObjectCampania = {
+        mode: 'generate',
+        id: idProyecto, 
+        item: "campania-marketing", 
+        estudio: dataEstudioMercado,
+        estrategia: dataEstrategiaMarketing
+      }
+      const campaniaData = await useTokens("generate-campania",itemObjectCampania,email)
+      setDataCampaniaMarketing(campaniaData?.generated as CampaniaMarketingData);
+      setDataItemActual(campaniaData?.generated as CampaniaMarketingData);
 
-      const campaniaData = await GWV('generate',idProyecto,"campania-marketing",dataEstudioMercado,dataEstrategiaMarketing);
-      setDataCampaniaMarketing(campaniaData[0] as CampaniaMarketingData);
-      setDataItemActual(campaniaData[0] as CampaniaMarketingData)
-      console.log("StepByStep Say> Generado. existe campania-marketing?")
-      console.log(existeCampania)
-      console.log("StepByStep Say> Generado. campaniaData?")
-      console.log(campaniaData)
+      // Actualizar el saldo después de consumir tokens
+      const updatedSaldo = await validarSaldo(session?.user?.email as string);
+      if (updatedSaldo !== null) {
+        setSaldo(updatedSaldo);
+      }
     } catch (err: any) {
       setError("Error al generar campaña de marketing: " + err.message);
     } finally {
@@ -288,7 +380,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
                   onClick={handleGenerateEstudio}
                   className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors"
                 >
-                  Generar Estudio de Mercado
+                  Generar Estudio de Mercado 🪙 {priceEstudio || '...'}
                 </button>
               </div>
             )}
@@ -343,7 +435,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
                       : 'bg-green-600 text-white hover:bg-green-700'
                   }`}
                 >
-                  Generar Estrategia de Marketing
+                  Generar Estrategia de Marketing 🪙 {priceEstrategia || '...'}
                 </button>
                 {!dataEstudioMercado && (
                   <p className="text-sm text-gray-500 mt-2">
@@ -400,7 +492,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
                       : 'bg-green-600 text-white hover:bg-green-700'
                   }`}
                 >
-                  Generar Campaña de Marketing
+                  Generar Campaña de Marketing 🪙 {priceCampania || '...'}
                 </button>
                 {!dataEstrategiaMarketing && (
                   <p className="text-sm text-gray-500 mt-2">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from '@/components/Navbar';
 import {Providers} from "./Providers";
+import { SaldoProvider } from "./SaldoContext";
 
 
 
@@ -20,8 +21,10 @@ export default function RootLayout({
     <html lang="es">
       <body>
         <Providers>
-        <Navbar/>
-        {children}
+          <SaldoProvider>
+            <Navbar/>
+            {children}
+          </SaldoProvider>
         </Providers>
       </body>
     </html>

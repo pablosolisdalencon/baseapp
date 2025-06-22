@@ -107,28 +107,7 @@ async function useWilli(projectId,item,maker,estudio,estrategia){
 }
 
 export default async function GWV(mode,projectId,item,estudio,estrategia){
-    console.log(`============  GWV  ===============`)
-    console.log(`GWV.${item} id: !${projectId}! `)
-    console.log(`GWV. estudio:!${estudio}!`)
-    console.log(`GWV. estrategia !!${estudio}!!`)
-
-
-    console.log(`=#=3=#=3=#=3=#=====  GWV  WILLI?? mode =`)
-    console.log(mode)
-    console.log(`=#=3=#=3= GWV  WILLI??= pid`)
-    console.log(projectId)
-    console.log(`=#=3=#=3= GWV  WILLI??= item`)
-    console.log(item)
-    console.log(`=#=3=#=3= GWV  WILLI??= estudio`)
-    console.log(estudio)
-    console.log(`=#=3=#=3= GWV  WILLI??= estrategia`)
-    console.log(estrategia)
-    console.log(`=#=3=#=3= GWV  WILLI??= FIN  `)
-    console.log(`=#=3=#=3==#=3=#=3==#=3=#=3==#=3=#=3==#=3=#=3=`)
-    console.log(`=#=3=#=3==#=3=#=3==#=3=#=3==#=3=#=3==#=3=#=3=`)
-    console.log(`=#=3=#=3==#=3=#=3==#=3=#=3==#=3=#=3==#=3=#=3=`)
-    console.log(`=#=3=#=3==#=3=#=3==#=3=#=3==#=3=#=3==#=3=#=3=`)
-    console.log(`=#=3=#=3==#=3=#=3==#=3=#=3==#=3=#=3==#=3=#=3=`)
+   
 
 
     

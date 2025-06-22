@@ -190,7 +190,9 @@ input[type=button]{
 .radio-label { @apply inline-flex items-center text-gray-700 text-sm; }
 .radio-input { @apply h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
 .form-actions { @apply mt-8 flex justify-end; }
-.button-agregar-item { @apply bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2; }
+.button-agregar-item { @apply hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2;
+  background-color: #4DB6AC; 
+}
 
 /* SECCION MKT VIEWER */
 .mkt-viewer-page { @apply bg-gray-100 font-sans; }
@@ -209,7 +211,10 @@ input[type=button]{
 .product-post { @apply bg-white rounded-lg shadow-sm overflow-hidden; }
 .product-image-container { @apply relative; }
 .product-image { @apply w-full h-32 object-cover; }
-.product-price { @apply absolute bottom-2 right-2 bg-indigo-500 text-white text-sm font-semibold px-2 py-1 rounded; }
+.product-price { 
+  @apply absolute bottom-2 right-2 text-white text-sm font-semibold px-2 py-1 rounded; 
+  background-color:rgb(253, 177, 63)
+}
 .post-content { @apply p-4; }
 .post-title { @apply text-lg font-semibold text-gray-800 mb-2; }
 .post-description { @apply text-gray-600 text-sm leading-relaxed; }
@@ -224,7 +229,9 @@ input[type=button]{
 .form-input { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
 .form-select { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
 .form-actions { @apply mt-4 flex justify-end space-x-2; }
-.button-save { @apply bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2; }
+.button-save { @apply hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2; 
+  background-color: #4DB6AC;
+}
 .button-cancel { @apply bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2; }
 .social-link-group { @apply grid grid-cols-2 gap-4 mb-4; }
 .social-label { @apply block text-gray-700 text-sm font-bold mb-2 col-span-1; }
@@ -270,7 +277,8 @@ input[type=button]{
 
 /* Barra CTA Fija Superior */
 .cta-bar {
-    @apply fixed top-0 w-full bg-indigo-500 text-white text-center py-2 z-50;
+    @apply fixed top-0 w-full text-white text-center py-2 z-50;
+    background-color: #4DB6AC;
 }
 
 .cta-link {
@@ -302,8 +310,10 @@ input[type=button]{
 }
 
 .nav-button {
-    @apply bg-indigo-500 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
-}
+    @apply text-white font-semibold py-2 px-4 rounded focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
+    background-color: #4DB6AC;
+    
+  }
 
 /* Sección de Bienvenida */
 .welcome-section {
@@ -339,8 +349,9 @@ input[type=button]{
 
 .welcome-button ,.contact-button{
     border-radius: 50px;
-    @apply bg-indigo-500 hover:bg-purple-700 text-white font-semibold py-3 px-4 focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
-}
+    @apply hover:bg-purple-700 text-white font-semibold py-3 px-4 focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
+    background-color: #4DB6AC;
+  }
 
 /* Sección del Logo */
 .logo-section {
@@ -378,6 +389,7 @@ input[type=button]{
 
 .about-us-subtitle {
     @apply text-xl font-semibold text-indigo-500 mb-2;
+  color:rgb(253, 177, 63)
 }
 
 .about-us-text {
@@ -424,12 +436,14 @@ input[type=button]{
 }
 
 .product-price {
-    @apply text-xl font-bold text-indigo-500 block mb-2;
+    @apply text-xl font-bold block mb-2;
+    color:rgb(253, 177, 63);
 }
 
 .product-button {
-    @apply inline-block mt-4 bg-indigo-500 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
-}
+    @apply inline-block mt-4 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
+    background-color: #4DB6AC;
+  }
 
 /* Sección Footer con Mini Form de Contacto */
 .contact-footer {
@@ -660,4 +674,11 @@ body {
   
   .wlistItem p strong {
     color: #333;
+  }
+
+  .coins{
+    background-color: rgb(253, 177, 63);
+  }
+  .coins *{
+    text-shadow: 10px 10px 20px black;
   }

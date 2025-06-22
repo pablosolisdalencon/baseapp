@@ -1,5 +1,6 @@
 import { useSession } from "next-auth/react";
 import React from "react";   
+import GWV from '@/utils/GWV';
 
 
 // fx consumeTokens
@@ -9,17 +10,10 @@ import React from "react";
 // descontar tokens
 
 // --- DEV TOOL --------------------------------------------
-async function devTool(objectAction){
-    console.log("##@@ DEV TOOLS")
-    console.log(objectAction)
-    /*
-      
-    
-    
-
-    // PRICING : const bodyData =  JSON.stringify({ actionName: 'generate-post', price: 1})
-    const bodyData =  JSON.stringify({ tokens: 110, email: currentUserEmail})
-    const response = await fetch(`/api/user-tokens`, {
+async function devTool(item,price){
+    const bodyData =  JSON.stringify({ actionName: item, price: price})
+    // PRICING : const bodyData =  JSON.stringify({ actionName: 110, email: currentUserEmail})
+    const response = await fetch(`/api/pricing`, {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
@@ -28,7 +22,7 @@ async function devTool(objectAction){
     });
     console.log(response)
     //return response.data.price
-    */
+    
 }
 // -----------------------------------------------
 
@@ -118,9 +112,6 @@ const generatePost = async (post) => {
         //  AI API call for content generation
        
         const generated=  await generatePost(post);
-
-        console.log("##$$## generated ##$$##")
-        console.log(generated)
            return {key, generated}
       } catch (err) {
         console.error(`Error generating content for ${key}:`, err);
@@ -137,15 +128,40 @@ async function ejecutarAccion(action,objectAction){
     
     if(action=="generate-post"){
         const {key, generated} = await GeneratePost(objectAction)
-        console.log("888 generated 888")
-        console.log(generated)
         if(key!=null){
             return {key, generated}
         }else{
             return null
         }
     }
-    
+
+    if(action=="generate-estudio"){
+      const  { mode, projectId, item } = objectAction
+      const {key, generated} = await GWV(mode, projectId, item)
+      if(key!=null){
+          return {key, generated}
+      }else{
+          return null
+      }
+    }
+    if(action=="generate-estrategia"){
+      const  { mode, projectId, item, estudio } = objectAction
+      const {key, generated} = await GWV(mode, projectId, item, estudio)
+      if(key!=null){
+          return {key, generated}
+      }else{
+          return null
+      }
+    }
+    if(action=="generate-campania"){
+      const  { mode, projectId, item, estudio, estrategia } = objectAction
+      const {key, generated} = await GWV(mode, projectId, item, estudio, estrategia)
+      if(key!=null){
+          return {key, generated}
+      }else{
+          return null
+      }
+    }    
 }
 
 function displayTokensModal(data){
@@ -247,15 +263,23 @@ function historyTokens(){
 
 
 
-function rollBackTokens(){
-    alert("rollBackTokens")
-    return null
-}
 
+async function rollBackTokens(monto,currentUserEmail){
+  const bodyData =  JSON.stringify({ tokens: monto, email: currentUserEmail})
+  const response = await fetch(`/api/user-tokens`, {
+      method: 'PUT',
+      headers: {
+      'Content-Type': 'application/json',
+      },
+      body: bodyData,
+  });
+
+  return response
+}
 
 // main?
 async function useTokens(action,objectAction,currentUserEmail){
-    devTool(objectAction);
+    //devTool(objectAction);
 
     // flow
 
@@ -285,10 +309,11 @@ async function useTokens(action,objectAction,currentUserEmail){
                     return {key, generated} 
                 }else{
                     // 5! -  Error en accion : roll back tokens
-                    let rollback = rollBackTokens(descuento)
+                    let rollback = rollBackTokens(saldo,currentUserEmail)
                     if(rollback!=null){
                         // rollback ok
-                        return rollback
+                        let generated = {text:"Oops! Fallo en la generacion de contenido, tranquilo, de restauraron tus tokens y puedes volver a intentarlo.",image:"error"}
+                        return {key,generated}
                     }else{
                         // error en rollback. CRITICO.
                         // ?
@@ -324,4 +349,4 @@ async function useTokens(action,objectAction,currentUserEmail){
 
 }
 
-export default useTokens 
+export { useTokens, validarSaldo, getPrice, devTool } 

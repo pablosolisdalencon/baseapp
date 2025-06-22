@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import useTokens from '../tokens/simpleTokens';
+import {useTokens,validarSaldo,getPrice} from '../tokens/simpleTokens';
 // Import only the necessary types from the central types file
 import {
   CampaniaMarketingData,
@@ -10,7 +10,7 @@ import {
 } from '../../types/marketingWorkflowTypes';
 import GWV from '@/utils/GWV';
 import { useSearchParams } from "next/navigation";
-
+import { useSaldo } from '../../app/SaldoContext'; // Importa el contexto de saldo
 import { useSession } from "next-auth/react";
 
 // Define type for generated content, which is the output format from 'Generar'
@@ -35,11 +35,8 @@ const renderTags = (items: string[] | undefined, label: string = '', baseClass: 
 };
 
 const MarketingContentManager: React.FC = () => {
-  const {data: session } = useSession()
-
-   
-
-const [currentUserEmail, setCurrentUserEmail] = useState<any | null>();
+const {data: session } = useSession()
+const { setSaldo } = useSaldo(); // Obtén la función para actualizar el saldo desde el contexto
 
 
   const searchParams = useSearchParams();
@@ -47,6 +44,7 @@ const [currentUserEmail, setCurrentUserEmail] = useState<any | null>();
   const [campaignData, setCampaignData] = useState<CampaniaMarketingData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [price, setPrice] = useState<number | null>(null);
   // Using a Map to store generated content for each post (key: 'weekIndex_dayIndex')
   const [generatedPosts, setGeneratedPosts] = useState<Map<string, GeneratedContent>>(new Map());
   // Using a Map to track loading state for each generate button
@@ -87,6 +85,7 @@ const [currentUserEmail, setCurrentUserEmail] = useState<any | null>();
         // Simulating API call to fetch campaign data using the new structure
         const response = await GWV('check',idProyecto,"campania-marketing");
         setCampaignData(response);
+       
         
       } catch (err) {
         setError("Failed to fetch campaign data.");
@@ -97,12 +96,23 @@ const [currentUserEmail, setCurrentUserEmail] = useState<any | null>();
     };
     
     fetchCampaignData();
-  }, []);
+
+
 
   
+  },[]);
 
+  useEffect(() => {
+    const getThisPrice = async () => {
+      const responsePrice = await getPrice("generate-post")
+      if(responsePrice){
+        setPrice(responsePrice)
+      }
+    }
+    getThisPrice();
+  });
   
- 
+  
 
   // Key now uses weekIndex and dayIndex because each day has one post
   const getKey = (weekIndex: number, dayIndex: number) =>
@@ -148,6 +158,11 @@ const [currentUserEmail, setCurrentUserEmail] = useState<any | null>();
      if(exec!=null){
       setGeneratedPosts(prev => new Map(prev).set(key, exec.generated));
       setGeneratingStates(prev => new Map(prev).set(key, false));
+      // Actualiza el saldo después de generar contenido
+      const updatedSaldo = await validarSaldo(email);
+      if (updatedSaldo !== null) {
+        setSaldo(updatedSaldo); // Actualiza el saldo en el contexto
+      }
      }else{
       setGeneratingStates(prev => new Map(prev).set(key, false));
      }
@@ -158,7 +173,7 @@ const [currentUserEmail, setCurrentUserEmail] = useState<any | null>();
   if (loading) {
     return (
       <div className={commonClasses.container}>
-        <h2 className="text-2xl font-bold text-center text-gray-700">Cargando datos de la campaña...</h2>
+        <h2 className="text-2xl font-bold text-center text-gray-700">Cargando datos de la campaña y billetera...</h2>
       </div>
     );
   }
@@ -179,6 +194,8 @@ const [currentUserEmail, setCurrentUserEmail] = useState<any | null>();
       </div>
     );
   }
+
+
 
 
 
@@ -286,18 +303,19 @@ const [currentUserEmail, setCurrentUserEmail] = useState<any | null>();
                         <div className={commonClasses.buttonGroup}>
                           
 
-                            {session?.user ? (
+                            {session?.user? (
+                              
                                                <button
                                                onClick={() => handleUseTokens("generate-post",{week:weekIndex, day:dayIndex, post:post},session?.user?.email as string )}
                                                className={`${commonClasses.buttonBase} ${commonClasses.buttonGenerate} ${isGenerating ? commonClasses.buttonDisabled : ''}`}
                                                disabled={isGenerating}
                                              >
-                                              {isGenerating ? 'Generando...' : 'Generar New'}
+                                              {isGenerating ? 'Generando...' : `Generar Post 🪙 ${price}`}
                                              </button>
                                           ):(
                                               <div className="nav-links"> 
                                               Conectando tu almacen de Tokens
-                                          </div>
+                                              </div>
                                               
                                           )}
                          
