@@ -2,9 +2,7 @@
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 
-const CatalogoClient = dynamic(() => import("@/components/catalogo-client"), {
-  suspense: true
-});
+const CatalogoClient = dynamic(() => import("@/components/catalogo-client"));
 
 export default function CatalogoPage() {
   // El middleware protege esta ruta.
