@@ -1,25 +1,26 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
-import { useTokens, validarSaldo, getPrice } from "../tokens/simpleTokens";
+import { useTokens, validarSaldo, getPrice } from "../tokens/simpleTokens"; // Asegúrate que la extensión sea .js si es un archivo JS
 import { CampaniaMarketingData, Semana, Dia } from "../../types/marketingWorkflowTypes";
 import GWV from "@/utils/GWV";
-import { useSearchParams, useRouter } from "next/navigation"; // Importar useRouter
+import { useSearchParams, useRouter } from "next/navigation";
 import { useAppContext } from "../../app/AppContext";
 
 interface GeneratedContent {
-  texto: string | null; // Especificar que texto es string
-  imagen: string | null; // Asumir que imagen es una URL (string)
+  texto: string | null;
+  imagen: string | null;
 }
 
 const MarketingContentManager: React.FC = () => {
   const { session, status, saldo, setSaldo } = useAppContext();
-  const router = useRouter(); // Inicializar router
+  const router = useRouter();
   const searchParams = useSearchParams();
   const idProyecto = searchParams.get("id");
 
   const [campaignData, setCampaignData] = useState<CampaniaMarketingData | null>(null);
   const [isFetchingCampaign, setIsFetchingCampaign] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null); // Para errores generales de la página
+  const [postError, setPostError] = useState<Map<string, string | null>>(new Map()); // Para errores por post
   const [price, setPrice] = useState<number | null>(null);
   const [generatedPosts, setGeneratedPosts] = useState<Map<string, GeneratedContent>>(new Map());
   const [generatingStates, setGeneratingStates] = useState<Map<string, boolean>>(new Map());
@@ -30,6 +31,7 @@ const MarketingContentManager: React.FC = () => {
     sectionTitle: "text-3xl font-extrabold text-indigo-800 mb-6 pb-4 border-b-2 border-indigo-200 tracking-tight",
     postContainer: "p-3 bg-gray-50 rounded-md border border-gray-100 mb-4",
     generatedContentContainer: "bg-green-50 p-4 rounded-md mt-4 border border-green-200",
+    errorText: "text-red-600 text-sm mt-1",
     buttonGroup: "flex flex-wrap gap-3 mt-4",
     buttonBase: "px-5 py-2 rounded-md font-semibold text-white transition-colors duration-200 ease-in-out",
     buttonGenerate: "bg-purple-600 hover:bg-purple-700 focus:ring-purple-500",
@@ -47,8 +49,8 @@ const MarketingContentManager: React.FC = () => {
     try {
       const response = await GWV("check", idProyecto, "campania-marketing");
       setCampaignData(response);
-    } catch (err) {
-      setError("Failed to fetch campaign data.");
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch campaign data.");
       console.error(err);
     } finally {
       setIsFetchingCampaign(false);
@@ -58,7 +60,7 @@ const MarketingContentManager: React.FC = () => {
   useEffect(() => {
     if (status === "loading") return;
     if (status === "unauthenticated") {
-      router.push("/api/auth/signin?callbackUrl=/contents-manager" + (idProyecto ? `?id=${idProyecto}`: ''));
+      router.push("/api/auth/signin?callbackUrl=/contents-manager" + (idProyecto ? `?id=${idProyecto}` : ''));
       return;
     }
     if (status === "authenticated") {
@@ -69,8 +71,11 @@ const MarketingContentManager: React.FC = () => {
   useEffect(() => {
     const getThisPrice = async () => {
       const responsePrice = await getPrice("generate-post");
-      if (responsePrice) {
+      if (responsePrice !== null) { // Chequear contra null explícitamente
         setPrice(responsePrice);
+      } else {
+        console.warn("MarketingContentManager: No se pudo obtener el precio para generate-post.");
+        // Podrías setear un error aquí o manejarlo de otra forma si el precio es crucial.
       }
     };
     getThisPrice();
@@ -80,35 +85,51 @@ const MarketingContentManager: React.FC = () => {
 
   const handleUseTokens = async (action: string, objectAction: any) => {
     if (!session?.user?.email) {
-      setError("Usuario no autenticado o email no disponible.");
+      setError("Usuario no autenticado o email no disponible para la acción.");
       return;
     }
     const key = getKey(objectAction.week, objectAction.day);
     setGeneratingStates((prev) => new Map(prev).set(key, true));
+    setPostError((prev) => new Map(prev).set(key, null)); // Limpiar error previo para este post
 
     try {
+      // `useTokens` ahora recibe el email y es más robusto
       const exec = await useTokens(action, objectAction, session.user.email);
-      if (exec && exec.generated) { // Asegurarse que exec.generated exista
-        setGeneratedPosts((prev) => {
-            const newMap = new Map(prev);
-            newMap.set(key, { texto: exec.generated.texto, imagen: exec.generated.imagen });
-            return newMap;
-        });
 
+      if (exec && exec.generated) {
+        // Si el texto generado indica un error (convención de simpleTokens.js)
+        if (typeof exec.generated.texto === 'string' && exec.generated.texto.startsWith("Error:")) {
+            setPostError((prev) => new Map(prev).set(key, exec.generated.texto));
+            // No actualizar generatedPosts si hubo un error en la generación del contenido en sí
+        } else if (exec.generated.texto === "Saldo Insuficiente.") {
+            setPostError((prev) => new Map(prev).set(key, "Saldo insuficiente para generar este post."));
+        } else {
+            setGeneratedPosts((prev) => {
+                const newMap = new Map(prev);
+                newMap.set(key, { texto: exec.generated.texto, imagen: exec.generated.imagen });
+                return newMap;
+            });
+        }
+
+        // Siempre intentar revalidar y actualizar el saldo del contexto,
+        // ya que `useTokens` maneja el descuento internamente si la acción tuvo costo.
         const updatedSaldo = await validarSaldo(session.user.email);
         if (updatedSaldo !== null) {
           setSaldo(updatedSaldo);
+        } else {
+          console.warn("MarketingContentManager: No se pudo reconfirmar el saldo después de la acción.");
+          // No setear a null aquí para evitar borrar el saldo visualmente si ya existía.
+          // El usuario podría ver un saldo "viejo" temporalmente si esta validación falla.
         }
       } else {
-        // Manejar el caso donde exec o exec.generated es null/undefined
-        console.warn("La generación de contenido no devolvió un resultado esperado:", exec);
-        setError(`No se pudo generar el contenido para el post ${key}.`);
+        console.warn("MarketingContentManager: La función useTokens no devolvió un resultado esperado.", exec);
+        setPostError((prev) => new Map(prev).set(key, "Error inesperado durante la generación del contenido."));
       }
-    } catch (error: any) {
-      console.error("Error al generar contenido:", error);
-      setError(`Error al generar contenido: ${error.message}`);
+    } catch (error: any) { // Capturar errores de la llamada a useTokens en sí (ej. si useTokens lanza una excepción)
+      console.error("MarketingContentManager: Error al llamar a useTokens o procesar su resultado:", error);
+      setPostError((prev) => new Map(prev).set(key, error.message || "Error desconocido al procesar la acción."));
     } finally {
-        setGeneratingStates((prev) => new Map(prev).set(key, false));
+      setGeneratingStates((prev) => new Map(prev).set(key, false));
     }
   };
 
@@ -122,7 +143,7 @@ const MarketingContentManager: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error) { // Error general de carga de la página/campaña
     return (
       <div className={`${commonClasses.container} text-red-700`}>
         <h2 className="text-2xl font-bold text-center">Error:</h2>
@@ -156,6 +177,7 @@ const MarketingContentManager: React.FC = () => {
               const key = getKey(weekIndex, dayIndex);
               const generatedContent = generatedPosts.get(key);
               const isGenerating = generatingStates.get(key) || false;
+              const currentPostError = postError.get(key);
 
               return (
                 <div key={dia.fecha} className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
@@ -169,7 +191,7 @@ const MarketingContentManager: React.FC = () => {
                     {post.imagen && <p><strong>Imagen (prompt):</strong> {post.imagen}</p>}
                   </div>
 
-                  {generatedContent && (generatedContent.texto || generatedContent.imagen) && (
+                  {generatedContent && (generatedContent.texto || generatedContent.imagen) && !currentPostError && (
                     <div className={commonClasses.generatedContentContainer}>
                       <h5 className="text-base font-semibold text-green-800 mb-2">Contenido Generado</h5>
                       {generatedContent.texto && (
@@ -196,26 +218,32 @@ const MarketingContentManager: React.FC = () => {
                   {isGenerating && (
                      <p className="text-purple-600 italic mt-2">Generando contenido...</p>
                   )}
+                  {currentPostError && (
+                    <p className={commonClasses.errorText}>{currentPostError}</p>
+                  )}
 
                   <div className={commonClasses.buttonGroup}>
-                    {session?.user && (
+                    {session?.user && ( // Asegurar que hay sesión antes de mostrar el botón
                       <button
                         onClick={() =>
                           handleUseTokens("generate-post", {
                             week: weekIndex,
                             day: dayIndex,
-                            post, // Enviar el objeto post completo
-                            id_proyecto: idProyecto, // Enviar idProyecto
-                            nombre_campaña: campaignData.nombre // Enviar nombre de la campaña
+                            post,
+                            id_proyecto: idProyecto,
+                            nombre_campaña: campaignData.nombre
                           })
                         }
                         className={`${commonClasses.buttonBase} ${commonClasses.buttonGenerate} ${
                           isGenerating || saldo === null || (price !== null && saldo < price) ? commonClasses.buttonDisabled : ""
                         }`}
-                        disabled={isGenerating || saldo === null || (price !== null && saldo < price)}
-                        title={saldo !== null && price !== null && saldo < price ? "Saldo insuficiente" : ""}
+                        disabled={isGenerating || saldo === null || (price !== null && saldo < price) || price === null}
+                        title={
+                            price === null ? "Precio no disponible" :
+                            (saldo !== null && price !== null && saldo < price ? "Saldo insuficiente" : "Generar post")
+                        }
                       >
-                        {isGenerating ? "Generando..." : `Generar Post 🪙 ${price !== null ? price : '...'}`}
+                        {isGenerating ? "Generando..." : `Generar Post 🪙 ${price !== null ? price : 'N/A'}`}
                       </button>
                     )}
                   </div>
