@@ -1,28 +1,24 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTokens, validarSaldo, getPrice } from "../tokens/simpleTokens";
-import {
-  CampaniaMarketingData,
-  Semana,
-  Dia,
-  Post,
-} from "../../types/marketingWorkflowTypes";
+import { CampaniaMarketingData, Semana, Dia } from "../../types/marketingWorkflowTypes";
 import GWV from "@/utils/GWV";
-import { useSearchParams } from "next/navigation";
-import { useAppContext } from "../../app/AppContext"; // Importa el contexto global
+import { useSearchParams, useRouter } from "next/navigation"; // Importar useRouter
+import { useAppContext } from "../../app/AppContext";
 
 interface GeneratedContent {
-  texto: any | null;
-  imagen: any | null;
+  texto: string | null; // Especificar que texto es string
+  imagen: string | null; // Asumir que imagen es una URL (string)
 }
 
 const MarketingContentManager: React.FC = () => {
-  const { session, saldo, setSaldo } = useAppContext(); // Accede al saldo y la función para actualizarlo desde el contexto
+  const { session, status, saldo, setSaldo } = useAppContext();
+  const router = useRouter(); // Inicializar router
   const searchParams = useSearchParams();
   const idProyecto = searchParams.get("id");
 
   const [campaignData, setCampaignData] = useState<CampaniaMarketingData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [isFetchingCampaign, setIsFetchingCampaign] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [price, setPrice] = useState<number | null>(null);
   const [generatedPosts, setGeneratedPosts] = useState<Map<string, GeneratedContent>>(new Map());
@@ -40,23 +36,35 @@ const MarketingContentManager: React.FC = () => {
     buttonDisabled: "bg-gray-400 cursor-not-allowed",
   };
 
-  useEffect(() => {
-    const fetchCampaignData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await GWV("check", idProyecto, "campania-marketing");
-        setCampaignData(response);
-      } catch (err) {
-        setError("Failed to fetch campaign data.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCampaignData();
+  const fetchCampaignData = useCallback(async () => {
+    if (!idProyecto) {
+      setError("ID de proyecto no proporcionado.");
+      setIsFetchingCampaign(false);
+      return;
+    }
+    setIsFetchingCampaign(true);
+    setError(null);
+    try {
+      const response = await GWV("check", idProyecto, "campania-marketing");
+      setCampaignData(response);
+    } catch (err) {
+      setError("Failed to fetch campaign data.");
+      console.error(err);
+    } finally {
+      setIsFetchingCampaign(false);
+    }
   }, [idProyecto]);
+
+  useEffect(() => {
+    if (status === "loading") return;
+    if (status === "unauthenticated") {
+      router.push("/api/auth/signin?callbackUrl=/contents-manager" + (idProyecto ? `?id=${idProyecto}`: ''));
+      return;
+    }
+    if (status === "authenticated") {
+      fetchCampaignData();
+    }
+  }, [status, fetchCampaignData, router, idProyecto]);
 
   useEffect(() => {
     const getThisPrice = async () => {
@@ -70,35 +78,45 @@ const MarketingContentManager: React.FC = () => {
 
   const getKey = (weekIndex: number, dayIndex: number) => `${weekIndex}_${dayIndex}`;
 
-  const handleUseTokens = async (action: string, objectAction: any, email: string) => {
+  const handleUseTokens = async (action: string, objectAction: any) => {
+    if (!session?.user?.email) {
+      setError("Usuario no autenticado o email no disponible.");
+      return;
+    }
     const key = getKey(objectAction.week, objectAction.day);
     setGeneratingStates((prev) => new Map(prev).set(key, true));
 
     try {
-      const exec = await useTokens(action, objectAction, email);
-      if (exec) {
-        setGeneratedPosts((prev) => new Map(prev).set(key, exec.generated));
-        setGeneratingStates((prev) => new Map(prev).set(key, false));
+      const exec = await useTokens(action, objectAction, session.user.email);
+      if (exec && exec.generated) { // Asegurarse que exec.generated exista
+        setGeneratedPosts((prev) => {
+            const newMap = new Map(prev);
+            newMap.set(key, { texto: exec.generated.texto, imagen: exec.generated.imagen });
+            return newMap;
+        });
 
-        // Actualiza el saldo en el contexto después de generar contenido
-        const updatedSaldo = await validarSaldo(email);
+        const updatedSaldo = await validarSaldo(session.user.email);
         if (updatedSaldo !== null) {
-          setSaldo(updatedSaldo); // Actualiza el saldo en el contexto
+          setSaldo(updatedSaldo);
         }
       } else {
-        setGeneratingStates((prev) => new Map(prev).set(key, false));
+        // Manejar el caso donde exec o exec.generated es null/undefined
+        console.warn("La generación de contenido no devolvió un resultado esperado:", exec);
+        setError(`No se pudo generar el contenido para el post ${key}.`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error al generar contenido:", error);
-      setGeneratingStates((prev) => new Map(prev).set(key, false));
+      setError(`Error al generar contenido: ${error.message}`);
+    } finally {
+        setGeneratingStates((prev) => new Map(prev).set(key, false));
     }
   };
 
-  if (loading) {
+  if (status === "loading" || isFetchingCampaign) {
     return (
       <div className={commonClasses.container}>
         <h2 className="text-2xl font-bold text-center text-gray-700">
-          Cargando datos de la campaña y billetera...
+          Cargando datos de la campaña...
         </h2>
       </div>
     );
@@ -107,7 +125,7 @@ const MarketingContentManager: React.FC = () => {
   if (error) {
     return (
       <div className={`${commonClasses.container} text-red-700`}>
-        <h2 className="text-2xl font-bold text-center">Error al cargar la campaña:</h2>
+        <h2 className="text-2xl font-bold text-center">Error:</h2>
         <p className="text-center">{error}</p>
       </div>
     );
@@ -129,7 +147,7 @@ const MarketingContentManager: React.FC = () => {
         Gestor de Contenido de Campaña: {campaignData.nombre || "Sin Nombre"}
       </h1>
       <section className={commonClasses.section}>
-        <h2 className={commonClasses.sectionTitle}>Planificación de Contenido</h2>
+        <h2 className={commonClasses.sectionTitle}>Planificación de Contenido - Saldo: 🪙{saldo !== null ? saldo : '...'}</h2>
         {campaignData.contenido.map((semana: Semana, weekIndex: number) => (
           <div key={semana.numero} className="mb-8 p-6 bg-blue-50 rounded-lg shadow-md border border-blue-100">
             <h3 className="text-xl font-bold text-blue-800 mb-3">Semana {semana.numero}</h3>
@@ -140,44 +158,64 @@ const MarketingContentManager: React.FC = () => {
               const isGenerating = generatingStates.get(key) || false;
 
               return (
-                <div key={dia.fecha} className="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
+                <div key={dia.fecha} className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
                   <p className="text-md font-bold text-indigo-700 mb-2">
                     Día: {dia.nombre} ({dia.fecha})
                   </p>
                   <div className={commonClasses.postContainer}>
                     <h5 className="text-base font-semibold text-gray-900 mb-2">Post Original</h5>
-                    <p>Título: {post.titulo}</p>
-                    <p>Contenido: {post.texto}</p>
+                    <p><strong>Título:</strong> {post.titulo}</p>
+                    <p><strong>Contenido:</strong> {post.texto}</p>
+                    {post.imagen && <p><strong>Imagen (prompt):</strong> {post.imagen}</p>}
                   </div>
-                  <div className={commonClasses.generatedContentContainer}>
-                    <h5 className="text-base font-semibold text-green-800 mb-2">Contenido Generado</h5>
-                    {isGenerating ? (
-                      <p className="text-green-600 italic">Generando contenido...</p>
-                    ) : generatedContent ? (
-                      <>
-                        <textarea
-                          className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 text-sm resize-none"
-                          rows={5}
-                          readOnly
-                          value={generatedContent.texto}
-                        />
-                      </>
-                    ) : (
-                      <p>No se ha generado contenido para este post.</p>
-                    )}
-                  </div>
+
+                  {generatedContent && (generatedContent.texto || generatedContent.imagen) && (
+                    <div className={commonClasses.generatedContentContainer}>
+                      <h5 className="text-base font-semibold text-green-800 mb-2">Contenido Generado</h5>
+                      {generatedContent.texto && (
+                        <>
+                          <p className="font-semibold">Texto:</p>
+                          <textarea
+                            className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 text-sm resize-none"
+                            rows={5}
+                            readOnly
+                            value={generatedContent.texto}
+                          />
+                        </>
+                      )}
+                      {generatedContent.imagen && (
+                        <>
+                          <p className="font-semibold mt-2">Imagen Generada:</p>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={generatedContent.imagen} alt="Imagen generada" className="max-w-xs rounded-md shadow-md mt-1"/>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {isGenerating && (
+                     <p className="text-purple-600 italic mt-2">Generando contenido...</p>
+                  )}
+
                   <div className={commonClasses.buttonGroup}>
                     {session?.user && (
                       <button
                         onClick={() =>
-                          handleUseTokens("generate-post", { week: weekIndex, day: dayIndex, post }, session.user.email)
+                          handleUseTokens("generate-post", {
+                            week: weekIndex,
+                            day: dayIndex,
+                            post, // Enviar el objeto post completo
+                            id_proyecto: idProyecto, // Enviar idProyecto
+                            nombre_campaña: campaignData.nombre // Enviar nombre de la campaña
+                          })
                         }
                         className={`${commonClasses.buttonBase} ${commonClasses.buttonGenerate} ${
-                          isGenerating ? commonClasses.buttonDisabled : ""
+                          isGenerating || saldo === null || (price !== null && saldo < price) ? commonClasses.buttonDisabled : ""
                         }`}
-                        disabled={isGenerating}
+                        disabled={isGenerating || saldo === null || (price !== null && saldo < price)}
+                        title={saldo !== null && price !== null && saldo < price ? "Saldo insuficiente" : ""}
                       >
-                        {isGenerating ? "Generando..." : `Generar Post 🪙 ${price}`}
+                        {isGenerating ? "Generando..." : `Generar Post 🪙 ${price !== null ? price : '...'}`}
                       </button>
                     )}
                   </div>

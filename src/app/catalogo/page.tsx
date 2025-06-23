@@ -1,21 +1,18 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+// Similar a ProyectosPage, esta página se simplifica.
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
-const CatalogoClient = dynamic(() => import("@/components/catalogo-client"))
 
-export default async function Catalogo() {
-   const session = await getServerSession(authOptions);
-  
-    if (!session) {
-      return (
-        <div>
-          <p>No estás autenticado. Redirigiendo...</p>
-          <meta http-equiv="refresh" content="0; url=/api/auth/signin?callbackUrl=/proyectos" />
-        </div>
-      );
-    }
-  return(
-    <Suspense fallback={<p>Cargando...</p>}><CatalogoClient/></Suspense>
-  )
+const CatalogoClient = dynamic(() => import("@/components/catalogo-client"), {
+  suspense: true,
+  ssr: false
+});
+
+export default function CatalogoPage() {
+  // El middleware protege esta ruta.
+  // CatalogoClient manejará la lógica de cliente, incluyendo el estado de carga/sesión.
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-screen"><p className="text-xl">Cargando catálogo...</p></div>}>
+      <CatalogoClient />
+    </Suspense>
+  );
 }
