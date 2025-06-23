@@ -3,8 +3,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 
 const CatalogoClient = dynamic(() => import("@/components/catalogo-client"), {
-  suspense: true,
-  ssr: false
+  suspense: true
 });
 
 export default function CatalogoPage() {

@@ -5,8 +5,7 @@ import dynamic from "next/dynamic";
 
 // Carga dinámica del componente cliente
 const ProyectosClient = dynamic(() => import("@/components/proyectos-client"), {
-  suspense: true, // Habilitar suspense para este componente dinámico
-  ssr: false // Opcional: deshabilitar SSR si el componente es puramente cliente y depende de hooks de cliente
+  suspense: true // Habilitar suspense para este componente dinámico
 });
 
 export default function ProyectosPage() { // Renombrar para claridad si es necesario
