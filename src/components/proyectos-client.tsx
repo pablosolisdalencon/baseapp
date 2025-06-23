@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faBoxesPacking, faTrashCan, faBullhorn, faMobileScreenButton } from "@fortawesome/free-solid-svg-icons";
 import ConfirmModal from "@/components/ConfirmModal";
 import { useAppContext } from "@/app/AppContext";
+import { useRouter } from "next/navigation"; // Importar useRouter
 
 interface ItemType {
   _id: string;
@@ -14,9 +15,11 @@ interface ItemType {
 }
 
 const ProyectosClient: React.FC = () => {
-  const { session } = useAppContext(); // Accede a la sesión desde el contexto
+  const { session, status } = useAppContext(); // Acceder a la sesión y status desde el contexto
+  const router = useRouter(); // Inicializar router
   const [dataList, setDataList] = useState<ItemType[] | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  // isLoading se maneja ahora por el status del AppContext y un estado local para el fetch
+  const [isFetchingData, setIsFetchingData] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<ItemType | null>(null);
@@ -26,33 +29,46 @@ const ProyectosClient: React.FC = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handelConfirmDelete = () => {
+  const handelConfirmDelete = async () => { // Convertir a async para esperar la eliminación
     if (itemToDelete) {
-      eliminar(itemToDelete);
+      await eliminar(itemToDelete); // Esperar a que se complete la eliminación
       closeDeleteModal();
+      // Refrescar datos después de eliminar
+      if (session?.user?.email) {
+        fetchProyectos(session.user.email);
+      }
     }
   };
 
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
+    setItemToDelete(null); // Limpiar itemToDelete
   };
 
   const eliminar = async (item: ItemType) => {
-    const res = await fetch(`/api/proyecto/${item._id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await res.json();
-    if (data) {
-      alert("Eliminado correctamente");
+    try {
+      const res = await fetch(`/api/proyecto/${item._id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || `Error al eliminar: ${res.status}`);
+      }
+      const data = await res.json();
+      alert("Eliminado correctamente"); // Considerar usar notificaciones menos intrusivas
       console.log(data);
+      // La actualización de la lista se hará en handelConfirmDelete
+    } catch (error: any) {
+      console.error("Error en eliminar:", error);
+      alert(`Error al eliminar: ${error.message}`);
     }
   };
 
   const fetchProyectos = async (email: string) => {
-    setIsLoading(true);
+    setIsFetchingData(true);
     setError(null);
     try {
       const res = await fetch(`/api/proyecto?user=${email}`);
@@ -65,91 +81,108 @@ const ProyectosClient: React.FC = () => {
       setError(`Error al cargar proyectos: ${err.message}`);
       setDataList(null);
     } finally {
-      setIsLoading(false);
+      setIsFetchingData(false);
     }
   };
 
   useEffect(() => {
-    const userEmail = session?.user?.email;
-    if (userEmail) {
-      fetchProyectos(userEmail);
-    } else {
-      setError("No estás autenticado.");
+    if (status === "loading") {
+      // No hacer nada mientras la sesión está cargando
+      return;
     }
-  }, [session]);
+    if (status === "unauthenticated") {
+      // Redirigir si no está autenticado
+      router.push("/api/auth/signin?callbackUrl=/proyectos");
+      return;
+    }
+    if (status === "authenticated" && session?.user?.email) {
+      fetchProyectos(session.user.email);
+    } else if (status === "authenticated" && !session?.user?.email) {
+        setError("No se pudo obtener el email del usuario.");
+        setIsFetchingData(false);
+    }
+  }, [status, session, router]); // Añadir router a las dependencias
 
-  const renderContent = () => {
-    if (isLoading) {
-      return <p>Cargando proyectos...</p>;
-    }
+  // Estado de carga global de la sesión
+  if (status === "loading") {
+    return <div className="flex justify-center items-center h-screen"><p className="text-xl">Verificando sesión...</p></div>;
+  }
 
-    if (error) {
-      return <p>Error: {error}</p>;
-    }
+  // Estado de carga de los datos del proyecto
+  if (isFetchingData) {
+    return <div className="flex justify-center items-center h-screen"><p className="text-xl">Cargando proyectos...</p></div>;
+  }
 
-    if (dataList && dataList.length > 0) {
-      return (
-        <div className="container mx-auto py-8">
-          {dataList.map((proyecto) => (
-            <div className="app-card" key={proyecto._id}>
-              <div className="app-card-image-container">
-                <img src={proyecto.logo} alt={proyecto.nombre} className="app-image" />
-              </div>
-              <div className="app-card-content">
-                <div>
-                  <h2 className="app-card-title">{proyecto.nombre}</h2>
-                  <p className="app-card-description">{proyecto.descripcion}</p>
-                </div>
-                <div className="app-card-buttons">
-                  <a href={`catalogo/?id=${proyecto._id}`} className="app-card-button boton-gestion">
-                    <FontAwesomeIcon icon={faBoxesPacking} />
-                    <br />
-                    Catálogo
-                  </a>
-                  <a href={`appviewer/?id=${proyecto._id}`} className="app-card-button boton-app">
-                    <FontAwesomeIcon icon={faMobileScreenButton} />
-                    <br />
-                    eWaveApp
-                  </a>
-                  <a href={`mktviewer/?id=${proyecto._id}`} className="app-card-button boton-mkt">
-                    <FontAwesomeIcon icon={faBullhorn} />
-                    <br />
-                    Marketing
-                  </a>
-                  <a href={`contents-manager/?id=${proyecto._id}`} className="app-card-button boton-mkt">
-                    <FontAwesomeIcon icon={faBullhorn} />
-                    <br />
-                    Contenido
-                  </a>
-                  <a href={`updateproyecto/?id=${proyecto._id}`} className="app-card-button boton-ficha">
-                    <FontAwesomeIcon icon={faEdit} />
-                    <br />
-                    Editar
-                  </a>
-                  <a
-                    href="#"
-                    onClick={() => handleDeleteClick(proyecto)}
-                    className="app-card-button boton-eliminar"
-                  >
-                    <FontAwesomeIcon icon={faTrashCan} />
-                    <br />
-                    Eliminar
-                  </a>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    } else {
-      return <p>No hay proyectos disponibles.</p>;
-    }
-  };
+  if (error) {
+    return <div className="flex justify-center items-center h-screen"><p className="text-xl text-red-500">Error: {error}</p></div>;
+  }
+
+  if (!dataList || dataList.length === 0) {
+    return (
+      <div className="contenedor-proyectos text-center">
+        <h1 className="titulo-proyectos">Mis Proyectos</h1>
+        <p>No hay proyectos disponibles.</p>
+        <hr className="my-4"/>
+        <Link href="addproyecto">
+          <button className="button-add-proyecto mt-4">+ Agregar Nuevo Proyecto</button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="contenedor-proyectos">
       <h1 className="titulo-proyectos">Mis Proyectos</h1>
-      {renderContent()}
+      <div className="container mx-auto py-8">
+        {dataList.map((proyecto) => (
+          <div className="app-card" key={proyecto._id}>
+            <div className="app-card-image-container">
+              <img src={proyecto.logo || '/default-logo.png'} alt={proyecto.nombre} className="app-image" /> {/* Añadir logo por defecto */}
+            </div>
+            <div className="app-card-content">
+              <div>
+                <h2 className="app-card-title">{proyecto.nombre}</h2>
+                <p className="app-card-description">{proyecto.descripcion}</p>
+              </div>
+              <div className="app-card-buttons">
+                <Link href={`/catalogo/?id=${proyecto._id}`} className="app-card-button boton-gestion">
+                  <FontAwesomeIcon icon={faBoxesPacking} />
+                  <br />
+                  Catálogo
+                </Link>
+                <Link href={`/appviewer/?id=${proyecto._id}`} className="app-card-button boton-app">
+                  <FontAwesomeIcon icon={faMobileScreenButton} />
+                  <br />
+                  eWaveApp
+                </Link>
+                <Link href={`/mktviewer/?id=${proyecto._id}`} className="app-card-button boton-mkt">
+                  <FontAwesomeIcon icon={faBullhorn} />
+                  <br />
+                  Marketing
+                </Link>
+                <Link href={`/contents-manager/?id=${proyecto._id}`} className="app-card-button boton-mkt">
+                  <FontAwesomeIcon icon={faBullhorn} />
+                  <br />
+                  Contenido
+                </Link>
+                <Link href={`/updateproyecto/?id=${proyecto._id}`} className="app-card-button boton-ficha">
+                  <FontAwesomeIcon icon={faEdit} />
+                  <br />
+                  Editar
+                </Link>
+                <button // Cambiado de <a> a <button> para acciones
+                  onClick={() => handleDeleteClick(proyecto)}
+                  className="app-card-button boton-eliminar"
+                >
+                  <FontAwesomeIcon icon={faTrashCan} />
+                  <br />
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
       <hr />
       <Link href="addproyecto">
         <button className="button-add-proyecto">+ Agregar Nuevo Proyecto</button>
