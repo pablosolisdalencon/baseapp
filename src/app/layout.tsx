@@ -1,3 +1,4 @@
+"use client"
 import Navbar from "@/components/Navbar";
 import { AppProvider } from "@/app/AppContext";
 import { SessionProvider } from "next-auth/react";
