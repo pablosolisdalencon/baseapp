@@ -16,7 +16,7 @@ export async function AppProvider({ children }: { children: React.ReactNode }){
   const [saldo, setSaldo] = useState<number | null>(null); // Estado local para el saldo
 
   useEffect(() => {
-    if (status === "authenticated" && session?.user?.email) {
+    if (session) {
       const fetchSaldo = async () => {
         const response = await fetch(`/api/saldo?email=${session.user?.email}`);
         const data = await response.json();
