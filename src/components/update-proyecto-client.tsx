@@ -1,8 +1,8 @@
 "use client";
 import { ChangeEvent, FormEvent, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { CldUploadWidget } from 'next-cloudinary';
+import { useAppContext } from "@/app/AppContext";
 
 interface ProyectoType {
   [key: string]: string;
@@ -20,7 +20,7 @@ interface ProyectoType {
 }
 
 export default function UpdateProyectoClient() {
-  const { data: session, status } = useSession();
+  const { session } = useAppContext(); // Accede a la sesión desde el contexto
   const [proyectoData, setProyectoData] = useState<ProyectoType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,12 +32,6 @@ export default function UpdateProyectoClient() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (status === 'loading') {
-      setIsLoading(true);
-      setUserReady(false);
-      return;
-    }
-
     const user = session?.user?.email;
     setUserReady(!!user);
 
@@ -75,7 +69,7 @@ export default function UpdateProyectoClient() {
       setIsLoading(false);
       setProyectoData(null);
     }
-  }, [searchParams, session, status]);
+  }, [searchParams, session]);
 
   const llenarFormulario = (data: ProyectoType) => {
     for (const key in data) {
@@ -126,6 +120,7 @@ export default function UpdateProyectoClient() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
   };
+
   const submitUpdateProyecto = async () => {
     await updateProyecto();
   };
