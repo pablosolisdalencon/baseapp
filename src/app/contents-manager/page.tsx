@@ -3,8 +3,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 
 const MarketingContentManager = dynamic(() => import("@/components/willi/MarketingContentManager"), {
-  suspense: true,
-  ssr: false
+  suspense: true
 });
 
 export default function ContentsManagerPage() {
