@@ -19,7 +19,7 @@ export function AppProvider({ children }: { children: React.ReactNode }){
     if (status === "authenticated" && session?.user?.email) {
       const fetchSaldo = async () => {
         try {
-          const response = await fetch(`/api/user-tokens/${session.user.email}`);
+          const response = await fetch(`/api/user-tokens/${session.user?.email}`);
           if (response.ok) {
             const data = await response.json();
             setSaldo(data.tokens);
