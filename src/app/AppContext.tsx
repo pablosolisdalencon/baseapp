@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 
 interface AppContextProps {
   session: any;
@@ -10,8 +11,8 @@ interface AppContextProps {
 
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
-export const AppProvider = ({ children }: { children: React.ReactNode }) => {
-  const { data: session, status } = useSession();
+export async function AppProvider({ children }: { children: React.ReactNode }){
+  const session = await getServerSession(authOptions);
   const [saldo, setSaldo] = useState<number | null>(null); // Estado local para el saldo
 
   useEffect(() => {
