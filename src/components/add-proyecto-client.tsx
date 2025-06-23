@@ -1,11 +1,11 @@
 "use client";
 import { ChangeEvent, FormEvent, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-import { CldUploadWidget } from 'next-cloudinary';
+import { CldUploadWidget } from "next-cloudinary";
+import { useAppContext } from "@/app/AppContext";
 
 export default function AddProyectoClient() {
-  const { data: session, status } = useSession();
+  const { session } = useAppContext(); // Accede a la sesión desde el contexto
   const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
   const [fondoPreviewUrl, setFondoPreviewUrl] = useState<string | null>(null);
   const [newProyecto, setNewProyecto] = useState<{
@@ -41,15 +41,13 @@ export default function AddProyectoClient() {
     if (session?.user?.email) {
       setNewProyecto((prevProyecto) => ({
         ...prevProyecto,
-        user: session.user?.email as string ?? "",
+        user: session.user.email,
       }));
     }
   }, [session]);
 
- 
-
   const createProyecto = async () => {
-    const res = await fetch('api/proyecto', {
+    const res = await fetch("/api/proyecto", {
       method: "POST",
       body: JSON.stringify(newProyecto),
       headers: {
@@ -57,7 +55,7 @@ export default function AddProyectoClient() {
       },
     });
     const data = await res.json();
-    router.push('proyectos');
+    router.push("/proyectos");
     console.log(data);
   };
 
@@ -65,48 +63,41 @@ export default function AddProyectoClient() {
     e.preventDefault();
   };
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setNewProyecto({ ...newProyecto, [e.target.name]: e.target.value });
     console.log(newProyecto);
   };
 
-
   const handleLogoUpload = (result: any, widget: any) => {
-      if (result && result.info && result.info.secure_url) {
-        setNewProyecto((prevData) => ({
-          ...prevData!,
-          logo: result.info.secure_url,
-        }));
-        setLogoPreviewUrl(result.info.secure_url);
-        widget.close();
-      }
-    };
+    if (result && result.info && result.info.secure_url) {
+      setNewProyecto((prevData) => ({
+        ...prevData!,
+        logo: result.info.secure_url,
+      }));
+      setLogoPreviewUrl(result.info.secure_url);
+      widget.close();
+    }
+  };
 
-    const handleFondoUpload = (result: any, widget: any) => {
-      if (result && result.info && result.info.secure_url) {
-        setNewProyecto((prevData) => ({
-          ...prevData!,
-          fondo: result.info.secure_url,
-        }));
-        setFondoPreviewUrl(result.info.secure_url);
-        widget.close();
-      }
-    };
-
-
-
-  if (status === "loading") {
-    return <p>Cargando sesión...</p>;
-  }
+  const handleFondoUpload = (result: any, widget: any) => {
+    if (result && result.info && result.info.secure_url) {
+      setNewProyecto((prevData) => ({
+        ...prevData!,
+        fondo: result.info.secure_url,
+      }));
+      setFondoPreviewUrl(result.info.secure_url);
+      widget.close();
+    }
+  };
 
   return (
     <div className="form">
       <form onSubmit={handleSubmit}>
         <h1>Nuevo Proyecto</h1>
         <p>
-          ¡Estamos listos para crear tus productos digitales! 🛠️ Para empezar, necesitamos conocer a fondo tu emprendimiento. Completa este formulario con toda la información relevante. ¡Esta será la base para construir herramientas digitales poderosas para tu negocio!
+          ¡Estamos listos para crear tus productos digitales! 🛠️ Para empezar, necesitamos conocer a fondo tu
+          emprendimiento. Completa este formulario con toda la información relevante. ¡Esta será la base para construir
+          herramientas digitales poderosas para tu negocio!
         </p>
 
         <input onChange={handleChange} name="nombre" type="text" placeholder="Nombre del Proyecto" />
@@ -120,48 +111,50 @@ export default function AddProyectoClient() {
         <input onChange={handleChange} name="fono" type="text" placeholder="Número de Teléfono" />
       </form>
       <CldUploadWidget uploadPreset="ewavepack" onSuccess={handleLogoUpload}>
-            {({ open }) => {
-              const handleOpenLogoWidget = useCallback(() => {
-                open();
-              }, [open]);
-              return (
-                <button className="upload-button" name="logo" onClick={handleOpenLogoWidget}>
-                  Carga la imagen del Logotipo
-                </button>
-              );
-            }}
-          </CldUploadWidget>
-          {logoPreviewUrl && (
-            <div>
-              <p>Vista previa del Logo:</p>
-              <img src={logoPreviewUrl} alt="Vista previa del logo" style={{ maxWidth: '100px', maxHeight: '100px' }} />
-            </div>
-          )}
-          <CldUploadWidget uploadPreset="ewavepack" onSuccess={handleFondoUpload}>
-            {({ open }) => {
-              const handleOpenFondoWidget = useCallback(() => {
-                open();
-              }, [open]);
-              return (
-                <button className="upload-button" name="fondo" onClick={handleOpenFondoWidget}>
-                  Carga el fondo de la eWebApp
-                </button>
-              );
-            }}
-          </CldUploadWidget>
-          {fondoPreviewUrl && (
-            <div>
-              <p>Vista previa del Fondo:</p>
-              <img src={fondoPreviewUrl} alt="Vista previa del fondo" style={{ maxWidth: '100px', maxHeight: '100px' }} />
-            </div>
-          )}
-          <hr />
-          <div className="btncancelar">
-            <a href="proyectos"><input type="button"  className="boton-cancelar" value="Cancelar" /></a>
-          </div>
-          <div className="btnfinalizar">
-            <input type="button" onClick={createProyecto} className="boton-crear-proyecto" value="Guardar" />
-          </div>
+        {({ open }) => {
+          const handleOpenLogoWidget = useCallback(() => {
+            open();
+          }, [open]);
+          return (
+            <button className="upload-button" name="logo" onClick={handleOpenLogoWidget}>
+              Carga la imagen del Logotipo
+            </button>
+          );
+        }}
+      </CldUploadWidget>
+      {logoPreviewUrl && (
+        <div>
+          <p>Vista previa del Logo:</p>
+          <img src={logoPreviewUrl} alt="Vista previa del logo" style={{ maxWidth: "100px", maxHeight: "100px" }} />
         </div>
+      )}
+      <CldUploadWidget uploadPreset="ewavepack" onSuccess={handleFondoUpload}>
+        {({ open }) => {
+          const handleOpenFondoWidget = useCallback(() => {
+            open();
+          }, [open]);
+          return (
+            <button className="upload-button" name="fondo" onClick={handleOpenFondoWidget}>
+              Carga el fondo de la eWebApp
+            </button>
+          );
+        }}
+      </CldUploadWidget>
+      {fondoPreviewUrl && (
+        <div>
+          <p>Vista previa del Fondo:</p>
+          <img src={fondoPreviewUrl} alt="Vista previa del fondo" style={{ maxWidth: "100px", maxHeight: "100px" }} />
+        </div>
+      )}
+      <hr />
+      <div className="btncancelar">
+        <a href="/proyectos">
+          <input type="button" className="boton-cancelar" value="Cancelar" />
+        </a>
+      </div>
+      <div className="btnfinalizar">
+        <input type="button" onClick={createProyecto} className="boton-crear-proyecto" value="Guardar" />
+      </div>
+    </div>
   );
 }

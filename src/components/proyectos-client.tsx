@@ -1,11 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faBoxesPacking, faTrashCan, faBullhorn, faMobileScreenButton } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faBoxesPacking, faTrashCan, faBullhorn, faMobileScreenButton } from "@fortawesome/free-solid-svg-icons";
 import ConfirmModal from "@/components/ConfirmModal";
-import { useSession } from "next-auth/react";
-
+import { useAppContext } from "@/app/AppContext";
 
 interface ItemType {
   _id: string;
@@ -15,7 +14,7 @@ interface ItemType {
 }
 
 const ProyectosClient: React.FC = () => {
-  const { data: session, status } = useSession();
+  const { session } = useAppContext(); // Accede a la sesión desde el contexto
   const [dataList, setDataList] = useState<ItemType[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,15 +70,13 @@ const ProyectosClient: React.FC = () => {
   };
 
   useEffect(() => {
-    if (status === "loading") return;
-
-    if (status === "authenticated" && session?.user?.email) {
-      fetchProyectos(session.user.email);
-    } else if (status === "unauthenticated") {
+    const userEmail = session?.user?.email;
+    if (userEmail) {
+      fetchProyectos(userEmail);
+    } else {
       setError("No estás autenticado.");
     }
-  }, [status, session?.user?.email]);
-
+  }, [session]);
 
   const renderContent = () => {
     if (isLoading) {
