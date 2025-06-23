@@ -1,8 +1,21 @@
-import UpdateItemClient from "@/components/update-item-client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
+const UpdateItemClient = dynamic(() => import("@/components/update-item-client"));
 
-export default function UpdateItem() {
+export default async function UpdateItem() {
+   const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return (
+      <div>
+        <p>No estás autenticado. Redirigiendo...</p>
+        <meta http-equiv="refresh" content="0; url=/api/auth/signin?callbackUrl=/proyectos" />
+      </div>
+    );
+  }
   return(
-    <Suspense><UpdateItemClient/></Suspense>
+        <Suspense fallback={<p>Cargando...</p>}><UpdateItemClient/></Suspense>
   )
 }

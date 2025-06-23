@@ -1,8 +1,21 @@
-import CatalogoClient from "@/components/catalogo-client";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { Suspense } from "react";
+import dynamic from "next/dynamic";
+const CatalogoClient = dynamic(() => import("@/components/catalogo-client"))
 
-export default function Catalogo() {
+export default async function Catalogo() {
+   const session = await getServerSession(authOptions);
+  
+    if (!session) {
+      return (
+        <div>
+          <p>No estás autenticado. Redirigiendo...</p>
+          <meta http-equiv="refresh" content="0; url=/api/auth/signin?callbackUrl=/proyectos" />
+        </div>
+      );
+    }
   return(
-    <Suspense><CatalogoClient/></Suspense>
+    <Suspense fallback={<p>Cargando...</p>}><CatalogoClient/></Suspense>
   )
 }

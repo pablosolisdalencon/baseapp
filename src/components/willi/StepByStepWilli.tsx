@@ -21,8 +21,6 @@ import CampaniaMarketingDisplay from './../CampaniaMarketingDisplay';
 interface MarketingWorkflowProps {
   idProyecto?: string;
 }
-
-  
   
 const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
   const { session, saldo, setSaldo } = useAppContext();

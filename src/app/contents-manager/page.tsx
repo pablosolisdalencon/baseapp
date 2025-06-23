@@ -1,7 +1,8 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { Suspense } from "react";
-import MarketingContentManager from "@/components/willi/MarketingContentManager";
+import dynamic from "next/dynamic";
+const MarketingContentManager = dynamic(() => import("@/components/willi/MarketingContentManager"));
 
 export default async function ContentsManager(){
     const session = await getServerSession(authOptions);
@@ -20,7 +21,7 @@ export default async function ContentsManager(){
             <div className="cardMKT MarketingContentManager">    
                 <h2 className="mkt-subtitle">Generador y Gestor de Contenido con IA de Marketing Digital</h2>
                 <div className="cardMKTitemHidden">
-                    <Suspense><MarketingContentManager/></Suspense>
+                     <Suspense fallback={<p>Cargando...</p>}><MarketingContentManager/></Suspense>
                 </div> 
             </div>
         </div>    

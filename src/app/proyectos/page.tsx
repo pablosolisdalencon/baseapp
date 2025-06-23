@@ -1,9 +1,8 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-import ProyectosClient from "@/components/proyectos-client";
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
-const UpdateProyectoClient = dynamic(() => import("@/components/update-proyecto-client"));
+const ProyectosClient = dynamic(() => import("@/components/proyectos-client"));
 
 export default async function Proyectos() {
   const session = await getServerSession(authOptions);
