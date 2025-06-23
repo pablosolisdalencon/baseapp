@@ -4,9 +4,7 @@ import { Suspense } from "react";
 import dynamic from "next/dynamic";
 
 // Carga dinámica del componente cliente
-const ProyectosClient = dynamic(() => import("@/components/proyectos-client"), {
-  suspense: true // Habilitar suspense para este componente dinámico
-});
+const ProyectosClient = dynamic(() => import("@/components/proyectos-client"));
 
 export default function ProyectosPage() { // Renombrar para claridad si es necesario
   // El middleware ya protege esta ruta.
