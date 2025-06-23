@@ -2,9 +2,7 @@
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
 
-const MarketingContentManager = dynamic(() => import("@/components/willi/MarketingContentManager"), {
-  suspense: true
-});
+const MarketingContentManager = dynamic(() => import("@/components/willi/MarketingContentManager"));
 
 export default function ContentsManagerPage() {
   // El middleware protege esta ruta.
