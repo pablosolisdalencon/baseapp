@@ -2,10 +2,10 @@
 import { ChangeEvent, FormEvent, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { CldUploadWidget } from "next-cloudinary";
-import { useAppContext } from "@/app/AppContext";
+import { useSession } from 'next-auth/react';
 
 export default function AddProyectoClient() {
-  const { session } = useAppContext(); // Accede a la sesión desde el contexto
+  const { data: session } = useSession();
   const [logoPreviewUrl, setLogoPreviewUrl] = useState<string | null>(null);
   const [fondoPreviewUrl, setFondoPreviewUrl] = useState<string | null>(null);
   const [newProyecto, setNewProyecto] = useState<{
@@ -39,9 +39,10 @@ export default function AddProyectoClient() {
 
   useEffect(() => {
     if (session?.user?.email) {
+      const email = session?.user?.email as string
       setNewProyecto((prevProyecto) => ({
         ...prevProyecto,
-        user: session.user.email,
+        user: email,
       }));
     }
   }, [session]);

@@ -1,10 +1,11 @@
 'use client';
 import Link from "next/link";
-import { useAppContext } from "../app/AppContext";
+import { useSession, signIn, signOut } from 'next-auth/react';
+import DisplayTokens from "./tokens/displayTokens";
 
 function Navbar() {
-  const { session, saldo } = useAppContext();
-
+  const { data: session } = useSession();
+  
   return (
     <nav className="main-nav">
       <div className="cta-bar">
@@ -20,24 +21,22 @@ function Navbar() {
             </Link>
             <div>
               <span className="coins text-sm font-bold text-white ring-1 rounded p-1 mr-3">
-                🪙{saldo}
+               <DisplayTokens/>
               </span>
               <span className="text-sm font-bold text-blue-800 rounded p-1 bg-gray-200">
                 {session.user.email}
               </span>
             </div>
-            <Link href="./logout">
-              <button className="rounded p-1 text-sm font-bold text-white bg-red-500">Salir</button>
-            </Link>
+              <button onClick={()=> signOut()} className="rounded p-1 text-sm font-bold text-white bg-red-500">Salir</button>
           </>
         ) : (
           <div className="nav-links">
             <a href="./#nosotros" className="nav-link">Nosotros</a>
             <a href="./#catalogo" className="nav-link">Catálogo</a>
             <a href="./#contacto" className="nav-link">Contacto</a>
-            <Link href="./login">
-              <button className="bg-sky-500 nav-button">Ingresar</button>
-            </Link>
+            
+              <button onClick={()=> signIn()} className="bg-sky-500 nav-button">Ingresar</button>
+          
           </div>
         )}
       </div>

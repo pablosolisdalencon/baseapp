@@ -1,7 +1,7 @@
 import React from "react";   
 import GWV from '@/utils/GWV';
-import { useAppContext } from "@/app/AppContext"; // Importa AppContext
-
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 // fx consumeTokens
 // validarSaldo
 // ejecutar accion
@@ -222,8 +222,8 @@ async function rollBackTokens(monto, currentUserEmail) {
 }
 
 // main?
-async function useTokens(action, objectAction,email) {
-    const { session } = useAppContext(); // Accede a la sesión desde el contexto
+async function useTokens(action, objectAction) {
+    const session = await getServerSession(authOptions);
     const currentUserEmail = session?.user?.email;
 
     if (!currentUserEmail) {

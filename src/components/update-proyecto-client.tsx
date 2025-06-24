@@ -2,7 +2,7 @@
 import { ChangeEvent, FormEvent, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CldUploadWidget } from 'next-cloudinary';
-import { useAppContext } from "@/app/AppContext";
+import { useSession } from 'next-auth/react';
 
 interface ProyectoType {
   [key: string]: string;
@@ -20,7 +20,7 @@ interface ProyectoType {
 }
 
 export default function UpdateProyectoClient() {
-  const { session } = useAppContext(); // Accede a la sesión desde el contexto
+  const { data: session } = useSession();
   const [proyectoData, setProyectoData] = useState<ProyectoType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

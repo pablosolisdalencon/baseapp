@@ -2,7 +2,6 @@
 import React from 'react'; // Necesario para .tsx
 import { useState, useEffect } from 'react';
 import { useSearchParams } from "next/navigation";
-import { useAppContext } from '../../app/AppContext'; // Importa el contexto de saldo
 import {useTokens,validarSaldo,getPrice} from '../tokens/simpleTokens';
 
 import GWV from '@/utils/GWV';
@@ -16,6 +15,7 @@ import {
 import EstudioMercadoDisplay from './../EstudioMercadoDisplay';
 import EstrategiaMarketingDisplay from './../EstrategiaMarketingDisplay';
 import CampaniaMarketingDisplay from './../CampaniaMarketingDisplay';
+import { useSession } from 'next-auth/react';
 
 // --- Componente principal del Flujo de Marketing ---
 interface MarketingWorkflowProps {
@@ -23,8 +23,7 @@ interface MarketingWorkflowProps {
 }
   
 const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
-  const { session, saldo, setSaldo } = useAppContext();
-
+  const { data: session } = useSession();
   const searchParams = useSearchParams();
   const thisIDP = searchParams.get('id');
   const [idProyecto, setIdProyecto] = useState<string | null>(thisIDP);
@@ -189,16 +188,11 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
         id: idProyecto, 
         item: "estudio-mercado"
       }
-      const estudioData = await useTokens("generate-estudio",itemObjectEstudio,email)
+      const estudioData = await useTokens("generate-estudio",itemObjectEstudio)
       setDataEstudioMercado(estudioData?.generated as EstudioMercadoData);
       setDataItemActual(estudioData?.generated as EstudioMercadoData);
-
       // Actualizar el saldo después de consumir tokens
-      
-      const updatedSaldo = await validarSaldo(session?.user?.email as string);
-      if (updatedSaldo !== null) {
-        setSaldo(updatedSaldo);
-      }
+      //const updatedSaldo = await validarSaldo(session?.user?.email as string);
     } catch (err: any) {
       setError("Error al generar estudio de mercado: " + err.message);
     } finally {
@@ -228,16 +222,11 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
         item: "estrategia-marketing", 
         estudio: dataEstudioMercado
       }
-      const estrategiaData = await useTokens("generate-estrategia",itemObjectEstrategia,email)
+      const estrategiaData = await useTokens("generate-estrategia",itemObjectEstrategia)
 
       setDataEstrategiaMarketing(estrategiaData?.generated as EstrategiaMarketingData);
       setDataItemActual(estrategiaData?.generated as EstrategiaMarketingData);
   
-      // Actualizar el saldo después de consumir tokens
-      const updatedSaldo = await validarSaldo(email);
-      if (updatedSaldo !== null) {
-        setSaldo(updatedSaldo);
-      }
     } catch (err: any) {
       setError("Error al generar estrategia de marketing: " + err.message);
     } finally {
@@ -267,15 +256,10 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
         estudio: dataEstudioMercado,
         estrategia: dataEstrategiaMarketing
       }
-      const campaniaData = await useTokens("generate-campania",itemObjectCampania,email)
+      const campaniaData = await useTokens("generate-campania",itemObjectCampania)
       setDataCampaniaMarketing(campaniaData?.generated as CampaniaMarketingData);
       setDataItemActual(campaniaData?.generated as CampaniaMarketingData);
 
-      // Actualizar el saldo después de consumir tokens
-      const updatedSaldo = await validarSaldo(session?.user?.email as string);
-      if (updatedSaldo !== null) {
-        setSaldo(updatedSaldo);
-      }
     } catch (err: any) {
       setError("Error al generar campaña de marketing: " + err.message);
     } finally {

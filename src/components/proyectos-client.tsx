@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faBoxesPacking, faTrashCan, faBullhorn, faMobileScreenButton } from "@fortawesome/free-solid-svg-icons";
 import ConfirmModal from "@/components/ConfirmModal";
-import { useAppContext } from "@/app/AppContext";
+import { useSession } from 'next-auth/react';
 
 interface ItemType {
   _id: string;
@@ -14,7 +14,7 @@ interface ItemType {
 }
 
 const ProyectosClient: React.FC = () => {
-  const { session } = useAppContext(); // Accede a la sesión desde el contexto
+  const { data: session } = useSession();
   const [dataList, setDataList] = useState<ItemType[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

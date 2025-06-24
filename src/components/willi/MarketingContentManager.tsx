@@ -1,15 +1,14 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useTokens, validarSaldo, getPrice } from "../tokens/simpleTokens";
+import { useTokens, getPrice } from "../tokens/simpleTokens";
 import {
   CampaniaMarketingData,
   Semana,
-  Dia,
-  Post,
+  Dia
 } from "../../types/marketingWorkflowTypes";
 import GWV from "@/utils/GWV";
 import { useSearchParams } from "next/navigation";
-import { useAppContext } from "../../app/AppContext"; // Importa el contexto global
+import { useSession } from 'next-auth/react';
 
 interface GeneratedContent {
   texto: any | null;
@@ -17,7 +16,7 @@ interface GeneratedContent {
 }
 
 const MarketingContentManager: React.FC = () => {
-  const { session, saldo, setSaldo } = useAppContext(); // Accede al saldo y la función para actualizarlo desde el contexto
+  const { data: session } = useSession();
   const searchParams = useSearchParams();
   const idProyecto = searchParams.get("id");
 
@@ -70,21 +69,15 @@ const MarketingContentManager: React.FC = () => {
 
   const getKey = (weekIndex: number, dayIndex: number) => `${weekIndex}_${dayIndex}`;
 
-  const handleUseTokens = async (action: string, objectAction: any, email: string) => {
+  const handleUseTokens = async (action: string, objectAction: any) => {
     const key = getKey(objectAction.week, objectAction.day);
     setGeneratingStates((prev) => new Map(prev).set(key, true));
 
     try {
-      const exec = await useTokens(action, objectAction, email);
+      const exec = await useTokens(action, objectAction);
       if (exec) {
         setGeneratedPosts((prev) => new Map(prev).set(key, exec.generated));
         setGeneratingStates((prev) => new Map(prev).set(key, false));
-
-        // Actualiza el saldo en el contexto después de generar contenido
-        const updatedSaldo = await validarSaldo(email);
-        if (updatedSaldo !== null) {
-          setSaldo(updatedSaldo); // Actualiza el saldo en el contexto
-        }
       } else {
         setGeneratingStates((prev) => new Map(prev).set(key, false));
       }
@@ -170,7 +163,7 @@ const MarketingContentManager: React.FC = () => {
                     {session?.user && (
                       <button
                         onClick={() =>
-                          handleUseTokens("generate-post", { week: weekIndex, day: dayIndex, post }, session.user.email)
+                          handleUseTokens("generate-post", { week: weekIndex, day: dayIndex, post})
                         }
                         className={`${commonClasses.buttonBase} ${commonClasses.buttonGenerate} ${
                           isGenerating ? commonClasses.buttonDisabled : ""
