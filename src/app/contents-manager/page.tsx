@@ -1,29 +1,22 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+// Simplificación similar para ContentsManager page
 import { Suspense } from "react";
 import dynamic from "next/dynamic";
+
 const MarketingContentManager = dynamic(() => import("@/components/willi/MarketingContentManager"));
 
-export default async function ContentsManager(){
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return (
-        <div>
-          <p>No estás autenticado. Redirigiendo...</p>
-          <meta http-equiv="refresh" content="0; url=/api/auth/signin?callbackUrl=/proyectos" />
+export default function ContentsManagerPage() {
+  // El middleware protege esta ruta.
+  // MarketingContentManager se encargará de la lógica de cliente.
+  return (
+    <div>
+      <div className="cardMKT MarketingContentManager">
+        <h2 className="mkt-subtitle">Generador y Gestor de Contenido con IA de Marketing Digital</h2>
+        <div className="cardMKTitemHidden">
+          <Suspense fallback={<div className="flex justify-center items-center h-screen"><p className="text-xl">Cargando gestor de contenidos...</p></div>}>
+            <MarketingContentManager />
+          </Suspense>
         </div>
-      );
-    }
-  
-    return (
-        <div>
-            <div className="cardMKT MarketingContentManager">    
-                <h2 className="mkt-subtitle">Generador y Gestor de Contenido con IA de Marketing Digital</h2>
-                <div className="cardMKTitemHidden">
-                     <Suspense fallback={<p>Cargando...</p>}><MarketingContentManager/></Suspense>
-                </div> 
-            </div>
-        </div>    
-    )
+      </div>
+    </div>
+  );
 }
