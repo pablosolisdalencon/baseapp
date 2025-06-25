@@ -95,8 +95,8 @@ const ProyectosClient: React.FC = () => {
   }, [session, router]); // Añadir router a las dependencias
 
   // Estado de carga global de la sesión
-  if (status === "loading") {
-    return <div className="flex justify-center items-center h-screen"><p className="text-xl">Verificando sesión...</p></div>;
+  if (!session) {
+    return <div className="flex justify-center items-center h-screen"><p className="text-xl">Cargando sesión...</p></div>;
   }
 
   // Estado de carga de los datos del proyecto
