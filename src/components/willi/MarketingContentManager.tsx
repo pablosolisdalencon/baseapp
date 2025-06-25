@@ -66,10 +66,6 @@ const MarketingContentManager: React.FC = () => {
 
   useEffect(() => {
 
-    if (!session) {
-      router.push("/api/auth/signin?callbackUrl=/contents-manager" + (idProyecto ? `?id=${idProyecto}` : ''));
-      return;
-    }
     if (session) {
       fetchCampaignData();
     }
