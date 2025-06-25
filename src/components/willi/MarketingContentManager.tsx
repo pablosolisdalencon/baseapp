@@ -18,7 +18,7 @@ interface GeneratedContent {
 }
 
 const MarketingContentManager: React.FC = async () => {
-  const { data: session } = useSession();
+  const { data: session } = await useSession();
   const router = useRouter();
   const searchParams = await useSearchParams();
   const idProyecto = searchParams.get("id");
@@ -71,8 +71,7 @@ const MarketingContentManager: React.FC = async () => {
         setError("No se pudo obtener el email del usuario.");
         setIsFetchingCampaign(false);
     }
-  }, [session, router]); // Añadir router a las dependencias
-
+  }, [session]);
   useEffect(() => {
     const getThisPrice = async () => {
       const responsePrice = await getPrice("generate-post");
