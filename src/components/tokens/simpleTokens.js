@@ -18,15 +18,12 @@ async function devTool(item, price) {
         },
         body: bodyData,
     });
-    console.log(response);
 }
 // -----------------------------------------------
 
 
 //-------- ACCIONES --------------
 const generatePost = async (post) => {
-    console.log("###### generate POST > post");
-    console.log(post);
     try {
         let bodyData = JSON.stringify({ item: 'post-final', post: post });
         let bodyData_img = JSON.stringify({ item: 'post-final-img', post: post });
@@ -64,7 +61,6 @@ const generatePost = async (post) => {
                 return { texto: texto_final, imagen: null };
             } else {
                 const errorData = await response_imagen.json();
-                console.error(`generatePost: Error al generar imagen. Status: ${response_imagen.status}, Mensaje: ${errorData.message}`);
                 // Devolver solo el texto si la imagen falla por otra razón
                 return { texto: texto_final, imagen: null };
             }
@@ -74,7 +70,6 @@ const generatePost = async (post) => {
             return null;
         }
     } catch (error) {
-        console.error(`generatePost: Fallo al crear.`, error);
        
     }
 };
@@ -87,7 +82,6 @@ const GeneratePost = async ({ week, day, post }) => {
         const generated = await generatePost(post);
         return { key, generated }; // `generated` puede ser `{texto, imagen}` o `null`
     } catch (err) {
-        console.error(`Error generating content for ${key}:`, err);
         // Retornar una estructura consistente incluso en error para que `ejecutarAccion` no falle
         return { key, generated: { texto: `Error al generar: ${err.message}`, imagen: null } };
     }
@@ -109,7 +103,6 @@ async function ejecutarAccion(action, objectAction) {
             const result = await GWV(mode, projectId, item); // Asumir que GWV puede lanzar error o devolver null/estructura
             return result; // o { key: "estudio_key", generated: result } si es necesario adaptar
         } catch (error) {
-            console.error("Error en ejecutarAccion (generate-estudio):", error);
             return { key: "estudio_error", generated: { texto: `Error: ${error.message}` } }; // Ejemplo
         }
     }
@@ -119,7 +112,6 @@ async function ejecutarAccion(action, objectAction) {
             const result = await GWV(mode, projectId, item, estudio);
             return result;
         } catch (error) {
-            console.error("Error en ejecutarAccion (generate-estrategia):", error);
             return { key: "estrategia_error", generated: { texto: `Error: ${error.message}` } };
         }
     }
@@ -129,11 +121,9 @@ async function ejecutarAccion(action, objectAction) {
             const result = await GWV(mode, projectId, item, estudio, estrategia);
             return result;
         } catch (error) {
-            console.error("Error en ejecutarAccion (generate-campania):", error);
             return { key: "campania_error", generated: { texto: `Error: ${error.message}` } };
         }
     }
-    console.warn(`ejecutarAccion: Acción desconocida '${action}'`);
     return null; // O una estructura de error por defecto
 }
 
@@ -142,21 +132,18 @@ async function ejecutarAccion(action, objectAction) {
 // -----------------------------------------------
 async function getPrice(action) {
     if (!action) {
-        console.error("getPrice: Acción no proporcionada.");
         return null;
     }
     try {
         const response = await fetch(`/api/pricing?a=${action}`); // No necesita headers ni method GET por defecto
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({})); // Intenta parsear JSON, si falla, objeto vacío
-            console.error(`getPrice: Error al obtener precio para '${action}'. Status: ${response.status}, Mensaje: ${errorData.message || response.statusText}`);
             // No usar alert aquí, mejor propagar el error o null.
             return null;
         }
         const jsonPrice = await response.json();
         return jsonPrice.price; // Asume que la API devuelve { price: X }
     } catch (e) {
-        console.error(`getPrice: Excepción al obtener precio para '${action}'.`, e);
         return null;
     }
 }
@@ -164,7 +151,6 @@ async function getPrice(action) {
 
 async function validarSaldo(currentUserEmail) {
     if (!currentUserEmail) {
-        console.error("validarSaldo: Email no proporcionado.");
         return null;
     }
     try {
@@ -177,7 +163,6 @@ async function validarSaldo(currentUserEmail) {
         const jsonData = await response.json();
         return jsonData.tokens; // Asume { tokens: Y }
     } catch (e) {
-        console.error("validarSaldo: Excepción al obtener saldo.", e);
         return null;
     }
 }
@@ -187,11 +172,9 @@ async function descontarTokens(montoADejar, currentUserEmail) {
     // El 'monto' aquí es el saldo final después del descuento, no la cantidad a descontar.
     // La API /api/user-tokens (PUT) debe estar diseñada para SETear el saldo.
     if (typeof montoADejar !== 'number' || montoADejar < 0) {
-        console.error("descontarTokens: Monto inválido.", montoADejar);
         return null; // O false para indicar fallo
     }
     if (!currentUserEmail) {
-        console.error("descontarTokens: Email no proporcionado.");
         return null;
     }
 
@@ -204,12 +187,10 @@ async function descontarTokens(montoADejar, currentUserEmail) {
         });
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            console.error(`descontarTokens: Error al actualizar tokens. Status: ${response.status}, Mensaje: ${errorData.message || response.statusText}`);
             return null; // O false
         }
         return await response.json(); // O true si la API devuelve el usuario actualizado o un success
     } catch (e) {
-        console.error("descontarTokens: Excepción al actualizar tokens.", e);
         return null; // O false
     }
 }
@@ -237,13 +218,11 @@ async function useTokens(action, objectAction) {
 
         const price = await getPrice(action);
         if (price === null) { // getPrice ahora devuelve null en error
-            console.error(`useTokens: No se pudo obtener el precio para la acción '${action}'.`);
             return { key: action, generated: { texto: `Error: No se pudo determinar el costo de la acción.`, imagen: null } };
         }
 
         
         if (saldoActual === null) {
-            console.error(`useTokens: No se pudo validar el saldo para el usuario '${currentUserEmail}'.`);
             return { key: action, generated: { texto: `Error: No se pudo verificar el saldo.`, imagen: null } };
         }
 
@@ -256,7 +235,6 @@ async function useTokens(action, objectAction) {
 
                 // Verificar si la acción falló (ej. resultadoAccion.generated.texto contiene "Error:")
                 if (resultadoAccion && resultadoAccion.generated && typeof resultadoAccion.generated.texto === 'string' && resultadoAccion.generated.texto.startsWith("Error:")) {
-                    console.warn(`useTokens: La acción '${action}' se ejecutó pero resultó en un error. Intentando rollback.`);
                     await rollBackTokens(saldoActual, email); // Devolver tokens al saldo original
                     return resultadoAccion; // Devolver el error de la acción
                 }
@@ -264,7 +242,6 @@ async function useTokens(action, objectAction) {
                 if (resultadoAccion && resultadoAccion.key != null) { // Chequeo más robusto
                     return resultadoAccion;
                 } else {
-                    console.error(`useTokens: Fallo en la ejecución de la acción '${action}' después del descuento. Intentando rollback.`);
                     await rollBackTokens(saldoActual, currentUserEmail); // Devolver tokens al saldo original
                     return {
                         key: action,
@@ -275,11 +252,9 @@ async function useTokens(action, objectAction) {
                     };
                 }
             } else {
-                console.error(`useTokens: Error al descontar tokens para la acción '${action}'.`);
                 return { key: action, generated: { texto: "Error: No se pudieron descontar los tokens.", imagen: null } };
             }
         } else {
-            console.warn(`useTokens: Saldo insuficiente para la acción '${action}'. Saldo: ${saldoActual}, Precio: ${price}`);
             return { key: action, generated: { texto: "Saldo Insuficiente.", imagen: null } }; // Estructura consistente
         }
     }

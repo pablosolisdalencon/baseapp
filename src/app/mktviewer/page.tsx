@@ -5,17 +5,6 @@ import dynamic from "next/dynamic";
 const MarketingWorkflow = dynamic(() => import("@/components/willi/StepByStepWilli"));
 
 export default async function MktViewer(){
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return (
-        <div>
-          <p>No estás autenticado. Redirigiendo...</p>
-          <meta http-equiv="refresh" content="0; url=/api/auth/signin?callbackUrl=/proyectos" />
-        </div>
-      );
-    }
-  
     return (
         <div>
 
