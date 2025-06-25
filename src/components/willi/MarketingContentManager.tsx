@@ -1,7 +1,7 @@
 "use client";
-<<<<<<< HEAD
-import React, { useState, useEffect } from "react";
-import { useTokens, getPrice } from "../tokens/simpleTokens";
+
+import React, { useState, useEffect, useCallback } from "react";
+import { useTokens, getPrice, validarSaldo } from "../tokens/simpleTokens";
 import {
   CampaniaMarketingData,
   Semana,
@@ -10,14 +10,7 @@ import {
 import GWV from "@/utils/GWV";
 import { useSearchParams } from "next/navigation";
 import { useSession } from 'next-auth/react';
-=======
-import React, { useState, useEffect, useCallback } from "react";
-import { useTokens, validarSaldo, getPrice } from "../tokens/simpleTokens"; // Asegúrate que la extensión sea .js si es un archivo JS
-import { CampaniaMarketingData, Semana, Dia } from "../../types/marketingWorkflowTypes";
-import GWV from "@/utils/GWV";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useAppContext } from "../../app/AppContext";
->>>>>>> f257cb1c42ba8354c9a78354d4a2a253e59decf3
+import { useRouter } from "next/navigation";
 
 interface GeneratedContent {
   texto: string | null;
@@ -25,14 +18,11 @@ interface GeneratedContent {
 }
 
 const MarketingContentManager: React.FC = () => {
-<<<<<<< HEAD
   const { data: session } = useSession();
-=======
-  const { session, status, saldo, setSaldo } = useAppContext();
   const router = useRouter();
->>>>>>> f257cb1c42ba8354c9a78354d4a2a253e59decf3
   const searchParams = useSearchParams();
   const idProyecto = searchParams.get("id");
+  const saldo = validarSaldo(session?.user?.email)
 
   const [campaignData, setCampaignData] = useState<CampaniaMarketingData | null>(null);
   const [isFetchingCampaign, setIsFetchingCampaign] = useState<boolean>(true);
@@ -101,26 +91,14 @@ const MarketingContentManager: React.FC = () => {
   const getKey = (weekIndex: number, dayIndex: number) => `${weekIndex}_${dayIndex}`;
 
   const handleUseTokens = async (action: string, objectAction: any) => {
-<<<<<<< HEAD
-=======
-    if (!session?.user?.email) {
-      setError("Usuario no autenticado o email no disponible para la acción.");
-      return;
-    }
->>>>>>> f257cb1c42ba8354c9a78354d4a2a253e59decf3
+
     const key = getKey(objectAction.week, objectAction.day);
     setGeneratingStates((prev) => new Map(prev).set(key, true));
     setPostError((prev) => new Map(prev).set(key, null)); // Limpiar error previo para este post
 
     try {
-<<<<<<< HEAD
+
       const exec = await useTokens(action, objectAction);
-      if (exec) {
-        setGeneratedPosts((prev) => new Map(prev).set(key, exec.generated));
-        setGeneratingStates((prev) => new Map(prev).set(key, false));
-=======
-      // `useTokens` ahora recibe el email y es más robusto
-      const exec = await useTokens(action, objectAction, session.user.email);
 
       if (exec && exec.generated) {
         // Si el texto generado indica un error (convención de simpleTokens.js)
@@ -139,15 +117,7 @@ const MarketingContentManager: React.FC = () => {
 
         // Siempre intentar revalidar y actualizar el saldo del contexto,
         // ya que `useTokens` maneja el descuento internamente si la acción tuvo costo.
-        const updatedSaldo = await validarSaldo(session.user.email);
-        if (updatedSaldo !== null) {
-          setSaldo(updatedSaldo);
-        } else {
-          console.warn("MarketingContentManager: No se pudo reconfirmar el saldo después de la acción.");
-          // No setear a null aquí para evitar borrar el saldo visualmente si ya existía.
-          // El usuario podría ver un saldo "viejo" temporalmente si esta validación falla.
-        }
->>>>>>> f257cb1c42ba8354c9a78354d4a2a253e59decf3
+        
       } else {
         console.warn("MarketingContentManager: La función useTokens no devolvió un resultado esperado.", exec);
         setPostError((prev) => new Map(prev).set(key, "Error inesperado durante la generación del contenido."));
@@ -253,25 +223,17 @@ const MarketingContentManager: React.FC = () => {
                     {session?.user && ( // Asegurar que hay sesión antes de mostrar el botón
                       <button
                         onClick={() =>
-<<<<<<< HEAD
+
                           handleUseTokens("generate-post", { week: weekIndex, day: dayIndex, post})
-=======
-                          handleUseTokens("generate-post", {
-                            week: weekIndex,
-                            day: dayIndex,
-                            post,
-                            id_proyecto: idProyecto,
-                            nombre_campaña: campaignData.nombre
-                          })
->>>>>>> f257cb1c42ba8354c9a78354d4a2a253e59decf3
+
                         }
                         className={`${commonClasses.buttonBase} ${commonClasses.buttonGenerate} ${
-                          isGenerating || saldo === null || (price !== null && saldo < price) ? commonClasses.buttonDisabled : ""
+                          isGenerating || saldo === null ? commonClasses.buttonDisabled : ""
                         }`}
-                        disabled={isGenerating || saldo === null || (price !== null && saldo < price) || price === null}
+                        disabled={isGenerating || price === null}
                         title={
-                            price === null ? "Precio no disponible" :
-                            (saldo !== null && price !== null && saldo < price ? "Saldo insuficiente" : "Generar post")
+                            price === null ? "Precio no disponible" :"Generar post"
+                            
                         }
                       >
                         {isGenerating ? "Generando..." : `Generar Post 🪙 ${price !== null ? price : 'N/A'}`}

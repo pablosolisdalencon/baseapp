@@ -1,13 +1,7 @@
-import React from "react";   
 import GWV from '@/utils/GWV';
-<<<<<<< HEAD
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-=======
-// Ya no se usa useAppContext aquí directamente para obtener la sesión en useTokens,
-// ya que el email se pasará como argumento.
 
->>>>>>> f257cb1c42ba8354c9a78354d4a2a253e59decf3
 // fx consumeTokens
 // validarSaldo
 // ejecutar accion
@@ -75,15 +69,13 @@ const generatePost = async (post) => {
                 return { texto: texto_final, imagen: null };
             }
         } else if (response.status === 404) {
-            console.warn("generatePost: Texto no generado o no encontrado (404).");
             return null;
-        } else {
-            const errorData = await response.json();
-            throw new Error(errorData.message || `generatePost: Error al crear texto. Status: ${response.status}, StatusText: ${response.statusText}`);
+        }else{
+            return null;
         }
     } catch (error) {
         console.error(`generatePost: Fallo al crear.`, error);
-        throw new Error(`generatePost: No se pudo crear el contenido del post.`);
+       
     }
 };
 
@@ -178,10 +170,8 @@ async function validarSaldo(currentUserEmail) {
     try {
         // El endpoint es /api/user-tokens/[email], no necesita query param 'e=' si se ajusta la API
         // Asumiendo que la API está en /api/user-tokens/[email]
-        const response = await fetch(`/api/user-tokens/${currentUserEmail}`);
+        const response = await fetch(`/api/user-tokens/?e=${currentUserEmail}`);
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            console.error(`validarSaldo: Error al obtener saldo. Status: ${response.status}, Mensaje: ${errorData.message || response.statusText}`);
             return null;
         }
         const jsonData = await response.json();
@@ -236,69 +226,62 @@ async function rollBackTokens(saldoOriginal, currentUserEmail) {
 }
 
 // main?
-<<<<<<< HEAD
 async function useTokens(action, objectAction) {
     const session = await getServerSession(authOptions);
     const currentUserEmail = session?.user?.email;
 
-    if (!currentUserEmail) {
-        throw new Error("El usuario no está autenticado.");
-=======
-async function useTokens(action, objectAction, email) { // email ahora es un parámetro obligatorio
-    if (!email) {
-        console.error("useTokens: Email del usuario no proporcionado.");
-        // Considerar lanzar un error o devolver una estructura de error estándar.
-        // No usar alert, ya que este código puede correr en contextos no UI.
-        return { key: action, generated: { texto: "Error: Usuario no identificado.", imagen: null } };
->>>>>>> f257cb1c42ba8354c9a78354d4a2a253e59decf3
-    }
+    if (currentUserEmail) {
+        const saldoActual = await validarSaldo(currentUserEmail);
 
-    const price = await getPrice(action);
-    if (price === null) { // getPrice ahora devuelve null en error
-        console.error(`useTokens: No se pudo obtener el precio para la acción '${action}'.`);
-        return { key: action, generated: { texto: `Error: No se pudo determinar el costo de la acción.`, imagen: null } };
-    }
+        
 
-    const saldoActual = await validarSaldo(email);
-    if (saldoActual === null) {
-        console.error(`useTokens: No se pudo validar el saldo para el usuario '${email}'.`);
-        return { key: action, generated: { texto: `Error: No se pudo verificar el saldo.`, imagen: null } };
-    }
+        const price = await getPrice(action);
+        if (price === null) { // getPrice ahora devuelve null en error
+            console.error(`useTokens: No se pudo obtener el precio para la acción '${action}'.`);
+            return { key: action, generated: { texto: `Error: No se pudo determinar el costo de la acción.`, imagen: null } };
+        }
 
-    if (saldoActual >= price) {
-        const saldoDespuesDelDescuento = saldoActual - price;
-        const descuentoExitoso = await descontarTokens(saldoDespuesDelDescuento, email);
+        
+        if (saldoActual === null) {
+            console.error(`useTokens: No se pudo validar el saldo para el usuario '${currentUserEmail}'.`);
+            return { key: action, generated: { texto: `Error: No se pudo verificar el saldo.`, imagen: null } };
+        }
 
-        if (descuentoExitoso) { // Asumiendo que descontarTokens devuelve algo truthy en éxito
-            const resultadoAccion = await ejecutarAccion(action, objectAction);
+        if (saldoActual >= price) {
+            const saldoDespuesDelDescuento = saldoActual - price;
+            const descuentoExitoso = await descontarTokens(saldoDespuesDelDescuento, email);
 
-            // Verificar si la acción falló (ej. resultadoAccion.generated.texto contiene "Error:")
-            if (resultadoAccion && resultadoAccion.generated && typeof resultadoAccion.generated.texto === 'string' && resultadoAccion.generated.texto.startsWith("Error:")) {
-                console.warn(`useTokens: La acción '${action}' se ejecutó pero resultó en un error. Intentando rollback.`);
-                await rollBackTokens(saldoActual, email); // Devolver tokens al saldo original
-                return resultadoAccion; // Devolver el error de la acción
-            }
+            if (descuentoExitoso) { // Asumiendo que descontarTokens devuelve algo truthy en éxito
+                const resultadoAccion = await ejecutarAccion(action, objectAction);
 
-            if (resultadoAccion && resultadoAccion.key != null) { // Chequeo más robusto
-                return resultadoAccion;
+                // Verificar si la acción falló (ej. resultadoAccion.generated.texto contiene "Error:")
+                if (resultadoAccion && resultadoAccion.generated && typeof resultadoAccion.generated.texto === 'string' && resultadoAccion.generated.texto.startsWith("Error:")) {
+                    console.warn(`useTokens: La acción '${action}' se ejecutó pero resultó en un error. Intentando rollback.`);
+                    await rollBackTokens(saldoActual, email); // Devolver tokens al saldo original
+                    return resultadoAccion; // Devolver el error de la acción
+                }
+
+                if (resultadoAccion && resultadoAccion.key != null) { // Chequeo más robusto
+                    return resultadoAccion;
+                } else {
+                    console.error(`useTokens: Fallo en la ejecución de la acción '${action}' después del descuento. Intentando rollback.`);
+                    await rollBackTokens(saldoActual, currentUserEmail); // Devolver tokens al saldo original
+                    return {
+                        key: action,
+                        generated: {
+                            texto: "Oops! Fallo en la generación de contenido. Tus tokens han sido restaurados. Inténtalo de nuevo.",
+                            imagen: null
+                        }
+                    };
+                }
             } else {
-                console.error(`useTokens: Fallo en la ejecución de la acción '${action}' después del descuento. Intentando rollback.`);
-                await rollBackTokens(saldoActual, email); // Devolver tokens al saldo original
-                return {
-                    key: action,
-                    generated: {
-                        texto: "Oops! Fallo en la generación de contenido. Tus tokens han sido restaurados. Inténtalo de nuevo.",
-                        imagen: null
-                    }
-                };
+                console.error(`useTokens: Error al descontar tokens para la acción '${action}'.`);
+                return { key: action, generated: { texto: "Error: No se pudieron descontar los tokens.", imagen: null } };
             }
         } else {
-            console.error(`useTokens: Error al descontar tokens para la acción '${action}'.`);
-            return { key: action, generated: { texto: "Error: No se pudieron descontar los tokens.", imagen: null } };
+            console.warn(`useTokens: Saldo insuficiente para la acción '${action}'. Saldo: ${saldoActual}, Precio: ${price}`);
+            return { key: action, generated: { texto: "Saldo Insuficiente.", imagen: null } }; // Estructura consistente
         }
-    } else {
-        console.warn(`useTokens: Saldo insuficiente para la acción '${action}'. Saldo: ${saldoActual}, Precio: ${price}`);
-        return { key: action, generated: { texto: "Saldo Insuficiente.", imagen: null } }; // Estructura consistente
     }
 }
 

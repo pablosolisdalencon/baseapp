@@ -4,13 +4,8 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faBoxesPacking, faTrashCan, faBullhorn, faMobileScreenButton } from "@fortawesome/free-solid-svg-icons";
 import ConfirmModal from "@/components/ConfirmModal";
-<<<<<<< HEAD
 import { useSession } from 'next-auth/react';
-=======
-import { useAppContext } from "@/app/AppContext";
-import { useRouter } from "next/navigation"; // Importar useRouter
->>>>>>> f257cb1c42ba8354c9a78354d4a2a253e59decf3
-
+import { useRouter } from "next/navigation";
 interface ItemType {
   _id: string;
   nombre: string;
@@ -19,12 +14,8 @@ interface ItemType {
 }
 
 const ProyectosClient: React.FC = () => {
-<<<<<<< HEAD
   const { data: session } = useSession();
-=======
-  const { session, status } = useAppContext(); // Acceder a la sesión y status desde el contexto
   const router = useRouter(); // Inicializar router
->>>>>>> f257cb1c42ba8354c9a78354d4a2a253e59decf3
   const [dataList, setDataList] = useState<ItemType[] | null>(null);
   // isLoading se maneja ahora por el status del AppContext y un estado local para el fetch
   const [isFetchingData, setIsFetchingData] = useState(true);
@@ -94,22 +85,14 @@ const ProyectosClient: React.FC = () => {
   };
 
   useEffect(() => {
-    if (status === "loading") {
-      // No hacer nada mientras la sesión está cargando
-      return;
-    }
-    if (status === "unauthenticated") {
-      // Redirigir si no está autenticado
-      router.push("/api/auth/signin?callbackUrl=/proyectos");
-      return;
-    }
-    if (status === "authenticated" && session?.user?.email) {
+
+    if (session?.user?.email) {
       fetchProyectos(session.user.email);
-    } else if (status === "authenticated" && !session?.user?.email) {
+    } else if (!session?.user?.email) {
         setError("No se pudo obtener el email del usuario.");
         setIsFetchingData(false);
     }
-  }, [status, session, router]); // Añadir router a las dependencias
+  }, [session, router]); // Añadir router a las dependencias
 
   // Estado de carga global de la sesión
   if (status === "loading") {
