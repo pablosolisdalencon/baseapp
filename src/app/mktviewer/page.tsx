@@ -1,8 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { Suspense } from "react";
-import dynamic from "next/dynamic";
-const MarketingWorkflow = dynamic(() => import("@/components/willi/StepByStepWilli"));
+import MarketingWorkflow from "@/components/willi/StepByStepWilli";
 
 export default async function MktViewer(){
     return (
