@@ -65,15 +65,15 @@ const MarketingContentManager: React.FC = () => {
   }, [idProyecto]);
 
   useEffect(() => {
-    if (status === "loading") return;
-    if (status === "unauthenticated") {
+
+    if (!session) {
       router.push("/api/auth/signin?callbackUrl=/contents-manager" + (idProyecto ? `?id=${idProyecto}` : ''));
       return;
     }
-    if (status === "authenticated") {
+    if (session) {
       fetchCampaignData();
     }
-  }, [status, fetchCampaignData, router, idProyecto]);
+  }, [session, fetchCampaignData, router, idProyecto]);
 
   useEffect(() => {
     const getThisPrice = async () => {
@@ -130,7 +130,7 @@ const MarketingContentManager: React.FC = () => {
     }
   };
 
-  if (status === "loading" || isFetchingCampaign) {
+  if (isFetchingCampaign) {
     return (
       <div className={commonClasses.container}>
         <h2 className="text-2xl font-bold text-center text-gray-700">
