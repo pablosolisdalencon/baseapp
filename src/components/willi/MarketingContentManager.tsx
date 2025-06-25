@@ -17,10 +17,10 @@ interface GeneratedContent {
   imagen: string | null;
 }
 
-const MarketingContentManager: React.FC = () => {
+const MarketingContentManager: React.FC = async () => {
   const { data: session } = useSession();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = await useSearchParams();
   const idProyecto = searchParams.get("id");
   const saldo = validarSaldo(session?.user?.email)
 
@@ -45,31 +45,33 @@ const MarketingContentManager: React.FC = () => {
     buttonDisabled: "bg-gray-400 cursor-not-allowed",
   };
 
-  const fetchCampaignData = useCallback(async () => {
-    if (!idProyecto) {
-      setError("ID de proyecto no proporcionado.");
-      setIsFetchingCampaign(false);
-      return;
-    }
+  const fetchCampaignData = async () => {
     setIsFetchingCampaign(true);
     setError(null);
     try {
-      const response = await GWV("check", idProyecto, "campania-marketing");
-      setCampaignData(response);
+      const res = await fetch(`/api/campania-marketing?p=${idProyecto}`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! : ${res}`);
+      }
+      const jsonData: any = await res.json();
+      setCampaignData(jsonData.data);
     } catch (err: any) {
-      setError(err.message || "Failed to fetch campaign data.");
-      console.error(err);
+      setError(`Error al cargar Campaign: ${err.message}`);
+      setCampaignData(null);
     } finally {
       setIsFetchingCampaign(false);
     }
-  }, [idProyecto]);
+  };
 
   useEffect(() => {
 
-    if (session) {
+    if (session?.user?.email) {
       fetchCampaignData();
+    } else if (!session?.user?.email) {
+        setError("No se pudo obtener el email del usuario.");
+        setIsFetchingCampaign(false);
     }
-  }, [session, fetchCampaignData, router, idProyecto]);
+  }, [session, router]); // Añadir router a las dependencias
 
   useEffect(() => {
     const getThisPrice = async () => {
