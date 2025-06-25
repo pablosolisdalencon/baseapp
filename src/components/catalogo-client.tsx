@@ -5,7 +5,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import ConfirmModal from "@/components/ConfirmModal";
-import { useAppContext } from "@/app/AppContext"; // Importar AppContext
+import { useSession } from 'next-auth/react';
 
 interface ProyectoDataType { // Renombrado para claridad
     _id: string; // Asumiendo que el proyecto también tiene un _id
@@ -21,7 +21,7 @@ interface ItemType {
 }
 
 export default function CatalogoClient() {
-    const { session, status } = useAppContext(); // Usar el contexto de la aplicación
+  const { data: session } = useSession();
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -49,7 +49,7 @@ export default function CatalogoClient() {
         try {
             const response = await fetch(`/api/item/?p=${proyectoId}`);
             if (!response.ok) {
-                throw new Error(`HTTP error! in Catalogo status: ${response.status}`);
+                throw new Error(`HTTP error! in Catalogo status: ${response}`);
             }
             const jsonData: { data: ItemType[] } = await response.json(); // Asumir que la API devuelve un objeto con una propiedad 'data'
             setCatalogoItems(jsonData.data);
@@ -67,7 +67,7 @@ export default function CatalogoClient() {
         try {
             const response = await fetch(`/api/proyecto/${proyectoId}`);
             if (!response.ok) {
-                throw new Error(`HTTP error! in Proyecto status: ${response.status}`);
+                throw new Error(`HTTP error! in Proyecto status: ${response}`);
             }
             const jsonData: {data: ProyectoDataType} = await response.json(); // Asumir que la API devuelve un objeto con una propiedad 'data'
             setProyectoData(jsonData.data);
@@ -89,7 +89,7 @@ export default function CatalogoClient() {
                 });
                 if (!res.ok) {
                     const errorData = await res.json();
-                    throw new Error(errorData.message || `Error al eliminar item: ${res.status}`);
+                    throw new Error(errorData.message || `Error al eliminar item: ${res}`);
                 }
                 alert("Item eliminado correctamente");
                 fetchCatalogo(idProyecto); // Recargar el catálogo
@@ -108,8 +108,8 @@ export default function CatalogoClient() {
     };
     
     useEffect(() => {
-        if (status === "loading") return;
-        if (status === "unauthenticated") {
+        
+        if (!session) {
             router.push("/api/auth/signin?callbackUrl=/catalogo" + (searchParams.get('id') ? `?id=${searchParams.get('id')}` : ''));
             return;
         }
@@ -117,7 +117,7 @@ export default function CatalogoClient() {
         const proyectoIdFromParams = searchParams.get('id');
         if (proyectoIdFromParams) {
             setIdProyecto(proyectoIdFromParams);
-            if (status === "authenticated") { // Asegurarse de que la sesión esté autenticada antes de hacer fetch
+            if (session) { // Asegurarse de que la sesión esté autenticada antes de hacer fetch
                 fetchProyectoData(proyectoIdFromParams);
                 fetchCatalogo(proyectoIdFromParams);
             }
@@ -127,9 +127,9 @@ export default function CatalogoClient() {
             setIsFetchingCatalogo(false);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [status, searchParams, router, fetchCatalogo, fetchProyectoData]); // fetchCatalogo y fetchProyectoData están envueltas en useCallback
+    }, [searchParams, router, fetchCatalogo, fetchProyectoData]); // fetchCatalogo y fetchProyectoData están envueltas en useCallback
 
-    if (status === "loading" || (idProyecto && (isFetchingProyecto || isFetchingCatalogo))) {
+    if ( (idProyecto && (isFetchingProyecto || isFetchingCatalogo))) {
         return <div className="flex justify-center items-center h-screen"><p className="text-xl">Cargando datos del catálogo...</p></div>;
     }
 

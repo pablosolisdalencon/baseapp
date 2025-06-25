@@ -17,7 +17,6 @@ const ProyectosClient: React.FC = () => {
   const { data: session } = useSession();
   const router = useRouter(); // Inicializar router
   const [dataList, setDataList] = useState<ItemType[] | null>(null);
-  // isLoading se maneja ahora por el status del AppContext y un estado local para el fetch
   const [isFetchingData, setIsFetchingData] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -54,7 +53,7 @@ const ProyectosClient: React.FC = () => {
       });
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || `Error al eliminar: ${res.status}`);
+        throw new Error(errorData.message || `Error al eliminar: ${res}`);
       }
       const data = await res.json();
       alert("Eliminado correctamente"); // Considerar usar notificaciones menos intrusivas
@@ -72,7 +71,7 @@ const ProyectosClient: React.FC = () => {
     try {
       const res = await fetch(`/api/proyecto?user=${email}`);
       if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+        throw new Error(`HTTP error! : ${res}`);
       }
       const jsonData: any = await res.json();
       setDataList(jsonData.data);
