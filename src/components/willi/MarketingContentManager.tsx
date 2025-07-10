@@ -7,9 +7,7 @@ import {
   Semana,
   Dia
 } from "../../types/marketingWorkflowTypes";
-//import GWV from "@/utils/GWV";
-import { useSearchParams } from "next/navigation";
-import { useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react'; // Importar useSession correctamente
 
 interface GeneratedContent {
   texto: string | null;
@@ -17,27 +15,41 @@ interface GeneratedContent {
 }
 
 interface MarketingContentManagerProps {
-  
-    CampaniaMarketingData:CampaniaMarketingData|null;
-  
+  CampaniaMarketingData: CampaniaMarketingData | null;
 }
 
-const MarketingContentManager: React.FC<MarketingContentManagerProps> = async ({CampaniaMarketingData:CampaniaMarketingData}) => {
+// REMOVED `async` from the component function
+const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ CampaniaMarketingData }) => {
+  // Estado para la sesión y el saldo
+  const { data: session, status } = useSession(); 
+  const [saldo, setSaldo] = useState<number | null>(null); // Nuevo estado para el saldo
 
-  if(!CampaniaMarketingData){
-    return(
+  // Effect para validar el saldo una vez que la sesión esté cargada
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user?.email) {
+      // Validar saldo es una función sincrónica o debería serlo para un Client Component
+      // Si validarSaldo es asíncrona, debe ser manejada dentro de este useEffect con un await
+      const currentSaldo = validarSaldo(session.user.email);
+      setSaldo(currentSaldo as unknown as any);
+    } else if (status === 'unauthenticated' || status === 'loading') {
+      setSaldo(null); // O un valor por defecto si no hay sesión
+    }
+  }, [session, status]); // Dependencias: sesión y su estado
+
+  if (!CampaniaMarketingData) {
+    return (
       <>
-      Opps No hay Campaña para gestionar!
+        Opps No hay Campaña para gestionar!
       </>
-    )
+    );
   }
-  const { data: session } = await useSession();
-  const saldo = validarSaldo(session?.user?.email)
 
   const campaignData = CampaniaMarketingData;
-  const [isFetchingCampaign, setIsFetchingCampaign] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null); // Para errores generales de la página
-  const [postError, setPostError] = useState<Map<string, string | null>>(new Map()); // Para errores por post
+  // Ya no necesitas isFetchingCampaign si los datos vienen de props.
+  // setIsFetchingCampaign(true) es para cuando el componente *fetch* sus propios datos.
+  // Aquí, los datos (CampaniaMarketingData) ya llegan resueltos del Server Component padre.
+  const [error, setError] = useState<string | null>(null);
+  const [postError, setPostError] = useState<Map<string, string | null>>(new Map());
   const [price, setPrice] = useState<number | null>(null);
   const [generatedPosts, setGeneratedPosts] = useState<Map<string, GeneratedContent>>(new Map());
   const [generatingStates, setGeneratingStates] = useState<Map<string, boolean>>(new Map());
@@ -55,45 +67,13 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = async ({
     buttonDisabled: "bg-gray-400 cursor-not-allowed",
   };
 
-  /*
-  const fetchCampaignData = async () => {
-    setIsFetchingCampaign(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/campania-marketing?p=${idProyecto}`);
-      if (!res.ok) {
-        throw new Error(`HTTP error! : ${res}`);
-      }
-      const jsonData: any = await res.json();
-      setCampaignData(jsonData.data);
-    } catch (err: any) {
-      setError(`Error al cargar Campaign: ${err.message}`);
-      setCampaignData(null);
-    } finally {
-      setIsFetchingCampaign(false);
-    }
-  };
-*/
-
-/*
-  useEffect(() => {
-
-    if (session?.user?.email) {
-      fetchCampaignData();
-    } else if (!session?.user?.email) {
-        setError("No se pudo obtener el email del usuario.");
-        setIsFetchingCampaign(false);
-    }
-  }, [session]);
-  */
   useEffect(() => {
     const getThisPrice = async () => {
       const responsePrice = await getPrice("generate-post");
-      if (responsePrice !== null) { // Chequear contra null explícitamente
+      if (responsePrice !== null) {
         setPrice(responsePrice);
       } else {
         console.warn("MarketingContentManager: No se pudo obtener el precio para generate-post.");
-        // Podrías setear un error aquí o manejarlo de otra forma si el precio es crucial.
       }
     };
     getThisPrice();
@@ -102,38 +82,36 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = async ({
   const getKey = (weekIndex: number, dayIndex: number) => `${weekIndex}_${dayIndex}`;
 
   const handleUseTokens = async (action: string, objectAction: any) => {
-
     const key = getKey(objectAction.week, objectAction.day);
     setGeneratingStates((prev) => new Map(prev).set(key, true));
-    setPostError((prev) => new Map(prev).set(key, null)); // Limpiar error previo para este post
+    setPostError((prev) => new Map(prev).set(key, null));
 
     try {
-
       const exec = await useTokens(action, objectAction);
 
       if (exec && exec.generated) {
-        // Si el texto generado indica un error (convención de simpleTokens.js)
         if (typeof exec.generated.texto === 'string' && exec.generated.texto.startsWith("Error:")) {
-            setPostError((prev) => new Map(prev).set(key, exec.generated.texto));
-            // No actualizar generatedPosts si hubo un error en la generación del contenido en sí
+          setPostError((prev) => new Map(prev).set(key, exec.generated.texto));
         } else if (exec.generated.texto === "Saldo Insuficiente.") {
-            setPostError((prev) => new Map(prev).set(key, "Saldo insuficiente para generar este post."));
+          setPostError((prev) => new Map(prev).set(key, "Saldo insuficiente para generar este post."));
         } else {
-            setGeneratedPosts((prev) => {
-                const newMap = new Map(prev);
-                newMap.set(key, { texto: exec.generated.texto, imagen: exec.generated.imagen });
-                return newMap;
-            });
+          setGeneratedPosts((prev) => {
+            const newMap = new Map(prev);
+            newMap.set(key, { texto: exec.generated.texto, imagen: exec.generated.imagen });
+            return newMap;
+          });
+        }
+        // Después de usar tokens, revalidar el saldo
+        if (session?.user?.email) {
+          const updatedSaldo = validarSaldo(session.user.email);
+          setSaldo(updatedSaldo as unknown as number);
         }
 
-        // Siempre intentar revalidar y actualizar el saldo del contexto,
-        // ya que `useTokens` maneja el descuento internamente si la acción tuvo costo.
-        
       } else {
         console.warn("MarketingContentManager: La función useTokens no devolvió un resultado esperado.", exec);
         setPostError((prev) => new Map(prev).set(key, "Error inesperado durante la generación del contenido."));
       }
-    } catch (error: any) { // Capturar errores de la llamada a useTokens en sí (ej. si useTokens lanza una excepción)
+    } catch (error: any) {
       console.error("MarketingContentManager: Error al llamar a useTokens o procesar su resultado:", error);
       setPostError((prev) => new Map(prev).set(key, error.message || "Error desconocido al procesar la acción."));
     } finally {
@@ -141,16 +119,10 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = async ({
     }
   };
 
-  if (isFetchingCampaign) {
-    return (
-      <div className={commonClasses.container}>
-        <h2 className="text-2xl font-bold text-center text-gray-700">
-          Cargando datos de la campaña...
-        </h2>
-      </div>
-    );
-  }
-
+  // No necesitamos isFetchingCampaign si CampaniaMarketingData viene como prop
+  // y ya se maneja su ausencia al inicio del componente
+  // if (isFetchingCampaign) { ... }
+  
   if (error) { // Error general de carga de la página/campaña
     return (
       <div className={`${commonClasses.container} text-red-700`}>
@@ -176,7 +148,7 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = async ({
         Gestor de Contenido de Campaña: {campaignData.nombre || "Sin Nombre"}
       </h1>
       <section className={commonClasses.section}>
-        <h2 className={commonClasses.sectionTitle}>Planificación de Contenido - Saldo: 🪙{saldo !== null ? saldo : '...'}</h2>
+        <h2 className={commonClasses.sectionTitle}>Planificación de Contenido - Saldo: 🪙{saldo !== null ? saldo : 'Cargando...'}</h2>
         {campaignData.contenido.map((semana: Semana, weekIndex: number) => (
           <div key={semana.numero} className="mb-8 p-6 bg-blue-50 rounded-lg shadow-md border border-blue-100">
             <h3 className="text-xl font-bold text-blue-800 mb-3">Semana {semana.numero}</h3>
@@ -224,31 +196,36 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = async ({
                   )}
 
                   {isGenerating && (
-                     <p className="text-purple-600 italic mt-2">Generando contenido...</p>
+                    <p className="text-purple-600 italic mt-2">Generando contenido...</p>
                   )}
                   {currentPostError && (
                     <p className={commonClasses.errorText}>{currentPostError}</p>
                   )}
 
                   <div className={commonClasses.buttonGroup}>
-                    {session?.user && ( // Asegurar que hay sesión antes de mostrar el botón
+                    {status === 'authenticated' && ( // Solo mostrar el botón si la sesión está autenticada
                       <button
                         onClick={() =>
-
                           handleUseTokens("generate-post", { week: weekIndex, day: dayIndex, post})
-
                         }
                         className={`${commonClasses.buttonBase} ${commonClasses.buttonGenerate} ${
-                          isGenerating || saldo === null ? commonClasses.buttonDisabled : ""
+                          isGenerating || saldo === null || saldo < (price || 0) ? commonClasses.buttonDisabled : ""
                         }`}
-                        disabled={isGenerating || price === null}
+                        disabled={isGenerating || price === null || saldo === null || saldo < (price || 0)}
                         title={
-                            price === null ? "Precio no disponible" :"Generar post"
-                            
+                          price === null ? "Precio no disponible" :
+                          saldo === null ? "Cargando saldo..." :
+                          saldo < (price || 0) ? "Saldo insuficiente" : "Generar post"
                         }
                       >
                         {isGenerating ? "Generando..." : `Generar Post 🪙 ${price !== null ? price : 'N/A'}`}
                       </button>
+                    )}
+                    {status === 'loading' && (
+                        <p className="text-gray-500 italic">Cargando sesión...</p>
+                    )}
+                    {status === 'unauthenticated' && (
+                        <p className="text-red-500 italic">Debes iniciar sesión para generar contenido.</p>
                     )}
                   </div>
                 </div>

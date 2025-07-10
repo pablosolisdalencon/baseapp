@@ -20,9 +20,6 @@ export default async function MktViewer(){
 }
     */
 
-// src/app/proyectos/[idProyecto]/page.tsx
-// Este es un Page Server Component (por defecto es async)
-
 import MarketingContentManager from "@/components/willi/MarketingContentManager";
 import { Suspense } from "react";
 
