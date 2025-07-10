@@ -1,3 +1,4 @@
+/*
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -188,7 +189,6 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
                       {generatedContent.imagen && (
                         <>
                           <p className="font-semibold mt-2">Imagen Generada:</p>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={generatedContent.imagen} alt="Imagen generada" className="max-w-xs rounded-md shadow-md mt-1"/>
                         </>
                       )}
@@ -239,3 +239,4 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
 };
 
 export default MarketingContentManager;
+*/
