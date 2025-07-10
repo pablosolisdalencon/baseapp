@@ -29,13 +29,10 @@ import { Suspense } from "react";
 import { CampaniaMarketingData } from "@/types/marketingWorkflowTypes";
 // Define las props que el componente de página recibe de Next.js
 interface PageProps {
-  params: {
     idProyecto: string; // Coincide con el nombre de la carpeta dinámica [idProyecto]
-  };
 }
 
-export default async function MarketingContentsManagerPage({ params }: PageProps) {
-  const idProyecto = params.idProyecto; // ¡Extraemos el parámetro de la URL!
+export default async function MarketingContentsManagerPage({ idProyecto }: PageProps) {
 
   let campania: CampaniaMarketingData | null = null;
   let errorMessage: string | null = null;
