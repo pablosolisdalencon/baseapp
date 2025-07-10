@@ -69,3 +69,8 @@ export default async function MarketingContentsManagerPage({ params }: PageProps
   );
 }
   */
+ export default function MarketingContentsManagerPage(){
+  return(
+    <h1>MarketingContentsManagerPage</h1>
+  )
+ }
