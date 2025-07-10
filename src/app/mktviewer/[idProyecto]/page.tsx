@@ -30,3 +30,8 @@ export default async function CampaniaMarketingPage({ params }: CampaniaMarketin
     )
 }
     */
+    export default function MarketingContentsManager(){
+  return(
+    <h1>MarketingContentsManager</h1>
+  )
+ }
