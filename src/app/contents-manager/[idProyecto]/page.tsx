@@ -32,7 +32,7 @@ interface PageProps {
 }
 
 export default async function MarketingContentsManagerPage({ params }: PageProps) {
-  const idProyecto = params.idProyecto; // ¡Extraemos el parámetro de la URL!
+  const idProyecto = params.idProyecto as unknown as string; // ¡Extraemos el parámetro de la URL!
 
   let campania: CampaniaMarketingData | null = null;
   let errorMessage: string | null = null;
