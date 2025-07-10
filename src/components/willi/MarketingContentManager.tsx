@@ -7,24 +7,34 @@ import {
   Semana,
   Dia
 } from "../../types/marketingWorkflowTypes";
-import GWV from "@/utils/GWV";
+//import GWV from "@/utils/GWV";
 import { useSearchParams } from "next/navigation";
 import { useSession } from 'next-auth/react';
-import { useRouter } from "next/navigation";
 
 interface GeneratedContent {
   texto: string | null;
   imagen: string | null;
 }
 
-const MarketingContentManager: React.FC = async () => {
+interface MarketingContentManagerProps {
+  
+    CampaniaMarketingData:CampaniaMarketingData|null;
+  
+}
+
+const MarketingContentManager: React.FC<MarketingContentManagerProps> = async ({CampaniaMarketingData:CampaniaMarketingData}) => {
+
+  if(!CampaniaMarketingData){
+    return(
+      <>
+      Opps No hay Campaña para gestionar!
+      </>
+    )
+  }
   const { data: session } = await useSession();
-  const router = useRouter();
-  const searchParams = await useSearchParams();
-  const idProyecto = searchParams.get("id");
   const saldo = validarSaldo(session?.user?.email)
 
-  const [campaignData, setCampaignData] = useState<CampaniaMarketingData | null>(null);
+  const campaignData = CampaniaMarketingData;
   const [isFetchingCampaign, setIsFetchingCampaign] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null); // Para errores generales de la página
   const [postError, setPostError] = useState<Map<string, string | null>>(new Map()); // Para errores por post
@@ -45,6 +55,7 @@ const MarketingContentManager: React.FC = async () => {
     buttonDisabled: "bg-gray-400 cursor-not-allowed",
   };
 
+  /*
   const fetchCampaignData = async () => {
     setIsFetchingCampaign(true);
     setError(null);
@@ -62,7 +73,9 @@ const MarketingContentManager: React.FC = async () => {
       setIsFetchingCampaign(false);
     }
   };
+*/
 
+/*
   useEffect(() => {
 
     if (session?.user?.email) {
@@ -72,6 +85,7 @@ const MarketingContentManager: React.FC = async () => {
         setIsFetchingCampaign(false);
     }
   }, [session]);
+  */
   useEffect(() => {
     const getThisPrice = async () => {
       const responsePrice = await getPrice("generate-post");

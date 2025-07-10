@@ -19,14 +19,12 @@ import { useSession } from 'next-auth/react';
 
 // --- Componente principal del Flujo de Marketing ---
 interface MarketingWorkflowProps {
-  idProyecto?: string;
+  idProyectoD:string | null;
 }
   
-const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
+const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
   const { data: session } = useSession();
-  const searchParams = useSearchParams();
-  const thisIDP = searchParams.get('id');
-  const [idProyecto, setIdProyecto] = useState<string | null>(thisIDP);
+  const [idProyecto, setIdProyecto] = useState<string | null>(idProyectoD);
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -88,7 +86,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = () => {
   // Efecto para verificar existencia de datos cuando cambia el paso
   
   useEffect(() => {
-     setIdProyecto(thisIDP)
+     setIdProyecto(idProyectoD)
     
 
     const projectId=idProyecto;
