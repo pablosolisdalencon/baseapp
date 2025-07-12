@@ -31,7 +31,8 @@ export default async function DynamicPage({ params }: CampaniaMarketingPageProps
       console.error(`Error fetching data for ID '${itemId}':`, errorMessage);
     } else {
       // Si la respuesta es exitosa, parsea el JSON a tu interfaz `FetchedData`.
-      itemData = await res.json();
+      let data = await res.json();
+      itemData = data[0];
     }
   } catch (error: any) {
     // Captura cualquier error de red o de ejecución durante el fetch.
