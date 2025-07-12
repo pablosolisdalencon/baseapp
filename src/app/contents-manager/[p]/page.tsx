@@ -7,7 +7,7 @@ export default async function DynamicPage({ params }: CampaniaMarketingPageProps
   const parametros = await params;
   const { p: itemId } = parametros;
 
-      let itemData: CampaniaMarketingData | null = null;
+      let data: CampaniaMarketingData | null = null;
       let errorMessage: string | null = null;
 
   try {
@@ -30,9 +30,17 @@ export default async function DynamicPage({ params }: CampaniaMarketingPageProps
       errorMessage = errorResponse.message || `Error desconocido al cargar datos para ID: ${itemId}`;
       console.error(`Error fetching data for ID '${itemId}':`, errorMessage);
     } else {
-      // Si la respuesta es exitosa, parsea el JSON a tu interfaz `FetchedData`.
-      let data = await res.json();
-      itemData = data[0];
+ 
+     const response  = await res.json();
+         let mydata = response.data;
+
+          if(mydata){
+            data = mydata[0]
+      }else{
+         // Captura cualquier error de red o de ejecución durante el fetch.
+    console.error('Error en Jsonificando:');
+    errorMessage = `Error Jsonificando`;
+      }
     }
   } catch (error: any) {
     // Captura cualquier error de red o de ejecución durante el fetch.
@@ -45,7 +53,7 @@ export default async function DynamicPage({ params }: CampaniaMarketingPageProps
             <div className="cardMKT williFlowItem">    
                 <h2 className="mkt-subtitle">Flujo de Trabajo Marketing Digital</h2>
                 <div className="cardMKTitemHidden">
-                 <Suspense fallback={<p>Cargando...</p>}><MarketingContentManager CampaniaMarketingData={itemData}/></Suspense>
+                 <Suspense fallback={<p>Cargando...</p>}><MarketingContentManager CampaniaMarketingData={data}/></Suspense>
                 </div> 
             </div>
 

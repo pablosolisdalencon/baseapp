@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useTokens, getPrice, validarSaldo } from "../tokens/simpleTokens";
+
 import {
   MarketingContentManagerProps,
   CampaniaMarketingData,
@@ -9,8 +9,9 @@ import {
   Dia
 } from "../../types/marketingWorkflowTypes";
 
+import GWV from "@/utils/GWV";
 import { useSession } from 'next-auth/react'; // Importar useSession correctamente
-
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 interface GeneratedContent {
   texto: string | null;
   imagen: string | null;
@@ -20,37 +21,253 @@ interface GeneratedContent {
 // REMOVED `async` from the component function
 const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ CampaniaMarketingData }) => {
   // Estado para la sesión y el saldo
+  console.log(CampaniaMarketingData)
   const { data: session, status } = useSession(); 
+  const currentUserEmail = session?.user?.email;
+
+    /* SUITE useTokens*/
+
+          //-------- ACCIONES --------------
+          const generatePost = async (post:any) => {
+              try {
+                  let bodyData = JSON.stringify({ item: 'post-final', post: post });
+                  let bodyData_img = JSON.stringify({ item: 'post-final-img', post: post });
+                  const response = await fetch(`/api/willi`, {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: bodyData,
+                  });
+
+                  const response_imagen = await fetch(`/api/willi`, {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                      },
+                      body: bodyData_img,
+                  });
+
+                  if (response.ok) {
+                      const res = await response.json();
+                      const texto_final = res[0].texto;
+
+                      if (response_imagen.ok) {
+                          const res_img = await response_imagen.json();
+                          const imagen_final = res_img[0].data;
+                          const response_final = {
+                              texto: texto_final,
+                              imagen: imagen_final,
+                          };
+                          return response_final;
+                      } else if (response_imagen.status === 404) {
+                          // Si la imagen no se encuentra o no se genera, devolvemos solo el texto.
+                          console.warn("generatePost: Imagen no generada o no encontrada (404). Devolviendo solo texto.");
+                          return { texto: texto_final, imagen: null };
+                      } else {
+                          const errorData = await response_imagen.json();
+                          // Devolver solo el texto si la imagen falla por otra razón
+                          return { texto: texto_final, imagen: null };
+                      }
+                  } else if (response.status === 404) {
+                      return null;
+                  }else{
+                      return null;
+                  }
+              } catch (error) {
+                
+              }
+          };
+
+          const GeneratePost = async ({ week, day, post }:any) => {
+              const getKey = (week:any, day:any) => `${week}_${day}`;
+              const key = getKey(week, day);
+
+              try {
+                  const generated = await generatePost(post);
+                  return { key, generated }; // `generated` puede ser `{texto, imagen}` o `null`
+              } catch (err:any) {
+                  // Retornar una estructura consistente incluso en error para que `ejecutarAccion` no falle
+                  return { key, generated: { texto: `Error al generar: ${err.message}`, imagen: null } };
+              }
+          };
+          //----------------------
+
+          const ejecutarAccion = async (action:any, objectAction:any) =>{
+              if (action === "generate-post") { // Usar === para comparación estricta
+                  // GeneratePost ahora siempre devuelve un objeto { key, generated }
+                  return await GeneratePost(objectAction);
+              }
+
+              // Para otras acciones, asegurarse que GWV también devuelve una estructura consistente
+              // o manejar los errores de forma similar.
+              if (action === "generate-estudio") {
+                  const { mode, projectId, item } = objectAction;
+                  try {
+                      const result = await GWV(mode, projectId, item); // Asumir que GWV puede lanzar error o devolver null/estructura
+                      return result; // o { key: "estudio_key", generated: result } si es necesario adaptar
+                  } catch (error:any) {
+                      return { key: "estudio_error", generated: { texto: `Error: ${error.message}` } }; // Ejemplo
+                  }
+              }
+              if (action === "generate-estrategia") {
+                  const { mode, projectId, item, estudio } = objectAction;
+                  try {
+                      const result = await GWV(mode, projectId, item, estudio);
+                      return result;
+                  } catch (error:any) {
+                      return { key: "estrategia_error", generated: { texto: `Error: ${error.message}` } };
+                  }
+              }
+              if (action === "generate-campania") {
+                  const { mode, projectId, item, estudio, estrategia } = objectAction;
+                  try {
+                      const result = await GWV(mode, projectId, item, estudio, estrategia);
+                      return result;
+                  } catch (error:any) {
+                      return { key: "campania_error", generated: { texto: `Error: ${error.message}` } };
+                  }
+              }
+              return null; // O una estructura de error por defecto
+          }
+
+          // displayTokensModal no se usa actualmente, se podría eliminar o implementar si es necesario.
+
+          // -----------------------------------------------
+          const getPrice = async (action:any) => {
+              if (!action) {
+                  return null;
+              }
+              try {
+                  const response = await fetch(`/api/pricing?a=${action}`); // No necesita headers ni method GET por defecto
+                  if (!response.ok) {
+                      const errorData = await response.json().catch(() => ({})); // Intenta parsear JSON, si falla, objeto vacío
+                      // No usar alert aquí, mejor propagar el error o null.
+                      return null;
+                  }
+                  const jsonPrice = await response.json();
+                  return jsonPrice.price; // Asume que la API devuelve { price: X }
+              } catch (e) {
+                  return null;
+              }
+          }
+          // -----------------------------------------------
+
+          const validarSaldo = async (currentUserEmail:any) => {
+              if (!currentUserEmail) {
+                  return null;
+              }
+              try {
+                  // El endpoint es /api/user-tokens/[email], no necesita query param 'e=' si se ajusta la API
+                  // Asumiendo que la API está en /api/user-tokens/[email]
+                  const response = await fetch(`/api/user-tokens/?e=${currentUserEmail}`);
+                  if (!response.ok) {
+                      return null;
+                  }
+                  const jsonData = await response.json();
+                  return jsonData.tokens; // Asume { tokens: Y }
+              } catch (e) {
+                  return null;
+              }
+          }
+          // -----------------------------------------------
+
+          const descontarTokens = async (montoADejar:number, currentUserEmail:string) => {
+              // El 'monto' aquí es el saldo final después del descuento, no la cantidad a descontar.
+              // La API /api/user-tokens (PUT) debe estar diseñada para SETear el saldo.
+              /*
+              if (typeof montoADejar !== 'number' || montoADejar < 0) {
+                  return null; // O false para indicar fallo
+              }
+              if (!currentUserEmail) {
+                  return null;
+              }
+                  */
 
 
-  /*   SALDO 
-  const [saldo, setSaldo] = useState<number | null>(null); // Nuevo estado para el saldo
 
-  // Effect para validar el saldo una vez que la sesión esté cargada
-  useEffect(() => {
-    if (status === 'authenticated' && session?.user?.email) {
-      // Validar saldo es una función sincrónica o debería serlo para un Client Component
-      // Si validarSaldo es asíncrona, debe ser manejada dentro de este useEffect con un await
-      const currentSaldo = validarSaldo(session.user.email);
-      setSaldo(currentSaldo as unknown as any);
-    } else if (status === 'unauthenticated' || status === 'loading') {
-      setSaldo(null); // O un valor por defecto si no hay sesión
-    }
-  }, [session, status]); // Dependencias: sesión y su estado
-  */
+              const bodyData = JSON.stringify({ tokens: montoADejar, email:currentUserEmail }); // La API debe interpretar esto como el nuevo saldo
+              try {
+                  const response = await fetch(`/api/user-tokens`, { // Asumiendo API RESTful
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: bodyData,
+                  });
+                  if (!response.ok) {
+                      const errorData = await response.json().catch(() => ({}));
+                      return null; // O false
+                  }
+                  return await response.json(); // O true si la API devuelve el usuario actualizado o un success
+              } catch (e) {
+                  return null; // O false
+              }
+          }
+          // -----------------------------------------------
 
+          // historyTokens no se usa, se podría eliminar.
 
+          // -----------------------------------------------
 
-  if (!CampaniaMarketingData) {
-    return (
-      <>
-        Opps No hay Campaña para gestionar!
-      </>
-    );
-  }
+          const rollBackTokens = async (saldoOriginal:any, currentUserEmail:any) => {
+              // Esta función es esencialmente la misma que descontarTokens si la API SETea el saldo.
+              console.log(`rollBackTokens: Restaurando saldo a ${saldoOriginal} para ${currentUserEmail}`);
+              return await descontarTokens(saldoOriginal, currentUserEmail); // Reutilizar descontarTokens
+          }
 
-  const campaignData = CampaniaMarketingData;
- let saldo =100;
+          // main?
+          const useTokens = async (action:any, objectAction:any) => {
+              
+              if (currentUserEmail) {
+                  const saldoActual = await validarSaldo(currentUserEmail);
+
+                  
+
+                  const price = await getPrice(action);
+                  if (price === null) { // getPrice ahora devuelve null en error
+                      return { key: action, generated: { texto: `Error: No se pudo determinar el costo de la acción.`, imagen: null } };
+                  }
+
+                  
+                  if (saldoActual === null) {
+                      return { key: action, generated: { texto: `Error: No se pudo verificar el saldo.`, imagen: null } };
+                  }
+
+                  if (saldoActual >= price) {
+                      const saldoDespuesDelDescuento = saldoActual - price;
+                      const descuentoExitoso = await descontarTokens(saldoDespuesDelDescuento, currentUserEmail);
+
+                      if (descuentoExitoso) { // Asumiendo que descontarTokens devuelve algo truthy en éxito
+                          const resultadoAccion = await ejecutarAccion(action, objectAction);
+
+                          // Verificar si la acción falló (ej. resultadoAccion.generated.texto contiene "Error:")
+                          if (resultadoAccion && resultadoAccion.generated && typeof resultadoAccion.generated.texto === 'string' && resultadoAccion.generated.texto.startsWith("Error:")) {
+                              await rollBackTokens(saldoActual, currentUserEmail); // Devolver tokens al saldo original
+                              return resultadoAccion; // Devolver el error de la acción
+                          }
+
+                          if (resultadoAccion && resultadoAccion.key != null) { // Chequeo más robusto
+                              return resultadoAccion;
+                          } else {
+                              await rollBackTokens(saldoActual, currentUserEmail); // Devolver tokens al saldo original
+                              return {
+                                  key: action,
+                                  generated: {
+                                      texto: "Oops! Fallo en la generación de contenido. Tus tokens han sido restaurados. Inténtalo de nuevo.",
+                                      imagen: null
+                                  }
+                              };
+                          }
+                      } else {
+                      return { key: action, generated: { texto: `Error: No se pudieron descontar los tokens ^saldoDespuesDelDescuento:${saldoDespuesDelDescuento}, currentUserEmail: ${currentUserEmail}.`, imagen: null } };
+                      }
+                  } else {
+                      return { key: action, generated: { texto: "Saldo Insuficiente.", imagen: null } }; // Estructura consistente
+                  }
+              }
+          }
+
+  
+  let saldo =100;
   
   const [postError, setPostError] = useState<Map<string, string | null>>(new Map());
   const [price, setPrice] = useState<number | null>(null);
@@ -117,6 +334,8 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
       setGeneratingStates((prev) => new Map(prev).set(key, false));
     }
   };
+  
+  const campaignData = CampaniaMarketingData;
 
   if (!campaignData || !campaignData.contenido || campaignData.contenido.length === 0) {
     return (
