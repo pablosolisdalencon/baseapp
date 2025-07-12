@@ -3,9 +3,9 @@ import MarketingContentManager from "@/components/willi/MarketingContentManager"
 import type { CampaniaMarketingPageProps, CampaniaMarketingData } from '@/types/marketingWorkflowTypes';
 
 
-export default async function CampaniaMarketingPage({ params}: {params:{p:string}}) {
-      const { p } = await params;
-      const itemId = p;
+export default async function DynamicPage({ params }: CampaniaMarketingPageProps) {
+  const parametros = await params;
+  const { p: itemId } = parametros;
 
       let itemData: CampaniaMarketingData | null = null;
       let errorMessage: string | null = null;
