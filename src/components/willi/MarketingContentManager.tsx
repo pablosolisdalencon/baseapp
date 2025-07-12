@@ -1,13 +1,14 @@
-/*
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { useTokens, getPrice, validarSaldo } from "../tokens/simpleTokens";
 import {
+  MarketingContentManagerProps,
   CampaniaMarketingData,
   Semana,
   Dia
 } from "../../types/marketingWorkflowTypes";
+
 import { useSession } from 'next-auth/react'; // Importar useSession correctamente
 
 interface GeneratedContent {
@@ -15,14 +16,14 @@ interface GeneratedContent {
   imagen: string | null;
 }
 
-interface MarketingContentManagerProps {
-  CampaniaMarketingData: CampaniaMarketingData | null;
-}
 
 // REMOVED `async` from the component function
 const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ CampaniaMarketingData }) => {
   // Estado para la sesión y el saldo
   const { data: session, status } = useSession(); 
+
+
+  /*   SALDO 
   const [saldo, setSaldo] = useState<number | null>(null); // Nuevo estado para el saldo
 
   // Effect para validar el saldo una vez que la sesión esté cargada
@@ -36,6 +37,9 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
       setSaldo(null); // O un valor por defecto si no hay sesión
     }
   }, [session, status]); // Dependencias: sesión y su estado
+  */
+
+
 
   if (!CampaniaMarketingData) {
     return (
@@ -46,10 +50,8 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
   }
 
   const campaignData = CampaniaMarketingData;
-  // Ya no necesitas isFetchingCampaign si los datos vienen de props.
-  // setIsFetchingCampaign(true) es para cuando el componente *fetch* sus propios datos.
-  // Aquí, los datos (CampaniaMarketingData) ya llegan resueltos del Server Component padre.
-  const [error, setError] = useState<string | null>(null);
+ let saldo =100;
+  
   const [postError, setPostError] = useState<Map<string, string | null>>(new Map());
   const [price, setPrice] = useState<number | null>(null);
   const [generatedPosts, setGeneratedPosts] = useState<Map<string, GeneratedContent>>(new Map());
@@ -102,11 +104,7 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
             return newMap;
           });
         }
-        // Después de usar tokens, revalidar el saldo
-        if (session?.user?.email) {
-          const updatedSaldo = validarSaldo(session.user.email);
-          setSaldo(updatedSaldo as unknown as number);
-        }
+       
 
       } else {
         console.warn("MarketingContentManager: La función useTokens no devolvió un resultado esperado.", exec);
@@ -119,19 +117,6 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
       setGeneratingStates((prev) => new Map(prev).set(key, false));
     }
   };
-
-  // No necesitamos isFetchingCampaign si CampaniaMarketingData viene como prop
-  // y ya se maneja su ausencia al inicio del componente
-  // if (isFetchingCampaign) { ... }
-  
-  if (error) { // Error general de carga de la página/campaña
-    return (
-      <div className={`${commonClasses.container} text-red-700`}>
-        <h2 className="text-2xl font-bold text-center">Error:</h2>
-        <p className="text-center">{error}</p>
-      </div>
-    );
-  }
 
   if (!campaignData || !campaignData.contenido || campaignData.contenido.length === 0) {
     return (
@@ -239,4 +224,4 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
 };
 
 export default MarketingContentManager;
-*/
+

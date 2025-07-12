@@ -5,16 +5,7 @@
 import React, { Suspense } from 'react';
 import ModuleClientComponent from '@/components/module/moduleClient';
 
-// 1. Define la interfaz para las props que este Page Component recibirá de Next.js.
-// El nombre del parámetro (`p`) debe coincidir exactamente con el nombre de la carpeta dinámica `[p]`.
-interface PageProps {
-  params: {
-    p: string; // El valor del parámetro dinámico de la URL (e.g., "123" si la URL es /items/123)
-  };
-}
-
-// 2. Define la interfaz para la estructura de datos que esperas de tu API.
-// Esto ayuda a TypeScript a validar los datos obtenidos.
+import type { CampaniaMarketingPageProps } from '@/types/marketingWorkflowTypes';
 interface FetchedData {
   id: string;
   name: string;
@@ -29,8 +20,9 @@ interface FetchedData {
  * 2. Realizar una llamada a una API (interna en este caso).
  * 3. Pasar los datos obtenidos a un Client Component.
  */
-export default async function DynamicPage({ params }: PageProps) {
-  const itemId = params.p; // Accede al valor del parámetro 'p' de la URL
+export default async function DynamicPage({ params }: CampaniaMarketingPageProps) {
+  const parametros = await params;
+  const { p: itemId } = parametros;
 
   let itemData: FetchedData | null = null;
   let errorMessage: string | null = null;
@@ -43,7 +35,7 @@ export default async function DynamicPage({ params }: PageProps) {
     // `process.env.NEXT_PUBLIC_BASE_URL` debe estar configurado en tu `.env.local`
     // (ejemplo: NEXT_PUBLIC_BASE_URL=http://localhost:3000)
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const apiUrl = `${baseUrl}/api/data/${itemId}`; // Ruta a tu API Route dinámica
+    const apiUrl = `${baseUrl}/api/campania-marketing?p=${itemId}`; // Ruta a tu API Route dinámica
 
     const res = await fetch(apiUrl, {
       cache: 'no-store', // Opcional: Deshabilita el cacheo para siempre obtener datos frescos

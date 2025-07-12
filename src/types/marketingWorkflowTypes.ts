@@ -139,6 +139,16 @@ export interface CampaniaMarketingData {
   fecha_fin: string;    // Formato YYYY-MM-DD
   contenido: Semana[]; // Un array de objetos de tipo Semana
 }
+
+export interface CampaniaMarketingPageProps {
+    params:{
+      p: string | null; // El dato genérico puede ser de cualquier tipo definido arriba o null
+    } 
+  }
+  
+export interface MarketingContentManagerProps {
+  CampaniaMarketingData: CampaniaMarketingData | null;
+}
   
   // Tipos para las props de los componentes Display
   export interface DisplayProps<T> {

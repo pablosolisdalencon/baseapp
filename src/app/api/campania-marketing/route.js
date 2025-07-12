@@ -16,6 +16,11 @@ export async function GET(request){
             console.log("=============API CampaniaMarketing SAY:   DATA    ==================")
             console.log(typeof data)
             return NextResponse.json({data});
+        }else{
+            return NextResponse.json(
+                    { message: 'Parámetro de consulta "p" es requerido.' },
+                    { status: 400 } // Bad Request
+                );
         }
       
     }catch(error){
