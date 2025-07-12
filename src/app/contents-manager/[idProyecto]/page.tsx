@@ -2,8 +2,8 @@ import React, { Suspense } from 'react';
 import MarketingContentManager from "@/components/willi/MarketingContentManager";
 import type { CampaniaMarketingPageProps, CampaniaMarketingData, MarketingContentManagerProps } from '@/types/marketingWorkflowTypes';
 
-export default async function CampaniaMarketingPage({ params:Promise<{ p: string }>}}: CampaniaMarketingPageProps) {
-      const parametros = await params;
+export default async function CampaniaMarketingPage({ params}: CampaniaMarketingPageProps) {
+      const parametros = await params as any;
       const { p: itemId } = parametros;
 
       let itemData: CampaniaMarketingData | null = null;
@@ -17,7 +17,7 @@ export default async function CampaniaMarketingPage({ params:Promise<{ p: string
     // `process.env.NEXT_PUBLIC_BASE_URL` debe estar configurado en tu `.env.local`
     // (ejemplo: NEXT_PUBLIC_BASE_URL=http://localhost:3000)
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const apiUrl = `${baseUrl}/api/campania-marketing?p=${itemId}`; // Ruta a tu API Route dinámica
+    const apiUrl = `${baseUrl}/api/campania-marketing?p=${itemId as string}`; // Ruta a tu API Route dinámica
 
     const res = await fetch(apiUrl, {
       cache: 'no-store', // Opcional: Deshabilita el cacheo para siempre obtener datos frescos
