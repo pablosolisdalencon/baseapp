@@ -141,9 +141,9 @@ export interface CampaniaMarketingData {
 }
 
 export interface CampaniaMarketingPageProps {
-    params:{
+    params:Promise<{
       p: string; // El dato genérico puede ser de cualquier tipo definido arriba o null
-    } 
+    }>
   }
   
 export interface MarketingContentManagerProps {
