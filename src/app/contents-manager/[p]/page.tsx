@@ -4,8 +4,8 @@ import type { CampaniaMarketingPageProps, CampaniaMarketingData } from '@/types/
 
 
 export default async function CampaniaMarketingPage({ params}: {params:{p:string}}) {
-      const parametros = await params as any;
-      const { p: itemId } = parametros;
+      const { p } = await params;
+      const itemId = p;
 
       let itemData: CampaniaMarketingData | null = null;
       let errorMessage: string | null = null;
