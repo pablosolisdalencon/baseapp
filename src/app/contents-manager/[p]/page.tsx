@@ -2,7 +2,8 @@ import React, { Suspense } from 'react';
 import MarketingContentManager from "@/components/willi/MarketingContentManager";
 import type { CampaniaMarketingPageProps, CampaniaMarketingData } from '@/types/marketingWorkflowTypes';
 
-export default async function CampaniaMarketingPage({ params}: CampaniaMarketingPageProps) {
+
+export default async function CampaniaMarketingPage({ params}: {params:{p:string}}) {
       const parametros = await params as any;
       const { p: itemId } = parametros;
 
