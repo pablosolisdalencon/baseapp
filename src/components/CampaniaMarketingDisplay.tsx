@@ -132,7 +132,7 @@ const CampaniaMarketingDisplay: React.FC<DisplayProps<CampaniaMarketingData>> = 
       {/* Definición de Arte */}
       <div style={styles.section}>
         <h2 style={styles.subHeading}>🎨 Definición de Arte</h2>
-        <p><strong style={styles.itemTitle}>Estilo de Narración:</strong> {campania.definicion_arte.estilo_narracion}</p>
+        <p><strong style={styles.itemTitle}>Estilo de Narración:</strong> {campania.definicion_arte.estilo_narracion || ""}</p>
         <p><strong style={styles.itemTitle}>Colores:</strong> {campania.definicion_arte.colores}</p>
         <p><strong style={styles.itemTitle}>Gráfica Representativa:</strong> {campania.definicion_arte.grafica_representativa_campania}</p>
       </div>
