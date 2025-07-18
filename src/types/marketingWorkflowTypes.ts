@@ -184,7 +184,10 @@ export interface EwavePackGenerationResult {
   generatedPosts: GeneratedPost[];
   error: string | null;
 }
-
+export interface WilliEwavePackGeneratorProps {
+  idProyecto:string|null; // El dato genérico puede ser de cualquier tipo definido arriba o null
+   
+}
 // Tipos para los pasos del workflow en la UI
 export type GenerationStatus =
   'idle' | 'generating_maker_data' | 'generating_estudio' | 'generating_estrategia' |
@@ -194,4 +197,14 @@ export interface WorkflowStep {
   key: GenerationStatus;
   title: string;
   description: string;
+}
+
+export interface CampaniaMarketingPageProps {
+    params:Promise<{
+      p: string; // El dato genérico puede ser de cualquier tipo definido arriba o null
+    }>
+  }
+  
+export interface MarketingContentManagerProps {
+  CampaniaMarketingData: CampaniaMarketingData | null;
 }

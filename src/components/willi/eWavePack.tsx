@@ -10,7 +10,7 @@ import {
   GeneratedPost,
   GenerationStatus,
   WorkflowStep,
-  Post,
+  Post,WilliEwavePackGeneratorProps
 } from '@/types/marketingWorkflowTypes';
 
 import DisplayMakerData from '../DisplayMakerData';
@@ -23,12 +23,10 @@ import {
   generateEwavePack,
   saveObjectToDB,
   optimizeObjectWithWilli,
-  retryGeneratePost,
+  retryGeneratePost  
 } from '../ewavepack/actions'; // Importa las Server Actions
 
-interface WilliEwavePackGeneratorProps {
-  idProyecto: string | null;
-}
+
 
 const workflowSteps: WorkflowStep[] = [
   { key: 'idle', title: 'Listo para Generar', description: 'Haz clic para iniciar el proceso de creación del eWavePack.' },
