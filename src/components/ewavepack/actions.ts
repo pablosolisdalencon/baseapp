@@ -88,7 +88,7 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
     // Asegúrate de que la API de Willi espera los objetos completos y no solo sus representaciones en texto.
     estrategiaMarketing = await callApi<EstrategiaMarketingData>('/api/willi', 'POST', {
       item:"estrategia-marketing", 
-      maker: JSON.stringify(makerData),
+      maker: makerData,
       estudio: estudioMercado,
     });
 
