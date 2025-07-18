@@ -199,11 +199,22 @@ export type GenerationStatus =
   'idle' | 'generating_maker_data' | 'generating_estudio' | 'generating_estrategia' |
   'generating_campania' | 'generating_posts' | 'complete' | 'error';
 
-export interface WorkflowStep {
+export interface eWaveWorkflowStep {
   key: GenerationStatus;
   title: string;
   description: string;
 }
+
+
+  // Tipos para la respuesta general de callWilliAPI
+  export type WilliAPIResponse = EstudioMercadoData | EstrategiaMarketingData | CampaniaMarketingData;
+  
+  // Tipos para los pasos del workflow
+  export interface WorkflowStep {
+    number: number;
+    title: string;
+    completed: boolean;
+  }
 
 export interface CampaniaMarketingPageProps {
     params:Promise<{

@@ -9,7 +9,7 @@ import {
   CampaniaMarketingData,
   GeneratedPost,
   GenerationStatus,
-  WorkflowStep,
+  eWaveWorkflowStep,
   Post,WilliEwavePackGeneratorProps
 } from '@/types/marketingWorkflowTypes';
 
@@ -28,7 +28,7 @@ import {
 
 
 
-const workflowSteps: WorkflowStep[] = [
+const workflowSteps: eWaveWorkflowStep[] = [
   { key: 'idle', title: 'Listo para Generar', description: 'Haz clic para iniciar el proceso de creación del eWavePack.' },
   { key: 'generating_maker_data', title: 'Generando Ficha del Proyecto (MakerData)', description: 'Recopilando la información clave de tu proyecto y catálogo.' },
   { key: 'generating_estudio', title: 'Generando Estudio de Mercado', description: 'Willi está analizando tendencias, oportunidades y desafíos del mercado.' },
