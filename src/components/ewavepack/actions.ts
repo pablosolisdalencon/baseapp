@@ -59,17 +59,19 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
 
     // 2. Obtener EstudioMercado (POST a /api/willi con MakerData)
     // El 'maker' en el body del POST se espera como el objeto MakerData completo.
-    estudioMercado = await callApi<EstudioMercadoData>('/api/willi', 'POST', { maker: makerData });
+    estudioMercado = await callApi<EstudioMercadoData>('/api/willi', 'POST', { item:"estudio-mercado", maker: makerData });
 
     // 3. Obtener EstrategiaMarketing (POST a /api/willi con MakerData y EstudioMercado)
     // Asegúrate de que la API de Willi espera los objetos completos y no solo sus representaciones en texto.
     estrategiaMarketing = await callApi<EstrategiaMarketingData>('/api/willi', 'POST', {
+      item:"estrategia-marketing", 
       maker: makerData,
       estudio: estudioMercado,
     });
 
     // 4. Obtener CampaniaMarketing (POST a /api/willi con MakerData, EstudioMercado, EstrategiaMarketing)
     campaniaMarketing = await callApi<CampaniaMarketingData>('/api/willi', 'POST', {
+      item:"campania-marketing", 
       maker: makerData,
       estudio: estudioMercado,
       estrategia: estrategiaMarketing, // Asegúrate de que el nombre de la propiedad sea el que espera Willi
@@ -84,12 +86,14 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
 
             // Generar texto del post
             const textResponse = await callApi<{ text: string }>('/api/willi', 'POST', {
+              item: "post-final",
               post: originalPost,
               modo: 'text',
             });
 
             // Generar imagen del post
             const imageResponse = await callApi<{ image: string }>('/api/willi', 'POST', {
+              item: "post-final-img",
               post: originalPost,
               modo: 'image',
             });
