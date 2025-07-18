@@ -60,7 +60,7 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
 
     console.log("### GenerateEwavePak actions ## say makerData:")
     console.log(makerDataRes)
-    makerData = makerDataRes[0];
+    makerData = makerDataRes.data[0];
 
 
     // 2. Obtener EstudioMercado (POST a /api/willi con MakerData)
