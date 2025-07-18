@@ -17,15 +17,25 @@ async function callApi<T>(url: string, method: string, body?: any): Promise<T> {
   const fullUrl = url.startsWith('https') ? url : `${baseUrl}${url}`;
 
   try {
-    const options: RequestInit = {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store', // Muy importante para las llamadas a Willi/IA
-    };
+    let options:RequestInit;
     if (body) {
-      options.body = JSON.stringify(body);
+      options = {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+        cache: 'no-store', // Muy importante para las llamadas a Willi/IA
+      };
+     
+    }else{
+      options = {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store', // Muy importante para las llamadas a Willi/IA
+      };
     }
 
     const res = await fetch(fullUrl, options);
@@ -56,7 +66,7 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
     // Asumo que tienes endpoints /api/proyecto y /api/catalogo o una API única /api/maker/#id
     // Si la API /api/maker ya retorna el objeto combinado, úsalo directamente.
     // Basado en data.json, la API /api/maker/#idProyecto# debería retornar un objeto con 'proyecto' y 'catalogo'.
-    makerDataRes = await callApi<MakerData>(`/api/maker?p=${idProyecto}`,'GET');
+    makerDataRes = await callApi<any>(`/api/maker?p=${idProyecto}`,'GET');
 
     console.log("### GenerateEwavePak actions ## say makerData:")
     console.log(makerDataRes)
@@ -65,11 +75,15 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
 
     // 2. Obtener EstudioMercado (POST a /api/willi con MakerData)
     // El 'maker' en el body del POST se espera como el objeto MakerData completo.
-    estudioMercado = await callApi<EstudioMercadoData>('/api/willi', 'POST', { 
+    
+    estudioMercado = await callApi<any>('/api/willi', 'POST', { 
       item:"estudio-mercado",
       maker: makerData
     });
 
+    console.log("### GenerateEwavePak actions ## say estudioMercadoData:")
+    console.log(estudioMercado)
+    
     // 3. Obtener EstrategiaMarketing (POST a /api/willi con MakerData y EstudioMercado)
     // Asegúrate de que la API de Willi espera los objetos completos y no solo sus representaciones en texto.
     estrategiaMarketing = await callApi<EstrategiaMarketingData>('/api/willi', 'POST', {

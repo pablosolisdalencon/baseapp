@@ -37,10 +37,10 @@ export async function POST(req) {
   console.log("@@@@@@@ POST POST ")
   console.log(dataR)
   try {
-    const fileMetaName = btoa(dataR.post.titulo);
+    
     const finalPrompt = getPrompt(dataR.item,jsonToPrompt(dataR.maker),jsonToPrompt(dataR.estudio),jsonToPrompt(dataR.estrategia),jsonToPrompt(dataR.post));
     if(dataR.item=="post-final-img"){
-      
+      const fileMetaName = btoa(dataR.post.titulo);
       function saveBinaryFile(fileName, content) {
         writeFile(fileName, content, 'utf8', (err) => {
           if (err) {
