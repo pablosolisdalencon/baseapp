@@ -1,50 +1,66 @@
- //////////  ESTRUCTURA MAKER DATA
-// Tipos para los datos simulados de la API de Willi
-export interface MakerData {
-    id_proyecto: string;
-    producto: string;
-    mercadoObjetivo: string;
-    propuestaValor: string;
-    fecha: string; // ISO string
-  }
-  
+// src/app/lib/marketingWorkflowTypes.ts
 
-  //////////  ESTRUCTURA ESTUDIO MERCADO
-  export interface Tendencia {
-    nombre: string;
-    descripcion: string;
-    relevancia: string;
-  }
-  
-  export interface Oportunidad {
-    nombre: string;
-    descripcion: string;
-    alineacion: string;
-  }
-  
- export interface Desafio {
-    nombre: string;
-    descripcion: string;
-  }
-  
-  // Estructura completa del objeto EstudioMercado
-  export interface EstudioMercadoData {
-    id_proyecto: string,
-    nombre_del_estudio: string;
-    resumen_competitivo: string;
-    tendencias_clave_mercado: Tendencia[];
-    oportunidades_principales: Oportunidad[];
-    desafios_clave: Desafio[];
-    recomendaciones_iniciales: string;
-  }
+////////// ESTRUCTURA MAKER DATA
+export interface ProyectoData {
+  _id: string;
+  nombre: string;
+  texto: string;
+  frase: string;
+  descripcion: string;
+  mision: string;
+  vision: string;
+  logo: string;
+  fondo: string;
+  __v: number;
+}
+
+export interface ProductoServicio {
+  _id: string;
+  id_proyecto: string;
+  nombre: string;
+  descripcion: string;
+  precio: string;
+  foto: string;
+  __v: number;
+}
+
+export interface MakerData {
+  proyecto: ProyectoData;
+  catalogo: ProductoServicio[];
+}
+
+////////// ESTRUCTURA ESTUDIO MERCADO
+export interface Tendencia {
+  nombre: string;
+  descripcion: string;
+  relevancia: string;
+}
+
+export interface Oportunidad {
+  nombre: string;
+  descripcion: string;
+  alineacion: string;
+}
+
+export interface Desafio {
+  nombre: string;
+  descripcion: string;
+}
+
+// Estructura completa del objeto EstudioMercado
+export interface EstudioMercadoData {
+  id_proyecto: string;
+  nombre_del_estudio: string;
+  resumen_competitivo: string;
+  tendencias_clave_mercado: Tendencia[];
+  oportunidades_principales: Oportunidad[];
+  desafios_clave: Desafio[];
+  recomendaciones_iniciales: string;
+}
 
 /////////////// fin estructura estudio mercado
-  
-  
-  
 
-
- //////////  ESTRUCTURA ESTRATEGIA MARKETING
+////////// ESTRUCTURA ESTRATEGIA MARKETING
 // Define los tipos para los objetos anidados
 export interface ObjetivoGeneral {
   nombre: string;
@@ -76,7 +92,7 @@ export interface PlanDeAccionFase1Item {
 
 // Define el tipo principal para la Estrategia de Marketing
 export interface EstrategiaMarketingData {
-  id_proyecto: string,
+  id_proyecto: string;
   nombre_estrategia: string;
   objetivos_generales: ObjetivoGeneral[];
   analisis_mercado_target: AnalisisMercadoTarget;
@@ -86,8 +102,7 @@ export interface EstrategiaMarketingData {
   consideraciones_adicionales: string[];
 }
 
-
-   //////////  fin estructura estrategia marketing
+////////// fin estructura estrategia marketing
 
 // Definición para la estructura de 'definicion_arte'
 export interface DefinicionArte {
@@ -126,9 +141,9 @@ export interface Semana {
   dias: Dia[]; // Un array de objetos de tipo Dia
 }
 
-// Definición del esquema principal 'JsonFinalCampania'
+// Definición del esquema principal 'CampaniaMarketingData'
 export interface CampaniaMarketingData {
-  id_proyecto: string,
+  id_proyecto: string;
   nombre: string;
   objetivo: string;
   target: string;
@@ -140,45 +155,43 @@ export interface CampaniaMarketingData {
   contenido: Semana[]; // Un array de objetos de tipo Semana
 }
 
-export interface CampaniaMarketingPageProps {
-    params:Promise<{
-      p: string; // El dato genérico puede ser de cualquier tipo definido arriba o null
-    }>
-  }
-  
-export interface MarketingContentManagerProps {
-  CampaniaMarketingData: CampaniaMarketingData | null;
+// Tipos para las props de los componentes Display
+export interface DisplayProps<T> {
+  Input: T | null; // El dato genérico puede ser de cualquier tipo definido arriba o null
+  onSave?: (data: T) => Promise<void> | void; // onSave es una función asíncrona que toma el dato T
+  onOptimize?: (data: T) => Promise<void> | void; // onOptimize para el botón "Willi, Optimizalo!"
+  onRetry?: (data: T) => Promise<void> | void; // onRetry para el botón "Reintentar"
+  showSaveButton?: boolean;
+  showOptimizeButton?: boolean;
+  showRetryButton?: boolean;
+  isRetryDisabled?: boolean;
 }
-  
-  // Tipos para las props de los componentes Display
-  export interface DisplayProps<T> {
-    Input: T | null; // El dato genérico puede ser de cualquier tipo definido arriba o null
-    onSave?: (data: T) => Promise<void> | void;// onSave es una función asíncrona que toma el dato T
-    showSaveButton?: boolean;
-  }
-  // Tipos para la respuesta general de callWilliAPI
-  export type WilliAPIResponse = EstudioMercadoData | EstrategiaMarketingData | CampaniaMarketingData;
-  
-  // Tipos para los pasos del workflow
-  export interface WorkflowStep {
-    number: number;
-    title: string;
-    completed: boolean;
-  }
 
+// Tipos para un Post ya generado con texto e imagen
+export interface GeneratedPost {
+  id: string;
+  originalPostData: Post; // Referencia a los datos originales del Post
+  text: string;
+  image: string | null; // Base64 string
+}
 
+// Tipos para la respuesta de la Server Action de generación completa
+export interface EwavePackGenerationResult {
+  makerData: MakerData | null;
+  estudioMercado: EstudioMercadoData | null;
+  estrategiaMarketing: EstrategiaMarketingData | null;
+  campaniaMarketing: CampaniaMarketingData | null;
+  generatedPosts: GeneratedPost[];
+  error: string | null;
+}
 
+// Tipos para los pasos del workflow en la UI
+export type GenerationStatus =
+  'idle' | 'generating_maker_data' | 'generating_estudio' | 'generating_estrategia' |
+  'generating_campania' | 'generating_posts' | 'complete' | 'error';
 
-export interface eWavePackPageProps {
-    params:Promise<{
-      p: string; // El dato genérico puede ser de cualquier tipo definido arriba o null
-    }>
-  }
-  
-
-
-export interface eWavePackComponentProps {
-    MakerData:any|null;
-    idProyecto:string|null;
-  }
-  
+export interface WorkflowStep {
+  key: GenerationStatus;
+  title: string;
+  description: string;
+}
