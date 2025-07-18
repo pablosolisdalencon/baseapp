@@ -55,6 +55,9 @@ async function callApi<T>(url: string, method: string, body?: any): Promise<T> {
 
 export async function generateEwavePack(idProyecto: string): Promise<EwavePackGenerationResult> {
   let makerDataRes: any | null = null;
+  let estudioMercadoRes: any | null = null;
+  let estrategiaMarketingRes: any | null = null;
+  let campaniaMarketingRes: any | null = null;
   let makerData: MakerData | null = null;
   let estudioMercado: EstudioMercadoData | null = null;
   let estrategiaMarketing: EstrategiaMarketingData | null = null;
@@ -76,29 +79,33 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
     // 2. Obtener EstudioMercado (POST a /api/willi con MakerData)
     // El 'maker' en el body del POST se espera como el objeto MakerData completo.
     
-    estudioMercado = await callApi<any>('/api/willi', 'POST', { 
+    estudioMercadoRes = await callApi<any>('/api/willi', 'POST', { 
       item:"estudio-mercado",
       maker: makerData
     });
+
+    estudioMercado = estudioMercadoRes.data[0]
 
     console.log("### GenerateEwavePak actions ## say estudioMercadoData:")
     console.log(estudioMercado)
     
     // 3. Obtener EstrategiaMarketing (POST a /api/willi con MakerData y EstudioMercado)
     // Asegúrate de que la API de Willi espera los objetos completos y no solo sus representaciones en texto.
-    estrategiaMarketing = await callApi<EstrategiaMarketingData>('/api/willi', 'POST', {
+    estrategiaMarketingRes = await callApi<EstrategiaMarketingData>('/api/willi', 'POST', {
       item:"estrategia-marketing", 
       maker: makerData,
       estudio: estudioMercado,
     });
+    estrategiaMarketing = estrategiaMarketingRes.data[0]
 
     // 4. Obtener CampaniaMarketing (POST a /api/willi con MakerData, EstudioMercado, EstrategiaMarketing)
-    campaniaMarketing = await callApi<CampaniaMarketingData>('/api/willi', 'POST', {
+    campaniaMarketingRes = await callApi<CampaniaMarketingData>('/api/willi', 'POST', {
       item:"campania-marketing", 
       maker: makerData,
       estudio: estudioMercado,
       estrategia: estrategiaMarketing, // Asegúrate de que el nombre de la propiedad sea el que espera Willi
     });
+    campaniaMarketing = campaniaMarketingRes.data[0]
 
     // 5. Generar Posts (Texto e Imagen)
     if (campaniaMarketing?.contenido) {
