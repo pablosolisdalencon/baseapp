@@ -264,6 +264,7 @@ const schemaEstrategiaMarketing =
             type: "object",
             description: "Define el estilo visual y narrativo de la campaña.",
             properties: {
+              
                 estilo_narracion: {
                     type: "string",
                     description: "Estilo de la narrativa de la campaña (ej. emotivo, informativo, humorístico)."
