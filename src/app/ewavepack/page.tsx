@@ -1,13 +1,13 @@
 import { Suspense } from 'react';
 import WilliEwavePackGenerator from '@/components/willi/eWavePack';
+import { EwaveMakerPageProps } from "@/types/marketingWorkflowTypes";
 // Define las props esperadas para el componente de la página
-interface EwaveMakerPageProps {
-  searchParams: { id?: string };
-}
+
 
 // Este es un Server Component. No tiene estado ni efectos de cliente.
-export default function EwaveMakerPage({ searchParams }: EwaveMakerPageProps) {
-  const idProyecto = searchParams.id || null;
+export default async function DynamicPage({ params }: EwaveMakerPageProps) {
+  const parametros = await params;
+  const { p: idProyecto } = parametros;
 
   return (
     <Suspense fallback={
