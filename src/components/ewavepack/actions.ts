@@ -84,7 +84,7 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
       maker: makerData
     });
 
-    estudioMercado = estudioMercadoRes.data[0]
+    estudioMercado = estudioMercadoRes[0]
 
     console.log("### GenerateEwavePak actions ## say estudioMercadoData:")
     console.log(estudioMercado)
@@ -96,7 +96,7 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
       maker: makerData,
       estudio: estudioMercado,
     });
-    estrategiaMarketing = estrategiaMarketingRes.data[0]
+    estrategiaMarketing = estrategiaMarketingRes[0]
 
     // 4. Obtener CampaniaMarketing (POST a /api/willi con MakerData, EstudioMercado, EstrategiaMarketing)
     campaniaMarketingRes = await callApi<CampaniaMarketingData>('/api/willi', 'POST', {
@@ -105,7 +105,7 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
       estudio: estudioMercado,
       estrategia: estrategiaMarketing, // Asegúrate de que el nombre de la propiedad sea el que espera Willi
     });
-    campaniaMarketing = campaniaMarketingRes.data[0]
+    campaniaMarketing = campaniaMarketingRes[0]
 
     // 5. Generar Posts (Texto e Imagen)
     if (campaniaMarketing?.contenido) {
