@@ -35,6 +35,14 @@ export default function AddProyectoClient() {
     user: session?.user?.email || "",
   });
 
+
+  const [userStory, setUserStory] = useState<{
+    [key: string]: string;
+    historia: string;
+  }>({
+    historia: "",
+  });
+
   const router = useRouter();
 
   useEffect(() => {
@@ -69,6 +77,16 @@ export default function AddProyectoClient() {
     console.log(newProyecto);
   };
 
+  const handleMakeData = () => {
+    
+    console.log("llamar a willi para que genere un data");
+  };
+  
+  const handleMakeDataChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setUserStory({ ...userStory, [e.target.name]: e.target.value });
+    console.log(newProyecto);
+  };
+
   const handleLogoUpload = (result: any, widget: any) => {
     if (result && result.info && result.info.secure_url) {
       setNewProyecto((prevData) => ({
@@ -97,9 +115,13 @@ export default function AddProyectoClient() {
         <h1>Nuevo Proyecto</h1>
         <p>
           ¡Estamos listos para crear tus productos digitales! 🛠️ Para empezar, necesitamos conocer a fondo tu
-          emprendimiento. Completa este formulario con toda la información relevante. ¡Esta será la base para construir
-          herramientas digitales poderosas para tu negocio!
+          emprendimiento. Completa este formulario con toda la información clave. ¡Esta será la base para construir
+          herramientas digitales impulsadas con IA poderosas para tu negocio!
         </p>
+        <h2>Si ya tienes clara toda esta información completa el formulario de abajo</h2>
+        <h2>Si aun no tienes esta informacion no pasa nada, cuentale tu historia a Willi, y él se encargara de crearla de manera profesional y optimizada con el boton de mas abajo.</h2>
+        <textarea  onChange={handleMakeDataChange} name="historia" placeholder="Comenzando con el nombre de tu proyecto, agrega aqui todo lo que puedas decir sobre tu proyecto, no importa el formato de redaccion, solo trata de agregar la mayor cantidad de informacion posible que defina tu idea."></textarea>
+        <button onClick={handleMakeData} type="button">Willi, Ayudame a redactar mi proyecto!</button>
 
         <input onChange={handleChange} name="nombre" type="text" placeholder="Nombre del Proyecto" />
         <textarea onChange={handleChange} name="descripcion" placeholder="Descripción breve"></textarea>

@@ -12,7 +12,7 @@ import {
 import { revalidatePath } from 'next/cache'; // Para revalidar datos si se guardan en BD y se muestran en otra página
 
 // Función auxiliar para llamar a las APIs
-async function callApi<T>(url: string, method: string = 'GET', body?: any): Promise<T> {
+async function callApi<T>(url: string, method: string, body?: any): Promise<T> {
   const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta para tu entorno de desarrollo/producción
   const fullUrl = url.startsWith('https') ? url : `${baseUrl}${url}`;
 
@@ -44,6 +44,7 @@ async function callApi<T>(url: string, method: string = 'GET', body?: any): Prom
 }
 
 export async function generateEwavePack(idProyecto: string): Promise<EwavePackGenerationResult> {
+  let makerDataRes: any | null = null;
   let makerData: MakerData | null = null;
   let estudioMercado: EstudioMercadoData | null = null;
   let estrategiaMarketing: EstrategiaMarketingData | null = null;
@@ -55,7 +56,8 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
     // Asumo que tienes endpoints /api/proyecto y /api/catalogo o una API única /api/maker/#id
     // Si la API /api/maker ya retorna el objeto combinado, úsalo directamente.
     // Basado en data.json, la API /api/maker/#idProyecto# debería retornar un objeto con 'proyecto' y 'catalogo'.
-    makerData = await callApi<MakerData>(`/api/maker?p=${idProyecto}`);
+    makerDataRes = await callApi<MakerData>(`/api/maker?p=${idProyecto}`,'GET');
+    makerData = makerDataRes[0];
 
     // 2. Obtener EstudioMercado (POST a /api/willi con MakerData)
     // El 'maker' en el body del POST se espera como el objeto MakerData completo.
@@ -65,7 +67,7 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
     // Asegúrate de que la API de Willi espera los objetos completos y no solo sus representaciones en texto.
     estrategiaMarketing = await callApi<EstrategiaMarketingData>('/api/willi', 'POST', {
       item:"estrategia-marketing", 
-      maker: makerData,
+      maker: JSON.stringify(makerData),
       estudio: estudioMercado,
     });
 
