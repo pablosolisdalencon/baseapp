@@ -115,6 +115,19 @@ const CampaniaMarketingDisplay: React.FC<DisplayProps<CampaniaMarketingData>> = 
   console.log("##$$## CAMPANIA IS:");
   console.log(campania);
  // let arte:DefinicionArte = campania.definicion_arte;
+
+const campaignData = campania;
+
+  if (!campaignData || !campaignData.contenido || campaignData.contenido.length === 0) {
+    return (
+      <div>
+        <h2 className="text-2xl font-bold text-center text-gray-700">
+          No hay datos de campaña o planificación de contenido disponible.
+        </h2>
+      </div>
+    );
+  }
+
   return (
     <div style={styles.container}>
       <h1 style={styles.heading}>📈 Detalle de Campaña: {campania.nombre}</h1>
