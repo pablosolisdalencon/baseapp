@@ -145,12 +145,12 @@ const ProyectosClient: React.FC = () => {
                   <br />
                   eWaveApp
                 </Link>
-                <Link href={`/mktviewer/?id=${proyecto._id}`} className="app-card-button boton-mkt">
+                <Link href={`/mktviewer/${proyecto._id}`} className="app-card-button boton-mkt">
                   <FontAwesomeIcon icon={faBullhorn} />
                   <br />
                   Marketing
                 </Link>
-                <Link href={`/contents-manager/?id=${proyecto._id}`} className="app-card-button boton-mkt">
+                <Link href={`/contents-manager/${proyecto._id}`} className="app-card-button boton-mkt">
                   <FontAwesomeIcon icon={faBullhorn} />
                   <br />
                   Contenido

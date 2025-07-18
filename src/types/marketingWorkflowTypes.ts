@@ -166,3 +166,19 @@ export interface MarketingContentManagerProps {
     completed: boolean;
   }
 
+
+
+
+export interface eWavePackPageProps {
+    params:Promise<{
+      p: string; // El dato genérico puede ser de cualquier tipo definido arriba o null
+    }>
+  }
+  
+
+
+export interface eWavePackComponentProps {
+    MakerData:any|null;
+    idProyecto:string|null;
+  }
+  
