@@ -13,8 +13,8 @@ import { revalidatePath } from 'next/cache'; // Para revalidar datos si se guard
 
 // Función auxiliar para llamar a las APIs
 async function callApi<T>(url: string, method: string = 'GET', body?: any): Promise<T> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta para tu entorno de desarrollo/producción
-  const fullUrl = url.startsWith('http') ? url : `${baseUrl}${url}`;
+  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'; // Asegúrate de que esta URL sea correcta para tu entorno de desarrollo/producción
+  const fullUrl = url.startsWith('https') ? url : `${baseUrl}${url}`;
 
   try {
     const options: RequestInit = {
