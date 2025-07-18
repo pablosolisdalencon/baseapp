@@ -55,7 +55,7 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
     // Asumo que tienes endpoints /api/proyecto y /api/catalogo o una API única /api/maker/#id
     // Si la API /api/maker ya retorna el objeto combinado, úsalo directamente.
     // Basado en data.json, la API /api/maker/#idProyecto# debería retornar un objeto con 'proyecto' y 'catalogo'.
-    makerData = await callApi<MakerData>(`/api/maker/${idProyecto}`);
+    makerData = await callApi<MakerData>(`/api/maker?p=${idProyecto}`);
 
     // 2. Obtener EstudioMercado (POST a /api/willi con MakerData)
     // El 'maker' en el body del POST se espera como el objeto MakerData completo.
