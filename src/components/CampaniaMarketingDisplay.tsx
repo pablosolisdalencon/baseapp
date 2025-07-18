@@ -114,7 +114,7 @@ const CampaniaMarketingDisplay: React.FC<DisplayProps<CampaniaMarketingData>> = 
   };
   console.log("##$$## CAMPANIA IS:");
   console.log(campania);
-  let arte:DefinicionArte = campania.definicion_arte;
+ // let arte:DefinicionArte = campania.definicion_arte;
   return (
     <div style={styles.container}>
       <h1 style={styles.heading}>📈 Detalle de Campaña: {campania.nombre}</h1>
@@ -131,14 +131,14 @@ const CampaniaMarketingDisplay: React.FC<DisplayProps<CampaniaMarketingData>> = 
         </p>
       </div>
 
-      {/* Definición de Arte */}
+      {/* Definición de Arte 
       <div style={styles.section}>
         <h2 style={styles.subHeading}>🎨 Definición de Arte</h2>
         <p><strong style={styles.itemTitle}>Estilo de Narración:</strong> {arte.estilo_narracion}</p>
         <p><strong style={styles.itemTitle}>Colores:</strong> {arte.colores}</p>
         <p><strong style={styles.itemTitle}>Gráfica Representativa:</strong> {arte.grafica_representativa_campania}</p>
       </div>
-
+*/}
       {/* Contenido por Semanas */}
       <div style={styles.section}>
         <h2 style={styles.subHeading}>🗓️ Plan de Contenido</h2>
