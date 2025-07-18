@@ -112,6 +112,8 @@ const CampaniaMarketingDisplay: React.FC<DisplayProps<CampaniaMarketingData>> = 
       onSave(campania);
     }
   };
+  console.log("##$$## CAMPANIA IS:");
+  console.log(campania);
 
   return (
     <div style={styles.container}>
