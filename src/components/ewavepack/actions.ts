@@ -65,14 +65,14 @@ export async function generateEwavePack(idProyecto: string): Promise<EwavePackGe
     // Asegúrate de que la API de Willi espera los objetos completos y no solo sus representaciones en texto.
     estrategiaMarketing = await callApi<EstrategiaMarketingData>('/api/willi', 'POST', {
       maker: makerData,
-      estudio_mercado: estudioMercado,
+      estudio: estudioMercado,
     });
 
     // 4. Obtener CampaniaMarketing (POST a /api/willi con MakerData, EstudioMercado, EstrategiaMarketing)
     campaniaMarketing = await callApi<CampaniaMarketingData>('/api/willi', 'POST', {
       maker: makerData,
-      estudio_mercado: estudioMercado,
-      estrategia_marketing: estrategiaMarketing, // Asegúrate de que el nombre de la propiedad sea el que espera Willi
+      estudio: estudioMercado,
+      estrategia: estrategiaMarketing, // Asegúrate de que el nombre de la propiedad sea el que espera Willi
     });
 
     // 5. Generar Posts (Texto e Imagen)
