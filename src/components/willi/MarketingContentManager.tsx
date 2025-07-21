@@ -352,8 +352,10 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
       <h1 className="text-4xl font-extrabold text-center text-gray-900 mb-8 pb-4 border-b-4 border-indigo-400">
         Gestor de Contenido de Campaña: {campaignData.nombre || "Sin Nombre"}
       </h1>
+      
       <section className={commonClasses.section}>
-        <h2 className={commonClasses.sectionTitle}>Planificación de Contenido - Saldo: 🪙{saldo !== null ? saldo : 'Cargando...'}</h2>
+        <h2 className={commonClasses.sectionTitle}>Planificación de Contenido </h2>
+        <img src="step5.png"/>
         {campaignData.contenido.map((semana: Semana, weekIndex: number) => (
           <div key={semana.numero} className="mb-8 p-6 bg-blue-50 rounded-lg shadow-md border border-blue-100">
             <h3 className="text-xl font-bold text-blue-800 mb-3">Semana {semana.numero}</h3>

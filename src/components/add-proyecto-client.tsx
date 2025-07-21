@@ -113,6 +113,7 @@ export default function AddProyectoClient() {
     <div className="form">
       <form onSubmit={handleSubmit}>
         <h1>Nuevo Proyecto</h1>
+        <img src="step0.png"/>
         <p>
           ¡Estamos listos para crear tus productos digitales! 🛠️ Para empezar, necesitamos conocer a fondo tu
           emprendimiento. Completa este formulario con toda la información clave. ¡Esta será la base para construir
