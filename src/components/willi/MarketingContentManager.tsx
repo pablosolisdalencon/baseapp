@@ -395,7 +395,7 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
                       {generatedContent.imagen && (
                         <>
                           <p className="font-semibold mt-2">Imagen Generada:</p>
-                          <img src={generatedContent.imagen} alt="Imagen generada" className="max-w-xs rounded-md shadow-md mt-1"/>
+                          <img src=´data:image/jpeg;base64,{generatedContent.imagen}´ alt="Imagen generada" className="max-w-xs rounded-md shadow-md mt-1"/>
                         </>
                       )}
                     </div>
