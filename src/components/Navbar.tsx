@@ -16,7 +16,7 @@ function Navbar() {
 
         {session?.user ? (
           <>
-            <Link href="./proyectos">
+            <Link href="/proyectos">
               <button className="nav-button">Proyectos</button>
             </Link>
             <div>
@@ -31,9 +31,9 @@ function Navbar() {
           </>
         ) : (
           <div className="nav-links">
-            <a href="./#nosotros" className="nav-link">Nosotros</a>
-            <a href="./#catalogo" className="nav-link">Catálogo</a>
-            <a href="./#contacto" className="nav-link">Contacto</a>
+            <a href="/#nosotros" className="nav-link">Nosotros</a>
+            <a href="/#catalogo" className="nav-link">Catálogo</a>
+            <a href="/#contacto" className="nav-link">Contacto</a>
             
               <button onClick={()=> signIn()} className="bg-sky-500 nav-button">Ingresar</button>
           
