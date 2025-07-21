@@ -355,7 +355,7 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
       
       <section className={commonClasses.section}>
         <h2 className={commonClasses.sectionTitle}>Planificación de Contenido </h2>
-        <img src="step5.png"/>
+        <img src="/step5.png"/>
         {campaignData.contenido.map((semana: Semana, weekIndex: number) => (
           <div key={semana.numero} className="mb-8 p-6 bg-blue-50 rounded-lg shadow-md border border-blue-100">
             <h3 className="text-xl font-bold text-blue-800 mb-3">Semana {semana.numero}</h3>
@@ -424,7 +424,7 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
                           saldo < (price || 0) ? "Saldo insuficiente" : "Generar post"
                         }
                       >
-                        {isGenerating ? "Generando..." : `Generar Post 🪙 ${price !== null ? price : 'N/A'}`}
+                        {isGenerating ? "Generando..." : `Generar Post  ${price !== null ? price : 'N/A'}`}
                       </button>
                     )}
                     {status === 'loading' && (
