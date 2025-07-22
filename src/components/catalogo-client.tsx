@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import ConfirmModal from "@/components/ConfirmModal";
 import { useSession } from 'next-auth/react';
+import { ClientProps } from "@/types/marketingWorkflowTypes";
 
 interface ProyectoDataType { // Renombrado para claridad
     _id: string; // Asumiendo que el proyecto también tiene un _id
@@ -20,10 +21,12 @@ interface ItemType {
     tipo: string;
 }
 
-export default function CatalogoClient() {
-  const { data: session } = useSession();
+
+
+  
+const CatalogoClient: React.FC<ClientProps> = ({idProyecto}) => {
+  //const { data: session } = useSession();
   const router = useRouter();
-    const searchParams = useSearchParams();
 
     const [catalogoItems, setCatalogoItems] = useState<ItemType[] | null>(null);
     const [isFetchingCatalogo, setIsFetchingCatalogo] = useState(true);
@@ -33,7 +36,6 @@ export default function CatalogoClient() {
     const [isFetchingProyecto, setIsFetchingProyecto] = useState(true);
     const [errorProyecto, setErrorProyecto] = useState<string | null>(null);
 
-    const [idProyecto, setIdProyecto] = useState<string | null>(null);
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<ItemType | null>(null);
@@ -108,26 +110,20 @@ export default function CatalogoClient() {
     };
     
     useEffect(() => {
-        
-        if (!session) {
-            router.push("/api/auth/signin?callbackUrl=/catalogo" + (searchParams.get('id') ? `?id=${searchParams.get('id')}` : ''));
-            return;
-        }
 
-        const proyectoIdFromParams = searchParams.get('id');
+        const proyectoIdFromParams = idProyecto;
         if (proyectoIdFromParams) {
-            setIdProyecto(proyectoIdFromParams);
-            if (session) { // Asegurarse de que la sesión esté autenticada antes de hacer fetch
+            
                 fetchProyectoData(proyectoIdFromParams);
                 fetchCatalogo(proyectoIdFromParams);
-            }
+            
         } else {
             setErrorProyecto("ID de proyecto no encontrado en la URL.");
             setIsFetchingProyecto(false);
             setIsFetchingCatalogo(false);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchParams, router, fetchCatalogo, fetchProyectoData]); // fetchCatalogo y fetchProyectoData están envueltas en useCallback
+    }, [router, fetchCatalogo, fetchProyectoData]); // fetchCatalogo y fetchProyectoData están envueltas en useCallback
 
     if ( (idProyecto && (isFetchingProyecto || isFetchingCatalogo))) {
         return <div className="flex justify-center items-center h-screen"><p className="text-xl">Cargando datos del catálogo...</p></div>;
@@ -201,3 +197,4 @@ export default function CatalogoClient() {
         </div>
     );
 }
+export default CatalogoClient;
