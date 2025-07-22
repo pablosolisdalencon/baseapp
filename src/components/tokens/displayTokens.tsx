@@ -39,21 +39,22 @@ const DisplayTokens: React.FC = () => {
 
   const renderContent = () => {
     if (isLoading) {
-      return <p>...</p>;
+      return <span className="coins text-sm font-bold text-white ring-1 rounded p-1 mr-3">...</span>;
     }else{
         
       if (error) {
         return <p>E</p>;
+      }else{
+            
+          if (dataSaldo) {
+            return (
+              <span className="coins text-sm font-bold text-white ring-1 rounded p-1 mr-3">{dataSaldo}</span>
+            );
+          } else {
+            return <span className="coins text-sm font-bold text-white ring-1 rounded p-1 mr-3">0</span>;
+          }
+        
       }
-
-      if (dataSaldo) {
-        return (
-          <>{dataSaldo}</>
-        );
-      } else {
-        return <>0</>;
-      }
-    
     }
 
   };

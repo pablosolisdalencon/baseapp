@@ -20,9 +20,7 @@ function Navbar() {
               <button className="nav-button">Proyectos</button>
             </Link>
             <div>
-              <span className="coins text-sm font-bold text-white ring-1 rounded p-1 mr-3">
-               <DisplayTokens/>
-              </span>
+              <><DisplayTokens/></>
               <span className="text-sm font-bold text-blue-800 rounded p-1 bg-gray-200">
                 {session.user.email}
               </span>
