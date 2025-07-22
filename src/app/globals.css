@@ -2,498 +2,635 @@
 
 @tailwind utilities;
 
+/* --- Base Styles --- */
+body {
+  overflow-x: hidden;
+}
+
+body * {
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
 iframe {
-    max-width: 90% !important;
-    max-height: 90% !important;
-    margin: 5%;
-    box-shadow: 0px -10px 100px black;
+  max-width: 90% !important;
+  max-height: 90% !important;
+  margin: 5%;
+  box-shadow: 0px -10px 100px black;
 }
 
-.form{
-    box-shadow: 10px 10px 40px black;
-    width:80%;
-    padding:5%;
-    border:2px solid gray;
-    margin-left: auto;
-    margin-right: auto;
-}
-form h1{
-    font-size: 30px;
-    font-weight: bolder;
-}
-input, textarea{
-    display: block;
-    margin: 5px;
-    padding:5px;
-    border: 1px solid darkblue;
-    width:100%;
+input,
+textarea {
+  display: block;
+  margin: 5px;
+  padding: 5px;
+  border: 1px solid var(--ewave-blue); /* Replaced darkblue */
+  width: 100%;
 }
 
-.upload-button{
-    color: #fff;
-    background-color: #dc143c;
-    border-radius: 50px;
-    font-weight: bolder;
-    display: block;
-    margin: 15px;
-    padding: 10px;
-}
-input[type=button]{
-    color:white
+input[type=button] {
+  color: white;
 }
 
-.pscols2{
-    position: relative;
-    width: 46%;
-    height: auto;
-    background-color: honeydew;
-    display: inline-block;
-    border: 1px solid gray;
-    padding: 10px;
-    margin: 2%;
-}
-.btnfinalizar, .btncancelar{
-    text-align: center;
-    font-size: larger;
-    width: 50%;
-    display: inline-block;
-}
-.btnfinalizar input,.btncancelar input{
-    width: 95%;
-}
-.boton-crear-proyecto, .boton-crear-item{
-    background-color: green;
-    color:white;
-    font-weight: bolder;
-    border-radius: 50px;
+.oculto {
+  display: none;
 }
 
-.boton-cancelar{
-    background-color: rgb(53, 53, 53);
-    color:white;
-    font-weight: bolder;
-    border-radius: 50px;
+/* --- Form & Button Styles --- */
+.form {
+  box-shadow: 10px 10px 40px black;
+  width: 80%;
+  padding: 5%;
+  border: 2px solid gray; /* Kept gray border as it's not a color replacement */
+  margin-left: auto;
+  margin-right: auto;
 }
 
-
-
-.navuser{
-    color:purple;
-    font-size: small;
-}
-.navuser img{display:inline;}
-.itemMenu{
-    padding:5px; 
-    font-weight: bolder;
-    background-color: #333;
-    color:#ffcc0b;
-    margin:2px;
-    border-radius:10px;
-
-}
-.viewer{
-    text-align: center;
-}
-.viewer h1{
-    font-size:30px;
-    font-weight: bolder;
-}
-.viewer h2{
-    font-size:20px;
-    font-weight: bolder;
-    margin-top: 2%;
+form h1 {
+  font-size: 30px;
+  font-weight: bolder;
 }
 
-.oculto{
-    display:none;
+.upload-button,
+.boton-crear-proyecto,
+.boton-crear-item,
+.boton-cancelar,
+.product-button,
+.button-add-item,
+.button-add-proyecto,
+.button-agregar-item,
+.nav-button,
+.welcome-button,
+.contact-button {
+  color: #fff;
+  font-weight: bolder;
+  border-radius: 50px;
+  display: block; /* For .upload-button, .button-add-proyecto */
+  margin: 15px; /* For .upload-button */
+  padding: 10px; /* For .upload-button */
 }
 
-/* SECCION PROYECTOS */
+/* Specific backgrounds for buttons, using eWave colors */
+.upload-button {
+  background-color: var(--ewave-orange); /* Replaced #dc143c with eWave Orange */
+}
+
+.boton-crear-proyecto,
+.boton-crear-item,
+.product-button,
+.button-add-item,
+.button-agregar-item,
+.nav-button,
+.welcome-button,
+.contact-button {
+  background-color: var(--ewave-blue); /* Replaced green/indigo/various blues with eWave Blue */
+}
+
+.boton-cancelar {
+  background-color: rgb(53, 53, 53); /* Kept original dark gray */
+}
+
+/* Combined .btnfinalizar, .btncancelar */
+.btnfinalizar,
+.btncancelar {
+  text-align: center;
+  font-size: larger;
+  width: 50%;
+  display: inline-block;
+}
+
+.btnfinalizar input,
+.btncancelar input {
+  width: 95%;
+}
+
+/* --- Layouts & Containers --- */
+.pscols2 {
+  position: relative;
+  width: 46%;
+  height: auto;
+  background-color: var(--white); /* Replaced honeydew with white */
+  display: inline-block;
+  border: 1px solid gray; /* Kept gray border */
+  padding: 10px;
+  margin: 2%;
+}
+
+/* --- Navigation & Menu --- */
+.navuser {
+  color: var(--ewave-blue); /* Replaced purple with eWave Blue */
+  font-size: small;
+}
+
+.navuser img {
+  display: inline;
+}
+
+.itemMenu {
+  padding: 5px;
+  font-weight: bolder;
+  background-color: #333; /* Kept original dark gray */
+  color: var(--ewave-orange); /* Replaced #ffcc0b with eWave Orange */
+  margin: 2px;
+  border-radius: 10px;
+}
+
+/* --- Viewer Sections (General) --- */
+.viewer h1 {
+  font-size: 30px;
+  font-weight: bolder;
+}
+
+.viewer h2 {
+  font-size: 20px;
+  font-weight: bolder;
+  margin-top: 2%;
+}
+
+/* --- Projects Section --- */
 .app-card {
-    @apply flex flex-col overflow-hidden rounded-lg bg-white shadow-gray-950 md:flex-row;
-    box-shadow:0px 0px 10px rgba(0, 0, 0, 0.534); /* Vertical en mobile, horizontal en desktop */
-  }
-  
-  .app-card-image-container {
-    @apply w-full md:w-1/3; /* Ocupa todo el ancho en mobile, 1/3 en desktop */
-  }
-  
-  .app-card-image {
-    @apply h-48 w-full object-cover; /* Ajusta la imagen */
-  }
-  
-  .app-card-content {
-    @apply flex flex-col justify-between p-4 md:p-6; /* Padding y disposición flexible */
-  }
-  
-  .app-card-title {
-    @apply mb-2 text-xl font-bold text-gray-800;
-  }
-  
-  .app-card-description {
-    @apply mb-4 text-sm leading-relaxed text-gray-600;
-  }
-  
-  .app-card-buttons {
-    @apply flex flex-wrap justify-around space-y-2 space-x-2 md:justify-end md:space-y-0; /* Botones centrados en mobile, a la derecha en desktop */
-  }
-  .app-card-buttons a{font-size: x-small;}
-  .app-card-buttons a svg{font-size: x-large;}
-  
-  .app-card-button {
-    @apply px-4 py-2 font-semibold text-white  focus:outline-none rounded-full;
-     background: linear-gradient(135deg, #fafbfc 0%, #b1b1b3 100%);
-     box-shadow:0px 0px 5px black;
-     text-align:center;
-  }
-  
-  /* Estilos adicionales para un look fresco y moderno */
-  .app-card {
-    background: linear-gradient(135deg, #a9bccc 0%, #ffffff 100%); 
-    margin:35px 20px;
-    padding:20px;
-    border:3px solid rgb(255, 255, 255)/* Fondo con gradiente */
-  }
-  
-  .app-card-title {
-    @apply text-2xl; /* Título más grande */
-  }
-  
-  .app-card-description {
-    @apply text-base; /* Descripción más grande */
-  }
-  
-
-.boton-gestion { color:blue }
-.boton-ficha {color:green}
-.boton-app { color:rgb(1, 101, 252); }
-.boton-mkt {color:purple; }
-.boton-eliminar { color:red }
-
-/* SECCION  CATALOGO */
-.product-type-label { @apply inline-block bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700 mr-2; }
-        .button-add-item { @apply bg-blue-500 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
-        .button-add-proyecto { @apply bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; margin-left:auto; margin-right:auto;position:relative;display:block; margin-top:2%;}
-        .button-finish { @apply bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2; }
-
-/* SECCION FICHA ITEM */
-.ficha-item-page { @apply bg-gray-100 font-sans; }
-.ficha-item-container { @apply container mx-auto py-8; }
-.ficha-title { @apply text-3xl font-bold text-gray-800 mb-2 text-center; }
-.project-subtitle { @apply text-lg text-gray-600 mb-6 text-center; }
-.ficha-form { @apply bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4; }
-.form-group { @apply mb-4; }
-.form-label { @apply block text-gray-700 text-sm font-bold mb-2; }
-.form-input { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
-.form-textarea { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none h-32 resize-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
-.radio-group { @apply flex items-center space-x-4; }
-.radio-label { @apply inline-flex items-center text-gray-700 text-sm; }
-.radio-input { @apply h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
-.form-actions { @apply mt-8 flex justify-end; }
-.button-agregar-item { @apply hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2;
-  background-color: #4DB6AC; 
+  @apply flex flex-col overflow-hidden rounded-lg bg-white shadow-gray-950 md:flex-row;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.534);
+  background: linear-gradient(135deg, #a9bccc 0%, #ffffff 100%); /* Kept original gradient as it contains white */
+  margin: 35px 20px;
+  padding: 20px;
+  border: 3px solid rgb(255, 255, 255);
 }
 
-/* SECCION MKT VIEWER */
-.mkt-viewer-page { @apply bg-gray-100 font-sans; }
-.mkt-viewer-container { @apply container mx-auto py-8; }
-.project-title { @apply text-3xl font-bold text-gray-800 mb-2 text-center; }
-.mkt-subtitle { @apply text-lg text-gray-600 mb-6 text-center; }
-.main-cards-container { @apply space-y-6; }
-.elegant-card { @apply bg-white rounded-lg shadow-xl overflow-hidden; }
-.card-header { @apply px-6 py-4; }
-.card-title { @apply text-xl font-semibold text-gray-800 mb-2; }
-.card-body { @apply px-6 py-4 text-gray-700 leading-relaxed; }
-.horizontal-card { @apply bg-white rounded-lg shadow-md overflow-hidden flex; }
-.horizontal-card-image { @apply w-1/3 object-cover; }
-.horizontal-card-content { @apply p-6 w-2/3; }
-.product-grid { @apply grid grid-cols-1 md:grid-cols-3 gap-4; }
-.product-post { @apply bg-white rounded-lg shadow-sm overflow-hidden; }
-.product-image-container { @apply relative; }
-.product-image { @apply w-full h-32 object-cover; }
-.product-price { 
-  @apply absolute bottom-2 right-2 text-white text-sm font-semibold px-2 py-1 rounded; 
-  background-color:rgb(253, 177, 63)
-}
-.post-content { @apply p-4; }
-.post-title { @apply text-lg font-semibold text-gray-800 mb-2; }
-.post-description { @apply text-gray-600 text-sm leading-relaxed; }
-
-/* SECION  SETTING */
-.settings-page { @apply bg-gray-100 font-sans; }
-.settings-container { @apply container mx-auto py-8 space-y-6; }
-.settings-card { @apply bg-white rounded-lg shadow-md p-6; }
-.card-title { @apply text-xl font-semibold text-gray-800 mb-4; }
-.form-group { @apply mb-4; }
-.form-label { @apply block text-gray-700 text-sm font-bold mb-2; }
-.form-input { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
-.form-select { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
-.form-actions { @apply mt-4 flex justify-end space-x-2; }
-.button-save { @apply hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2; 
-  background-color: #4DB6AC;
-}
-.button-cancel { @apply bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2; }
-.social-link-group { @apply grid grid-cols-2 gap-4 mb-4; }
-.social-label { @apply block text-gray-700 text-sm font-bold mb-2 col-span-1; }
-.social-input { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none col-span-1 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
-.other-social-group { @apply grid grid-cols-3 gap-4 mb-4; }
-.other-social-label-name { @apply block text-gray-700 text-sm font-bold mb-2 col-span-1; }
-.other-social-input-name { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none col-span-2 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
-.other-social-label-link { @apply block text-gray-700 text-sm font-bold mb-2 col-span-1; }
-.other-social-input-link { @apply shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none col-span-2 focus:ring-2 focus:ring-blue-400 focus:ring-offset-2; }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* APP VIEWER prod*/
-
-/* css/styles.css */
-
-
-/* Estilos Generales de la Página */
-.landing-page {
-    @apply bg-gray-100 font-sans;
+.app-card-image-container {
+  @apply w-full md:w-1/3;
 }
 
-/* Barra CTA Fija Superior */
-.cta-bar {
-    @apply fixed top-0 w-full text-white text-center py-2 z-50;
-    background-color: #4DB6AC;
+.app-card-image {
+  @apply h-48 w-full object-cover;
 }
 
-.cta-link {
-    @apply font-semibold hover:underline;
+.app-card-content {
+  @apply flex flex-col justify-between p-4 md:p-6;
 }
 
-/* Navbar */
-.main-nav {
-    @apply bg-white shadow-md py-4 sticky top-8 z-40;
+.app-card-title {
+  @apply mb-2 text-xl font-bold;
+  color: var(--ewave-blue); /* Replaced gray-800/2xl with eWave Blue */
+  font-size: 2xl;
 }
 
-.nav-container {
-    @apply container mx-auto flex justify-between items-center;
+.app-card-description {
+  @apply mb-4 text-sm leading-relaxed;
+  color: gray; /* Kept gray-600 to gray */
+  font-size: base;
 }
 
-.nav-logo {
-    @apply font-bold text-xl text-gray-800;
-}
-.nav-logo img{
-   max-height: 50px;
+.app-card-buttons {
+  @apply flex flex-wrap justify-around space-y-2 space-x-2 md:justify-end md:space-y-0;
 }
 
-.nav-links {
-    @apply space-x-4;
+.app-card-buttons a {
+  font-size: x-small;
 }
 
-.nav-link {
-    @apply text-gray-600 hover:text-indigo-500;
+/* Uniform eWave color for project icons with white text */
+.app-card-buttons a svg,
+.boton-gestion,
+.boton-ficha,
+.boton-app,
+.boton-mkt,
+.boton-eliminar {
+  color: white; /* Icon text color */
+  background-color: var(--ewave-cyan); /* Uniform eWave color choice for icons */
+  padding: 5px; /* Added padding for visibility if icons are colored background */
+  border-radius: 50%; /* Make them circular if needed */
+  display: inline-flex; /* Ensure background applies well */
+  align-items: center;
+  justify-content: center;
 }
 
-.nav-button {
-    @apply text-white font-semibold py-2 px-4 rounded focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
-    background-color: #4DB6AC;
-    
-  }
-
-/* Sección de Bienvenida */
-.welcome-section {
-    @apply py-24 text-white text-center relative;
-    background-image: url('/fondo.jpg');
-    background-size: cover;
-    background-position: center;
+/* Explicitly setting background for these specific icon buttons as per instruction */
+.boton-gestion,
+.boton-ficha,
+.boton-app,
+.boton-mkt,
+.boton-eliminar {
+  background-color: var(--ewave-cyan); /* Uniform eWave Cyan for all project icons */
 }
 
-.welcome-overlay {
-    @apply absolute inset-0 bg-black opacity-40;
+.app-card-button {
+  @apply px-4 py-2 font-semibold text-white focus:outline-none rounded-full;
+  background: var(--ewave-blue); /* Replaced linear-gradient with eWave Blue for a flat look */
+  box-shadow: 0px 0px 5px black;
+  text-align: center;
 }
 
-.welcome-content {
-    @apply container mx-auto relative z-10;
+/* --- Catalog Section --- */
+.product-type-label {
+  @apply inline-block bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700 mr-2;
 }
 
-.welcome-title {
-    @apply text-4xl font-bold mb-6;
+.button-finish {
+  @apply bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2;
 }
 
-.welcome-subtitle {
-    @apply text-lg mb-8;
+.button-add-proyecto {
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  display: block;
+  margin-top: 2%;
 }
 
-.welcome-form {
-    @apply max-w-md mx-auto flex rounded-full overflow-hidden shadow-lg;
+/* --- Ficha Item Section --- */
+.ficha-item-page,
+.mkt-viewer-page,
+.settings-page {
+  @apply bg-gray-100 font-sans; /* Kept gray-100 background */
 }
 
-.welcome-input {
-    @apply w-2/3 py-3 px-4 text-gray-700 focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
+.ficha-item-container,
+.mkt-viewer-container,
+.settings-container {
+  @apply container mx-auto py-8;
 }
 
-.welcome-button ,.contact-button{
-    border-radius: 50px;
-    @apply hover:bg-purple-700 text-white font-semibold py-3 px-4 focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
-    background-color: #4DB6AC;
-  }
-
-/* Sección del Logo */
-.logo-section {
-    @apply py-12 bg-white;
+.ficha-title,
+.project-title {
+  @apply text-3xl font-bold mb-2 text-center;
+  color: var(--ewave-blue); /* Replaced gray-800 with eWave Blue */
 }
 
-.logo-container {
-    @apply container mx-auto text-center;
+.project-subtitle,
+.mkt-subtitle {
+  @apply text-lg mb-6 text-center;
+  color: gray; /* Kept gray-600 to gray */
 }
 
-.company-logo {
-    @apply mx-auto;
+.ficha-form,
+.elegant-card,
+.horizontal-card,
+.product-post,
+.settings-card {
+  @apply bg-white shadow-md rounded-lg;
+  /* Combined shadow-md, shadow-xl, shadow-sm here */
 }
 
-/* Sección Descripción de la Empresa */
-.about-us-section {
-    @apply py-16 bg-white;
+.ficha-form {
+  @apply px-8 pt-6 pb-8 mb-4;
 }
 
-.about-us-container {
-    @apply container mx-auto text-center;
+.form-group {
+  @apply mb-4;
 }
 
-.about-us-title {
-    @apply text-3xl font-bold text-gray-800 mb-8;
+.form-label,
+.social-label,
+.other-social-label-name,
+.other-social-label-link {
+  @apply block text-sm font-bold mb-2;
+  color: gray; /* Kept gray-700 to gray */
 }
 
-.about-us-grid {
-    @apply grid grid-cols-1 md:grid-cols-3 gap-8;
+.form-input,
+.form-textarea,
+.form-select,
+.social-input,
+.other-social-input-name,
+.other-social-input-link {
+  @apply shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:ring-2 focus:ring-offset-2;
+  color: gray; /* Kept gray-700 to gray */
+  border-color: gray; /* Ensure border is not colored by eWave-blue unless needed for focus */
+  focus-ring-color: var(--ewave-blue); /* Replaced blue-400 focus ring */
 }
 
-.about-us-item {
-    @apply text-center;
+.form-textarea {
+  @apply h-32 resize-none;
 }
 
-.about-us-subtitle {
-    @apply text-xl font-semibold text-indigo-500 mb-2;
-  color:rgb(253, 177, 63)
+.radio-group {
+  @apply flex items-center space-x-4;
 }
 
-.about-us-text {
-    @apply text-gray-700 leading-relaxed;
+.radio-label {
+  @apply inline-flex items-center text-sm;
+  color: gray; /* Kept gray-700 to gray */
 }
 
-/* Sección Catálogo de Productos/Servicios */
-.catalog-section {
-    @apply py-16 bg-gray-100;
+.radio-input {
+  @apply h-4 w-4 rounded focus:ring-2 focus:ring-offset-2;
+  color: var(--ewave-blue); /* Replaced blue-600 focus ring */
+  border-color: gray; /* Kept gray-300 border */
+  focus-ring-color: var(--ewave-blue); /* Replaced blue-400 focus ring */
 }
 
-.catalog-container {
-    @apply container mx-auto text-center;
+.form-actions {
+  @apply mt-8 flex justify-end;
 }
 
-.catalog-title {
-    @apply text-3xl font-bold text-gray-800 mb-8;
+.button-save {
+  @apply text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-offset-2;
+  background-color: var(--ewave-blue); /* Replaced #4DB6AC and indigo-700 with eWave Blue */
+  focus-ring-color: var(--ewave-cyan); /* Replaced indigo-400 focus ring */
 }
 
-.catalog-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6;
+/* --- MKT Viewer Section --- */
+.main-cards-container {
+  @apply space-y-6;
 }
 
-.product-card {
-    @apply bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300;
+.card-header {
+  @apply px-6 py-4;
+}
+
+.card-title {
+  @apply text-xl font-semibold mb-2;
+  color: var(--ewave-blue); /* Replaced gray-800 with eWave Blue */
+}
+
+.card-body {
+  @apply px-6 py-4 leading-relaxed;
+  color: gray; /* Kept gray-700 to gray */
+}
+
+.horizontal-card {
+  @apply flex;
+}
+
+.horizontal-card-image {
+  @apply w-1/3 object-cover;
+}
+
+.horizontal-card-content {
+  @apply p-6 w-2/3;
+}
+
+.product-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+}
+
+.product-image-container {
+  @apply relative;
 }
 
 .product-image {
-    @apply w-full h-48 object-cover;
-}
-
-.product-info {
-    @apply p-4 text-center;
-}
-
-.product-name {
-    height:57px;
-    @apply text-lg font-semibold text-gray-700 mb-2;
-}
-
-.product-description {
-    @apply text-gray-600 text-sm mb-3;
-    height:260px;
+  @apply w-full h-32 object-cover;
 }
 
 .product-price {
-    @apply text-xl font-bold block mb-2;
-    color:rgb(253, 177, 63);
+  @apply absolute bottom-2 right-2 text-white text-sm font-semibold px-2 py-1 rounded;
+  background-color: var(--ewave-orange); /* Replaced rgb(253, 177, 63) with eWave Orange */
 }
 
-.product-button {
-    @apply inline-block mt-4 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
-    background-color: #4DB6AC;
-  }
+.post-content {
+  @apply p-4;
+}
 
-/* Sección Footer con Mini Form de Contacto */
+.post-title {
+  @apply text-lg font-semibold mb-2;
+  color: var(--ewave-blue); /* Replaced gray-800 with eWave Blue */
+}
+
+.post-description {
+  @apply text-sm leading-relaxed;
+  color: gray; /* Kept gray-600 to gray */
+}
+
+/* --- Settings Section --- */
+.settings-container {
+  @apply space-y-6;
+}
+
+.button-cancel {
+  @apply bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2;
+}
+
+.social-link-group {
+  @apply grid grid-cols-2 gap-4 mb-4;
+}
+
+.social-input {
+  @apply col-span-1;
+}
+
+.other-social-group {
+  @apply grid grid-cols-3 gap-4 mb-4;
+}
+
+.other-social-label-name,
+.other-social-label-link {
+  @apply col-span-1;
+}
+
+.other-social-input-name,
+.other-social-input-link {
+  @apply col-span-2;
+}
+
+/* --- APP VIEWER (Landing Page) --- */
+.landing-page {
+  @apply bg-gray-100 font-sans;
+}
+
+.cta-bar {
+  @apply fixed top-0 w-full text-white text-center py-2 z-50;
+  background-color: var(--ewave-blue); /* Replaced #4DB6AC with eWave Blue */
+}
+
+.cta-link {
+  @apply font-semibold hover:underline;
+}
+
+.main-nav {
+  @apply bg-white shadow-md py-4 sticky top-8 z-40;
+}
+
+.nav-container {
+  @apply container mx-auto flex justify-between items-center;
+}
+
+.nav-logo {
+  @apply font-bold text-xl;
+  color: var(--ewave-blue); /* Replaced gray-800 with eWave Blue */
+}
+
+.nav-logo img {
+  max-height: 50px;
+}
+
+.nav-links {
+  @apply space-x-4;
+}
+
+.nav-link {
+  @apply text-gray-600 hover:text-ewave-cyan; /* Replaced indigo-500 with eWave Cyan */
+}
+
+.welcome-section {
+  @apply py-24 text-white text-center relative;
+  background-image: url('/fondo.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+.welcome-overlay {
+  @apply absolute inset-0 bg-black opacity-40; /* Kept black overlay */
+}
+
+.welcome-content {
+  @apply container mx-auto relative z-10;
+}
+
+.welcome-title {
+  @apply text-4xl font-bold mb-6;
+}
+
+.welcome-subtitle {
+  @apply text-lg mb-8;
+}
+
+.welcome-form {
+  @apply max-w-md mx-auto flex rounded-full overflow-hidden shadow-lg;
+}
+
+.welcome-input {
+  @apply w-2/3 py-3 px-4 text-gray-700 focus:outline-none focus-visible:ring focus-visible:ring-ewave-blue; /* Replaced indigo-500 with eWave Blue */
+}
+
+/* --- Logo Section (Landing Page) --- */
+.logo-section {
+  @apply py-12 bg-white;
+}
+
+.logo-container {
+  @apply container mx-auto text-center;
+}
+
+.company-logo {
+  @apply mx-auto;
+}
+
+/* --- About Us Section (Landing Page) --- */
+.about-us-section {
+  @apply py-16 bg-white;
+}
+
+.about-us-container {
+  @apply container mx-auto text-center;
+}
+
+.about-us-title {
+  @apply text-3xl font-bold mb-8;
+  color: var(--ewave-blue); /* Replaced gray-800 with eWave Blue */
+}
+
+.about-us-item {
+  @apply text-center;
+}
+
+.about-us-subtitle {
+  @apply text-xl font-semibold mb-2;
+  color: var(--ewave-orange); /* Replaced indigo-500/rgb(253, 177, 63) with eWave Orange */
+}
+
+.about-us-text {
+  @apply leading-relaxed;
+  color: gray; /* Kept gray-700 to gray */
+}
+
+/* --- Catalog Section (Landing Page) --- */
+.catalog-section {
+  @apply py-16 bg-gray-100;
+}
+
+.catalog-container {
+  @apply container mx-auto text-center;
+}
+
+.catalog-title {
+  @apply text-3xl font-bold mb-8;
+  color: var(--ewave-blue); /* Replaced gray-800 with eWave Blue */
+}
+
+.catalog-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6;
+}
+
+.product-card {
+  @apply bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300;
+}
+
+.product-image {
+  @apply w-full h-48 object-cover;
+}
+
+.product-info {
+  @apply p-4 text-center;
+}
+
+.product-name {
+  height: 57px;
+  @apply text-lg font-semibold mb-2;
+  color: gray; /* Kept gray-700 to gray */
+}
+
+.product-description {
+  @apply text-sm mb-3;
+  height: 260px;
+  color: gray; /* Kept gray-600 to gray */
+}
+
+.product-price {
+  @apply text-xl font-bold block mb-2;
+  color: var(--ewave-orange); /* Replaced rgb(253, 177, 63) with eWave Orange */
+}
+
+/* --- Footer Section (Landing Page) --- */
 .contact-footer {
-    @apply bg-gray-800 py-16 text-white;
+  @apply bg-gray-800 py-16 text-white;
 }
 
 .contact-container {
-    @apply container mx-auto text-center;
+  @apply container mx-auto text-center;
 }
 
 .contact-title {
-    @apply text-2xl font-bold mb-6;
+  @apply text-2xl font-bold mb-6;
 }
 
 .contact-subtitle {
-    @apply text-gray-300 mb-8;
+  @apply mb-8;
+  color: gray; /* Kept gray-300 to gray */
 }
 
 .contact-form {
-    @apply max-w-md mx-auto flex rounded-full overflow-hidden;
+  @apply max-w-md mx-auto flex rounded-full overflow-hidden;
 }
 
 .contact-input {
-    @apply w-2/3 py-3 px-4 text-gray-700 focus:outline-none focus-visible:ring focus-visible:ring-indigo-500;
+  @apply w-2/3 py-3 px-4 text-gray-700 focus:outline-none focus-visible:ring focus-visible:ring-ewave-blue; /* Replaced indigo-500 with eWave Blue */
 }
 
 .copyright-text {
-    @apply mt-8 text-gray-400 text-sm;
+  @apply mt-8 text-sm;
+  color: gray; /* Kept gray-400 to gray */
 }
 
+/* --- AI Chatbot Section --- */
+/* Defined Custom Properties for eWave colors */
+:root {
+  --ewave-blue: #2853C3;
+  --ewave-cyan: #00C2D9;
+  --ewave-orange: #FF7A00;
+  --user-msg-bg: var(--ewave-blue); /* Using eWave Blue for user messages */
+  --ai-msg-bg: #E0E0E0; /* Kept a neutral gray for AI messages */
+  --primary-color: var(--ewave-blue); /* Using eWave Blue for primary actions */
+  --border-radius: 8px; /* Defined a variable for border-radius */
+}
 
-body {
-    overflow-x: hidden;
-  }
-  
-  /* Opcionalmente, para elementos específicos dentro del body */
-  body * {
-    max-width: 100vw; /* 100% del ancho de la ventana gráfica */
-    box-sizing: border-box; /* Asegura que el padding y el border se incluyan dentro del max-width */
-  }
-
-
-
-  /* IA CHAT BOT */
-  .container {
+.container {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
 }
-  .chat-container {
+
+.chat-container {
   display: flex;
   flex-direction: column;
   height: 70vh;
@@ -530,6 +667,7 @@ body {
 .user-message {
   background-color: var(--user-msg-bg);
   align-self: flex-end;
+  color: white; /* Ensure text is white on eWave Blue background */
 }
 
 .ai-message {
@@ -570,7 +708,7 @@ body {
 }
 
 .send-button:hover {
-  background-color: #0056b3;
+  background-color: var(--ewave-cyan); /* Adjusted hover to eWave Cyan */
 }
 
 .send-button:disabled {
@@ -599,86 +737,85 @@ body {
   }
 }
 
-
-
-/* WILLI */
+/* --- WILLI Section --- */
 .wcontainer {
-    font-family: Arial, sans-serif;
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .wcontainer h1 {
-    color: #333;
-    font-size: 2em;
-    margin-bottom: 15px;
-    text-align: center;
-  }
-  
-  .wsummary {
-    background-color: #f0f8ff;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    line-height: 1.6;
-  }
-  
-  .wsection {
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px dashed #eee;
-  }
-  
-  .wsection:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-  }
-  
-  .wsection h2 {
-    color: #555;
-    font-size: 1.5em;
-    margin-bottom: 10px;
-    border-left: 4px solid #007bff;
-    padding-left: 10px;
-  }
-  
-  .wlist {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .wlistItem {
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-    padding: 15px;
-    margin-bottom: 10px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  }
-  
-  .wlistItem h3 {
-    color: #007bff;
-    font-size: 1.2em;
-    margin-top: 0;
-    margin-bottom: 8px;
-  }
-  
-  .wlistItem p {
-    line-height: 1.5;
-    margin-bottom: 5px;
-  }
-  
-  .wlistItem p strong {
-    color: #333;
-  }
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc; /* Kept original gray border */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
-  .coins{
-    background-color: rgb(253, 177, 63);
-  }
-  .coins *{
-    text-shadow: 10px 10px 20px black;
-  }
+.wcontainer h1 {
+  color: var(--ewave-blue); /* Replaced #333 with eWave Blue */
+  font-size: 2em;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.wsummary {
+  background-color: var(--ewave-cyan); /* Replaced #f0f8ff with eWave Cyan for a fresh look */
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.wsection {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px dashed #eee; /* Kept original light gray dashed border */
+}
+
+.wsection:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.wsection h2 {
+  color: var(--ewave-blue); /* Replaced #555 with eWave Blue */
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  border-left: 4px solid var(--ewave-orange); /* Replaced #007bff with eWave Orange */
+  padding-left: 10px;
+}
+
+.wlist {
+  list-style: none;
+  padding: 0;
+}
+
+.wlistItem {
+  background-color: var(--white); /* Kept white */
+  border: 1px solid #e0e0e0; /* Kept original light gray border */
+  border-radius: 5px;
+  padding: 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.wlistItem h3 {
+  color: var(--ewave-orange); /* Replaced #007bff with eWave Orange */
+  font-size: 1.2em;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.wlistItem p {
+  line-height: 1.5;
+  margin-bottom: 5px;
+}
+
+.wlistItem p strong {
+  color: #333; /* Kept original dark gray */
+}
+
+.coins {
+  background-color: var(--ewave-orange); /* Replaced rgb(253, 177, 63) with eWave Orange */
+}
+
+.coins * {
+  text-shadow: 10px 10px 20px black;
+}
