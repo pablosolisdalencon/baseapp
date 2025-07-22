@@ -459,7 +459,10 @@ form h1 {
 }
 
 .nav-link {
-  @apply text-gray-600 hover:text-ewave-cyan; /* Replaced indigo-500 with eWave Cyan */
+  @apply text-gray-600;
+}
+.nav-link:hover{
+color:var(--ewave-cyan); /* Replaced indigo-500 with eWave Cyan */
 }
 
 .welcome-section {
