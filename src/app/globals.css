@@ -493,7 +493,7 @@ color:var(--ewave-cyan); /* Replaced indigo-500 with eWave Cyan */
 }
 
 .welcome-input {
-  @apply w-2/3 py-3 px-4 text-gray-700 focus:outline-none focus-visible:ring focus-visible:ring-ewave-blue; /* Replaced indigo-500 with eWave Blue */
+  @apply w-2/3 py-3 px-4 text-gray-700 focus:outline-none;
 }
 
 /* --- Logo Section (Landing Page) --- */
@@ -607,7 +607,7 @@ color:var(--ewave-cyan); /* Replaced indigo-500 with eWave Cyan */
 }
 
 .contact-input {
-  @apply w-2/3 py-3 px-4 text-gray-700 focus:outline-none focus-visible:ring focus-visible:ring-ewave-blue; /* Replaced indigo-500 with eWave Blue */
+  @apply w-2/3 py-3 px-4 text-gray-700 focus:outline-none; /* Replaced indigo-500 with eWave Blue */
 }
 
 .copyright-text {
