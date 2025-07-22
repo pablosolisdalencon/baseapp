@@ -48,9 +48,7 @@ const DisplayTokens: React.FC = () => {
 
       if (dataSaldo) {
         return (
-          <>
-          {dataSaldo}
-          </>
+          <>{dataSaldo}</>
         );
       } else {
         return <>0</>;
@@ -61,10 +59,7 @@ const DisplayTokens: React.FC = () => {
   };
 
   return (
-    <>
-     
-      {renderContent()}
-    </>
+    <>{renderContent()}</>
   );
 };
 
