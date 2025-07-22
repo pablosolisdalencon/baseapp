@@ -12,9 +12,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           <Navbar />
           {children}
+          <FooterClient />
         </Providers>
       </body>
-      <FooterClient />
     </html>
   );
 }
