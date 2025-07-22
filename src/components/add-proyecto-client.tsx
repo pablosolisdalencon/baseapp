@@ -121,10 +121,10 @@ export default function AddProyectoClient() {
         
         <h2>Si aun no tienes esta informacion no pasa nada, cuentale tu historia a Willi, y él se encargara de crearla de manera profesional y optimizada con el boton de mas abajo.</h2>
         <textarea  onChange={handleMakeDataChange} name="historia" placeholder="Comenzando con el nombre de tu proyecto, agrega aqui todo lo que puedas decir sobre tu proyecto, no importa el formato de redaccion, solo trata de agregar la mayor cantidad de informacion posible que defina tu idea."></textarea>
-        <button onClick={handleMakeData} type="button" className="boton-crear-proyecto" >Willi, Ayudame a redactar mi proyecto!</button>
+        <input onClick={handleMakeData} type="button" className="boton-crear-proyecto" disabled value="Willi, Ayudame a redactar mi proyecto!" />
 
 <hr />
-        <h2> O Si ya tienes clara toda esta información completa el formulario de abajo</h2>
+        <h2> O Si ya tienes clara toda esta información completa el formulario de abajo [Recomendado]</h2>
 
         <input onChange={handleChange} name="nombre" type="text" placeholder="Nombre del Proyecto" />
         <textarea onChange={handleChange} name="descripcion" placeholder="Descripción breve"></textarea>
