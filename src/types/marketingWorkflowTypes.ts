@@ -193,6 +193,14 @@ export interface EwaveMakerPageProps {
       p: string; // El dato genérico puede ser de cualquier tipo definido arriba o null
     }>
 }
+export interface PageProps {
+  params:Promise<{
+      p: string; // El dato genérico puede ser de cualquier tipo definido arriba o null
+    }>
+}
+export interface ClientProps {
+  idProyecto:string | null | any; // El dato genérico puede ser de cualquier tipo definido arriba o null
+}
 
 // Tipos para los pasos del workflow en la UI
 export type GenerationStatus =

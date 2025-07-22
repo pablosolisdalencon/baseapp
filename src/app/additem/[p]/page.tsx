@@ -1,10 +1,13 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { Suspense } from "react";
-import dynamic from "next/dynamic";
-const AddItemClient = dynamic(() => import("@/components/add-item-client"));
+import { PageProps } from "@/types/marketingWorkflowTypes";
+import AddItemClient from "@/components/add-item-client";
 
-export default async function AddItem() {
+export default async function DynamicPage({ params }: PageProps) {
+  const parametros = await params;
+  const { p: idProyecto } = parametros;
+
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -17,6 +20,6 @@ export default async function AddItem() {
   }
   return(
         <Suspense fallback={<p>Cargando...</p>}>
-        <AddItemClient/></Suspense>
+        <AddItemClient idProyecto={idProyecto}/></Suspense>
   )
 }

@@ -2,10 +2,10 @@
 import { ChangeEvent, FormEvent, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CldUploadWidget } from 'next-cloudinary';
+import { ClientProps } from "@/types/marketingWorkflowTypes";
 
-export default function AddItemClient() {
+const AddItemClient: React.FC<ClientProps> = ({ idProyecto }) => {
   const [fotoPreviewUrl, setFotoPreviewUrl] = useState<string | null>(null);
-  const [idProyecto, setIdProyecto] = useState<string | null>(null);
   
   const [newItem, setNewItem] = useState<{
     [key: string]: string;
@@ -29,9 +29,6 @@ export default function AddItemClient() {
 
   useEffect(() => {
     router.refresh();
-    const idProyecto = searchParams.get('idProyecto');
-    setIdProyecto(idProyecto);4
-
     if (idProyecto) {
         setNewItem((prevItem) => ({
         ...prevItem,
@@ -129,3 +126,5 @@ export default function AddItemClient() {
         </div>
   );
 }
+
+export default AddItemClient;
