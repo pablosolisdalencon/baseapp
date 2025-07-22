@@ -135,7 +135,7 @@ const ProyectosClient: React.FC = () => {
                 <p className="app-card-description">{proyecto.descripcion}</p>
               </div>
               <div className="app-card-buttons">
-                <Link href={`/catalogo/?id=${proyecto._id}`} className="app-card-button boton-gestion">
+                <Link href={`/catalogo/${proyecto._id}`} className="app-card-button boton-gestion">
                   <FontAwesomeIcon icon={faBoxesPacking} />
                   <br />
                   Catálogo
