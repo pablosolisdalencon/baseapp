@@ -40,21 +40,24 @@ const DisplayTokens: React.FC = () => {
   const renderContent = () => {
     if (isLoading) {
       return <p>...</p>;
+    }else{
+        
+      if (error) {
+        return <p>E</p>;
+      }
+
+      if (dataSaldo) {
+        return (
+          <>
+          {dataSaldo}
+          </>
+        );
+      } else {
+        return <>0</>;
+      }
+    
     }
 
-    if (error) {
-      return <p>Error: {error}</p>;
-    }
-
-    if (dataSaldo) {
-      return (
-        <>
-        {dataSaldo}
-        </>
-      );
-    } else {
-      return <>0</>;
-    }
   };
 
   return (
