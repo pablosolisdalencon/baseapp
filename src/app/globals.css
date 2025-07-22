@@ -163,6 +163,7 @@ form h1 {
 
 .app-card-image {
   @apply h-48 w-full object-cover;
+  max-width: 100%;
 }
 
 .app-card-content {

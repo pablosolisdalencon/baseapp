@@ -22,7 +22,7 @@ interface ItemType {
 
 export default function CatalogoClient() {
   const { data: session } = useSession();
-    const router = useRouter();
+  const router = useRouter();
     const searchParams = useSearchParams();
 
     const [catalogoItems, setCatalogoItems] = useState<ItemType[] | null>(null);
