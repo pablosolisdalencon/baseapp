@@ -159,7 +159,7 @@ export default function AppViewerClient() {
   
    
 
-    {/* Sección Footer con Mini Form de Contacto */}
+    {/* Sección Footer con Mini Form de Contacto 
     <footer id="contacto" className="contact-footer">
         <div className="contact-container">
             <h2 className="contact-title">¿Listo para Empezar?</h2>
@@ -171,6 +171,7 @@ export default function AppViewerClient() {
             <p className="copyright-text">© 2025 {nombreProyecto}. Todos los derechos reservados.</p>
         </div>
     </footer>
+    */}
 </div>
 
 
