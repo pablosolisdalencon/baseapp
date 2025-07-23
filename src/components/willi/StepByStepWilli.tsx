@@ -1,3 +1,4 @@
+/*
 'use client';
 import React from 'react'; // Necesario para .tsx
 import { useState, useEffect } from 'react';
@@ -49,7 +50,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
 
 
 
-   /* SUITE useTokens*/
+   // SUITE useTokens
   
             //-------- ACCIONES --------------
             
@@ -133,15 +134,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
             const descontarTokens = async (montoADejar:number, currentUserEmail:string) => {
                 // El 'monto' aquí es el saldo final después del descuento, no la cantidad a descontar.
                 // La API /api/user-tokens (PUT) debe estar diseñada para SETear el saldo.
-                /*
-                if (typeof montoADejar !== 'number' || montoADejar < 0) {
-                    return null; // O false para indicar fallo
-                }
-                if (!currentUserEmail) {
-                    return null;
-                }
-                    */
-  
+       
   
   
                 const bodyData = JSON.stringify({ tokens: montoADejar, email:currentUserEmail }); // La API debe interpretar esto como el nuevo saldo
@@ -463,11 +456,10 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
           </div>
         </div>
 
-        {/* Indicador de pasos */}
         <div className="flex items-center justify-between mb-8">
           {steps.map((step, index) => (
             <React.Fragment key={step.number}>
-              <div className="flex flex-col items-center flex-1"> {/* flex-1 para distribuir espacio */}
+              <div className="flex flex-col items-center flex-1">
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold
                   ${step.number === currentStep ? 'bg-blue-600 ring-4 ring-blue-200' :
                     step.completed ? 'bg-green-600' : 'bg-gray-300'}`}>
@@ -497,7 +489,6 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
           </div>
         )}
 
-        {/* Paso 1: Estudio de Mercado */}
         {currentStep === 1 && (
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 1: Estudio de Mercado</h2>
@@ -548,7 +539,6 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
           </div>
         )}
 
-        {/* Paso 2: Estrategia de Marketing */}
         {currentStep === 2 && (
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 2: Estrategia de Marketing</h2>
@@ -609,7 +599,6 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
           </div>
         )}
 
-        {/* Paso 3: Campaña de Marketing */}
         {currentStep === 3 && (
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 3: Campaña de Marketing</h2>
@@ -673,7 +662,6 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
           </div>
         )}
 
-        {/* Navegación entre pasos */}
         <div className="flex justify-between mt-8 pt-6 border-t">
           <button
             onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
@@ -700,6 +688,281 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
           </button>
         </div>
       </div>
+    </div>
+  );
+};
+
+export default MarketingWorkflow;
+*/
+
+// components/willi/StepByStepWilli.tsx
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { 
+  CampaniaMarketingData, 
+  EstudioMercadoData, 
+  EstrategiaMarketingData,
+  MakerData // Si se usa en este componente
+} from '@/types/marketingWorkflowTypes';
+
+// Importa tus componentes de display (EstudioMercadoDisplay, EstrategiaMarketingDisplay, CampaniaMarketingDisplay)
+import EstudioMercadoDisplay from '@/components/EstudioMercadoDisplay';
+import EstrategiaMarketingDisplay from '@/components/EstrategiaMarketingDisplay';
+import CampaniaMarketingDisplay from '@/components/CampaniaMarketingDisplay';
+
+
+interface MarketingWorkflowProps {
+  idProyectoD: string;
+  initialEstudioData: EstudioMercadoData | null;
+  initialEstrategiaData: EstrategiaMarketingData | null;
+  initialCampaniaData: CampaniaMarketingData | null;
+  // initialMakerData?: MakerData | null; // Opcional, si se necesita
+
+  // Tipos para las Server Actions que se reciben como props
+  onGenerateEstudio: (projectId: string) => Promise<EstudioMercadoData | null>;
+  onSaveEstudio: (projectId: string, data: EstudioMercadoData) => Promise<boolean>;
+  onGenerateEstrategia: (projectId: string, estudio: EstudioMercadoData | null) => Promise<EstrategiaMarketingData | null>;
+  onSaveEstrategia: (projectId: string, data: EstrategiaMarketingData) => Promise<boolean>;
+  onGenerateCampania: (projectId: string, estudio: EstudioMercadoData | null, estrategia: EstrategiaMarketingData | null) => Promise<CampaniaMarketingData | null>;
+  onSaveCampania: (projectId: string, data: CampaniaMarketingData) => Promise<boolean>;
+}
+
+const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({
+  idProyectoD,
+  initialEstudioData,
+  initialEstrategiaData,
+  initialCampaniaData,
+  // initialMakerData, // Si se usa
+
+  onGenerateEstudio,
+  onSaveEstudio,
+  onGenerateEstrategia,
+  onSaveEstrategia,
+  onGenerateCampania,
+  onSaveCampania,
+}) => {
+  const [estudioData, setEstudioData] = useState<EstudioMercadoData | null>(initialEstudioData);
+  const [estrategiaData, setEstrategiaData] = useState<EstrategiaMarketingData | null>(initialEstrategiaData);
+  const [campaniaData, setCampaniaData] = useState<CampaniaMarketingData | null>(initialCampaniaData);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Funciones de manejo para los botones de generación y guardado
+  const handleGenerateEstudio = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const generated = await onGenerateEstudio(idProyectoD);
+      if (generated) {
+        setEstudioData(generated);
+        alert('Estudio de Mercado generado exitosamente!');
+      } else {
+        setError('Falló la generación del Estudio de Mercado.');
+      }
+    } catch (err: any) {
+      setError(`Error al generar estudio: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveEstudio = async () => {
+    if (!estudioData) {
+      alert('No hay estudio para guardar.');
+      return;
+    }
+    setIsLoading(true);
+    setError(null);
+    try {
+      const success = await onSaveEstudio(idProyectoD, estudioData);
+      if (success) {
+        alert('Estudio de Mercado guardado exitosamente!');
+      } else {
+        setError('Falló al guardar el Estudio de Mercado.');
+      }
+    } catch (err: any) {
+      setError(`Error al guardar estudio: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Repite estas funciones de manejo para Estrategia y Campaña
+  const handleGenerateEstrategia = async () => {
+    if (!estudioData) {
+      alert('Necesitas un Estudio de Mercado para generar la Estrategia.');
+      return;
+    }
+    setIsLoading(true);
+    setError(null);
+    try {
+      const generated = await onGenerateEstrategia(idProyectoD, estudioData);
+      if (generated) {
+        setEstrategiaData(generated);
+        alert('Estrategia de Marketing generada exitosamente!');
+      } else {
+        setError('Falló la generación de la Estrategia de Marketing.');
+      }
+    } catch (err: any) {
+      setError(`Error al generar estrategia: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveEstrategia = async () => {
+    if (!estrategiaData) {
+      alert('No hay estrategia para guardar.');
+      return;
+    }
+    setIsLoading(true);
+    setError(null);
+    try {
+      const success = await onSaveEstrategia(idProyectoD, estrategiaData);
+      if (success) {
+        alert('Estrategia de Marketing guardada exitosamente!');
+      } else {
+        setError('Falló al guardar la Estrategia de Marketing.');
+      }
+    } catch (err: any) {
+      setError(`Error al guardar estrategia: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGenerateCampania = async () => {
+    if (!estudioData || !estrategiaData) {
+      alert('Necesitas un Estudio y una Estrategia para generar la Campaña.');
+      return;
+    }
+    setIsLoading(true);
+    setError(null);
+    try {
+      const generated = await onGenerateCampania(idProyectoD, estudioData, estrategiaData);
+      if (generated) {
+        setCampaniaData(generated);
+        alert('Campaña de Marketing generada exitosamente!');
+      } else {
+        setError('Falló la generación de la Campaña de Marketing.');
+      }
+    } catch (err: any) {
+      setError(`Error al generar campaña: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveCampania = async () => {
+    if (!campaniaData) {
+      alert('No hay campaña para guardar.');
+      return;
+    }
+    setIsLoading(true);
+    setError(null);
+    try {
+      const success = await onSaveCampania(idProyectoD, campaniaData);
+      if (success) {
+        alert('Campaña de Marketing guardada exitosamente!');
+      } else {
+        setError('Falló al guardar la Campaña de Marketing.');
+      }
+    } catch (err: any) {
+      setError(`Error al guardar campaña: ${err.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Aquí iría tu lógica para determinar el paso actual o el flujo del "step by step"
+  // ...
+
+  return (
+    <div>
+      {error && <div className="text-red-500 mb-4">{error}</div>}
+      {isLoading && <p>Cargando/Procesando...</p>}
+
+      {/* Paso 1: Estudio de Mercado */}
+      <section>
+        <h3>Paso 1: Estudio de Mercado</h3>
+        {estudioData ? (
+          <>
+            <EstudioMercadoDisplay Input={estudioData} />
+            <button
+              onClick={handleSaveEstudio}
+              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              disabled={isLoading}
+            >
+              Guardar Estudio de Mercado
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={handleGenerateEstudio}
+            className="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+            disabled={isLoading}
+          >
+            Generar Estudio de Mercado
+          </button>
+        )}
+      </section>
+
+      {/* Paso 2: Estrategia de Marketing (solo si existe Estudio) */}
+      {estudioData && (
+        <section className="mt-8">
+          <h3>Paso 2: Estrategia de Marketing</h3>
+          {estrategiaData ? (
+            <>
+              <EstrategiaMarketingDisplay Input={estrategiaData} />
+              <button
+                onClick={handleSaveEstrategia}
+                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                disabled={isLoading}
+              >
+                Guardar Estrategia de Marketing
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={handleGenerateEstrategia}
+              className="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+              disabled={isLoading}
+            >
+              Generar Estrategia de Marketing
+            </button>
+          )}
+        </section>
+      )}
+
+      {/* Paso 3: Campaña de Marketing (solo si existe Estrategia) */}
+      {estrategiaData && (
+        <section className="mt-8">
+          <h3>Paso 3: Campaña de Marketing</h3>
+          {campaniaData ? (
+            <>
+              <CampaniaMarketingDisplay Input={campaniaData} />
+              <button
+                onClick={handleSaveCampania}
+                className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                disabled={isLoading}
+              >
+                Guardar Campaña de Marketing
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={handleGenerateCampania}
+              className="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+              disabled={isLoading}
+            >
+              Generar Campaña de Marketing
+            </button>
+          )}
+        </section>
+      )}
+
+      {/* Puedes agregar más lógica de UI para el flujo de pasos, etc. */}
     </div>
   );
 };
