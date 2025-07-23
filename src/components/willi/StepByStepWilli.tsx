@@ -14,6 +14,51 @@ import {
   Post,
 } from "../../types/marketingWorkflowTypes"; // Asegúrate de que la ruta sea correcta
 
+
+type InputData = string | null | object | any[];
+
+function facade(data: InputData): any | null {
+  if (data === null) {
+    return null;
+  }
+
+  if (typeof data === 'string') {
+    if (data === "[]") {
+      return null;
+    }
+    try {
+      // Intentar convertir el string a objeto JSON
+      const parsedData = JSON.parse(data);
+      // Si se parseó correctamente y es un objeto (o array, que es un tipo de objeto en JS)
+      if (typeof parsedData === 'object' && parsedData !== null) {
+        return parsedData;
+      }
+      // Si se parseó pero no resultó ser un objeto (ej: "true", "123")
+      return null;
+    } catch (e) {
+      // Si la conversión falla, el string no se puede convertir a objeto JSON
+      return null;
+    }
+  }
+
+  if (Array.isArray(data)) {
+    // Si es un array y tiene al menos un elemento
+    if (data.length > 0) {
+      return data[0];
+    }
+    // Si es un array vacío
+    return null;
+  }
+
+  if (typeof data === 'object') {
+    // Si es un objeto (y ya hemos excluido null)
+    return data;
+  }
+
+  // Si no se cumple ninguna de las condiciones anteriores
+  return null;
+}
+
 interface GeneratedContent {
   texto: string | null;
   imagen: string | null;
@@ -54,9 +99,9 @@ const StepByStepWilli: React.FC<StepByStepWilliProps> = ({
       const endpointMap: { [key: string]: string } = {
         'post-final': `/api/willi`, // Para generar posts (texto)
         'post-final-img': `/api/willi`, // Para generar posts (imagen)
-        'estudio': `/api/estudio`, // Asumir endpoint para estudio
-        'estrategia': `/api/estrategia`, // Asumir endpoint para estrategia
-        'campania': `/api/campania`, // Asumir endpoint para campaña
+        'estudio': `/api/estudio-mercado`, // Asumir endpoint para estudio
+        'estrategia': `/api/estrategia-marketing`, // Asumir endpoint para estrategia
+        'campania': `/api/campania-marketing`, // Asumir endpoint para campaña
       };
       const apiPath = endpointMap[itemType];
       if (!apiPath) {
@@ -75,7 +120,8 @@ const StepByStepWilli: React.FC<StepByStepWilliProps> = ({
         const errorData = await response.json().catch(() => ({ message: 'Error desconocido' }));
         throw new Error(errorData.message || `Fallo en la API ${itemType}: ${response.status}`);
       }
-      return await response.json();
+      let returnX = await response.json();
+      return facade(returnX);
     } catch (error: any) {
       console.error(`Error al generar ${itemType}:`, error);
       throw error; // Re-lanzar para que se maneje en la función que llama
@@ -124,7 +170,8 @@ const StepByStepWilli: React.FC<StepByStepWilliProps> = ({
         console.error(`Fallo al actualizar saldo para ${email}: ${response.status}`);
         return null;
       }
-      return await response.json();
+      let returnX = await response.json();
+      return facade(returnX);
     } catch (e) {
       console.error(`Error en updateSaldoApi para ${email}:`, e);
       return null;
