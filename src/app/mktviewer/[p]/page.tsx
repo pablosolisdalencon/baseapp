@@ -1,54 +1,4 @@
-/*
-import React, { Suspense } from 'react';
-import MarketingWorkflow from "@/components/willi/StepByStepWilli";
-import type { CampaniaMarketingPageProps, CampaniaMarketingData, MarketingContentManagerProps } from '@/types/marketingWorkflowTypes';
-
-export default async function CampaniaMarketingPage({ params }: CampaniaMarketingPageProps) {
-      const parametros = await params;
-      const { p: itemId } = parametros;
-
-      let itemData: CampaniaMarketingData | null = null;
-      let errorMessage: string | null = null;
-
-  try {
-   
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-    const apiUrl = `${baseUrl}/api/campania-marketing?p=${itemId}`; // Ruta a tu API Route dinámica
-
-    const res = await fetch(apiUrl, {
-      cache: 'no-store', // Opcional: Deshabilita el cacheo para siempre obtener datos frescos
-    });
-
-    if (!res.ok) {
-      // Si la respuesta no es exitosa (ej. 404, 500), parsea el error y setea el mensaje.
-      const errorResponse = await res.json();
-      errorMessage = errorResponse.message || `Error desconocido al cargar datos para ID: ${itemId}`;
-      console.error(`Error fetching data for ID '${itemId}':`, errorMessage);
-    } else {
-      // Si la respuesta es exitosa, parsea el JSON a tu interfaz `FetchedData`.
-      itemData = await res.json();
-    }
-  } catch (error: any) {
-    // Captura cualquier error de red o de ejecución durante el fetch.
-    console.error('Error en DynamicPage durante el fetching:', error.message);
-    errorMessage = `Error de conexión o inesperado: ${error.message}`;
-  }
-
-      return (
-        <div>
-            <div className="cardMKT williFlowItem">    
-                <h2 className="mkt-subtitle">Flujo de Trabajo Marketing Digital</h2>
-                <div className="cardMKTitemHidden">
-                 <Suspense fallback={<p>Cargando...</p>}><MarketingWorkflow idProyectoD={itemId}/></Suspense>
-                </div> 
-            </div>
-
-        </div>    
-    )
-}
-
-*/
-
+'use server';
 // app/mktviewer/[p]/page.tsx
 import React, { Suspense } from 'react';
 import MarketingWorkflow from "@/components/willi/StepByStepWilli";
@@ -66,7 +16,7 @@ import GWV from '@/utils/GWV'; // Importa tus utilidades de fetching/generación
 // Pueden definirse aquí o en un archivo separado e importarse.
 // Para este ejemplo, las definiremos aquí por simplicidad.
 
-'use server'; // Marcar este bloque como código de servidor
+ // Marcar este bloque como código de servidor
 
 /**
  * Server Action para generar o actualizar un Estudio de Mercado.
@@ -183,7 +133,7 @@ async function saveCampania(projectId: string, data: CampaniaMarketingData): Pro
 export default async function CampaniaMarketingPage({ params }: PageProps) {
 const parametros = await params;
   const { p: itemId } = parametros;
-  
+
   let estudioData: EstudioMercadoData | null = null;
   let estrategiaData: EstrategiaMarketingData | null = null;
   let campaniaData: CampaniaMarketingData | null = null;
@@ -255,3 +205,54 @@ const parametros = await params;
     </div>
   );
 }
+
+/*
+import React, { Suspense } from 'react';
+import MarketingWorkflow from "@/components/willi/StepByStepWilli";
+import type { CampaniaMarketingPageProps, CampaniaMarketingData, MarketingContentManagerProps } from '@/types/marketingWorkflowTypes';
+
+export default async function CampaniaMarketingPage({ params }: CampaniaMarketingPageProps) {
+      const parametros = await params;
+      const { p: itemId } = parametros;
+
+      let itemData: CampaniaMarketingData | null = null;
+      let errorMessage: string | null = null;
+
+  try {
+   
+    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+    const apiUrl = `${baseUrl}/api/campania-marketing?p=${itemId}`; // Ruta a tu API Route dinámica
+
+    const res = await fetch(apiUrl, {
+      cache: 'no-store', // Opcional: Deshabilita el cacheo para siempre obtener datos frescos
+    });
+
+    if (!res.ok) {
+      // Si la respuesta no es exitosa (ej. 404, 500), parsea el error y setea el mensaje.
+      const errorResponse = await res.json();
+      errorMessage = errorResponse.message || `Error desconocido al cargar datos para ID: ${itemId}`;
+      console.error(`Error fetching data for ID '${itemId}':`, errorMessage);
+    } else {
+      // Si la respuesta es exitosa, parsea el JSON a tu interfaz `FetchedData`.
+      itemData = await res.json();
+    }
+  } catch (error: any) {
+    // Captura cualquier error de red o de ejecución durante el fetch.
+    console.error('Error en DynamicPage durante el fetching:', error.message);
+    errorMessage = `Error de conexión o inesperado: ${error.message}`;
+  }
+
+      return (
+        <div>
+            <div className="cardMKT williFlowItem">    
+                <h2 className="mkt-subtitle">Flujo de Trabajo Marketing Digital</h2>
+                <div className="cardMKTitemHidden">
+                 <Suspense fallback={<p>Cargando...</p>}><MarketingWorkflow idProyectoD={itemId}/></Suspense>
+                </div> 
+            </div>
+
+        </div>    
+    )
+}
+
+*/
