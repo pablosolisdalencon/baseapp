@@ -195,7 +195,7 @@ export interface EwaveMakerPageProps {
 }
 export interface PageProps {
   params:Promise<{
-      p: string; // El dato genérico puede ser de cualquier tipo definido arriba o null
+      p: string|null|any; // El dato genérico puede ser de cualquier tipo definido arriba o null
     }>
 }
 export interface ClientProps {

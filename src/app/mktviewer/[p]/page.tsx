@@ -3,14 +3,10 @@ import {
   EstudioMercadoData,
   EstrategiaMarketingData,
   CampaniaMarketingData,
+  PageProps
 } from "@/types/marketingWorkflowTypes"; // Asegúrate de que la ruta sea correcta
 import StepByStepWilli from "@/components/willi/StepByStepWilli"; // Ajusta la ruta a tu componente de cliente
 
-interface MktViewerPageProps {
-  params: {
-    p: string; // Asume que el ID del proyecto viene de los parámetros de la URL
-  };
-}
 
 // Función para obtener datos de forma segura en el servidor
 // Puedes usar un archivo de utilidades de servidor para esto
@@ -32,8 +28,9 @@ async function fetchServerData<T>(endpoint: string, projectId: string): Promise<
   }
 }
 
-export default async function MktViewerPage({ params }: MktViewerPageProps) {
-  const projectId = params.p || "67f99da9f7b90ff068b870b2"; // Usar un ID de proyecto de ejemplo si no está en params
+export default async function DynamicPage({ params }: PageProps) {
+  const parametros = await params;
+  const { p: projectId } = parametros;
 
   // Obtener los datos iniciales para estudio, estrategia y campaña
   // Asumiendo que tienes endpoints de API para obtener estos datos por projectId
