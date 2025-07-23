@@ -14,14 +14,14 @@ async function getDataItem(projectId,item){
           const res  = await response.json();
           const data = res.data;
 
-          if(data){
+          if(data[0]){
             console.log(`getDataItem verify OK =======================`)
             console.log(data)
 
             //-------------------------/
             //  FIN OK
             //-------------------------/
-            return data;
+            return data[0];
             //-------------------------/
           }else{
             console.log(`getDataItem ${item}: idProyecto(${projectId} Not Found =======================`)
