@@ -24,6 +24,8 @@ interface MarketingWorkflowProps {
 }
   
 const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initialEstudio,initialEstrategia,initialCampania}) => {
+
+
   const { data: session } = useSession();
   const [idProyecto, setIdProyecto] = useState<string | null>(idProyectoD);
     
@@ -50,7 +52,12 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
   const [existeCampania, setExisteCampania] = useState<boolean | null>(initialCampania||null);
 
   
-  
+  console.log("### ESTUDIO ####")
+  console.log(dataEstudioMercado)
+  console.log("### ESTRATEGIA ####")
+  console.log(dataEstrategiaMarketing)
+  console.log("### CAMPANIA ####")
+  console.log(dataCampaniaMarketing)
             //-------- ACCIONES --------------
   
            
