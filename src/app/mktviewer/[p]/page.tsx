@@ -142,12 +142,12 @@ const parametros = await params;
   try {
    
     // 1. Fetch de Estudio de Mercado (Condicional)
-    estudioData = await GWV('check', itemId, 'estudio-mercado');
+    estudioData = await GWV('check', itemId, 'estudio-mercado') as EstudioMercadoData|null;
 
     if (estudioData) {
       mylog+="// 2. Fetch de Estrategia de Marketing (Condicional)";
       // 2. Fetch de Estrategia de Marketing (Condicional)
-      estrategiaData = await GWV('check', itemId, 'estrategia-marketing');
+      estrategiaData = await GWV('check', itemId, 'estrategia-marketing') as EstrategiaMarketingData|null;
     }
 
     if (estrategiaData) {
@@ -156,7 +156,7 @@ const parametros = await params;
       // Aunque el page.tsx original fetcheaba 'campania-marketing' primero,
       // la lógica de dependencia sugiere que la campaña solo existe si existe la estrategia.
       // Reajustamos para que siga la dependencia.
-      campaniaData = await GWV('check', itemId, 'campania-marketing');
+      campaniaData = await GWV('check', itemId, 'campania-marketing') as CampaniaMarketingData | null;
     }
 
     // Aquí también podrías fetchear MakerData si es un prerrequisito para alguna generación
