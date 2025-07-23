@@ -80,6 +80,7 @@ form h1 {
 .product-button,
 .button-add-item,
 .button-agregar-item,
+.button-add-proyecto,
 .nav-button,
 .welcome-button,
 .contact-button {
@@ -158,7 +159,7 @@ form h1 {
 }
 
 .app-card-image-container {
-  @apply w-full md:w-1/3;
+  @apply w-full md:w-1/2;
 }
 .flow-img{
   max-width: 100%;
@@ -191,6 +192,10 @@ form h1 {
 .app-card-buttons a {
   font-size: x-small;
 }
+.app-card-buttons .icon {
+  font-size: x-large;
+}
+
 
 /* Uniform eWave color for project icons with white text */
 .app-card-buttons a svg,

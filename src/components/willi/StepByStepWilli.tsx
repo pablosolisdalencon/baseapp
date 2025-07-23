@@ -31,7 +31,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
 
   const [itemActual, setItemActual] = useState<string | null>(null);
   const [dataItemActual, setDataItemActual] = useState<object | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
+  const [currentUserEmail, setEmail] = useState<string | null>(null);
 
   const [priceEstudio, setPriceEstudio] = useState<number | null>(null);
   const [priceEstrategia, setPriceEstrategia] = useState<number | null>(null);
@@ -46,6 +46,184 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
   const [existeEstudio, setExisteEstudio] = useState<boolean | null>(null);
   const [existeEstrategia, setExisteEstrategia] = useState<boolean | null>(null);
   const [existeCampania, setExisteCampania] = useState<boolean | null>(null);
+
+
+
+   /* SUITE useTokens*/
+  
+            //-------- ACCIONES --------------
+            
+  
+            const ejecutarAccion = async (action:any, objectAction:any) =>{
+                
+  
+                // Para otras acciones, asegurarse que GWV también devuelve una estructura consistente
+                // o manejar los errores de forma similar.
+                if (action === "generate-estudio") {
+                    const { mode, projectId, item } = objectAction;
+                    try {
+                        const result = await GWV(mode, projectId, item); // Asumir que GWV puede lanzar error o devolver null/estructura
+                        return result; // o { key: "estudio_key", generated: result } si es necesario adaptar
+                    } catch (error:any) {
+                        return { key: "estudio_error", generated: { texto: `Error: ${error.message}` } }; // Ejemplo
+                    }
+                }
+                if (action === "generate-estrategia") {
+                    const { mode, projectId, item, estudio } = objectAction;
+                    try {
+                        const result = await GWV(mode, projectId, item, estudio);
+                        return result;
+                    } catch (error:any) {
+                        return { key: "estrategia_error", generated: { texto: `Error: ${error.message}` } };
+                    }
+                }
+                if (action === "generate-campania") {
+                    const { mode, projectId, item, estudio, estrategia } = objectAction;
+                    try {
+                        const result = await GWV(mode, projectId, item, estudio, estrategia);
+                        return result;
+                    } catch (error:any) {
+                        return { key: "campania_error", generated: { texto: `Error: ${error.message}` } };
+                    }
+                }
+                return null; // O una estructura de error por defecto
+            }
+  
+            // displayTokensModal no se usa actualmente, se podría eliminar o implementar si es necesario.
+  
+            // -----------------------------------------------
+            const getPrice = async (action:any) => {
+                if (!action) {
+                    return null;
+                }
+                try {
+                    const response = await fetch(`/api/pricing?a=${action}`); // No necesita headers ni method GET por defecto
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({})); // Intenta parsear JSON, si falla, objeto vacío
+                        // No usar alert aquí, mejor propagar el error o null.
+                        return null;
+                    }
+                    const jsonPrice = await response.json();
+                    return jsonPrice.price; // Asume que la API devuelve { price: X }
+                } catch (e) {
+                    return null;
+                }
+            }
+            // -----------------------------------------------
+  
+            const validarSaldo = async (currentUserEmail:any) => {
+                if (!currentUserEmail) {
+                    return null;
+                }
+                try {
+                    // El endpoint es /api/user-tokens/[email], no necesita query param 'e=' si se ajusta la API
+                    // Asumiendo que la API está en /api/user-tokens/[email]
+                    const response = await fetch(`/api/user-tokens/?e=${currentUserEmail}`);
+                    if (!response.ok) {
+                        return null;
+                    }
+                    const jsonData = await response.json();
+                    return jsonData.tokens; // Asume { tokens: Y }
+                } catch (e) {
+                    return null;
+                }
+            }
+            // -----------------------------------------------
+  
+            const descontarTokens = async (montoADejar:number, currentUserEmail:string) => {
+                // El 'monto' aquí es el saldo final después del descuento, no la cantidad a descontar.
+                // La API /api/user-tokens (PUT) debe estar diseñada para SETear el saldo.
+                /*
+                if (typeof montoADejar !== 'number' || montoADejar < 0) {
+                    return null; // O false para indicar fallo
+                }
+                if (!currentUserEmail) {
+                    return null;
+                }
+                    */
+  
+  
+  
+                const bodyData = JSON.stringify({ tokens: montoADejar, email:currentUserEmail }); // La API debe interpretar esto como el nuevo saldo
+                try {
+                    const response = await fetch(`/api/user-tokens`, { // Asumiendo API RESTful
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: bodyData,
+                    });
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        return null; // O false
+                    }
+                    return await response.json(); // O true si la API devuelve el usuario actualizado o un success
+                } catch (e) {
+                    return null; // O false
+                }
+            }
+            // -----------------------------------------------
+  
+            // historyTokens no se usa, se podría eliminar.
+  
+            // -----------------------------------------------
+  
+            const rollBackTokens = async (saldoOriginal:any, currentUserEmail:any) => {
+                // Esta función es esencialmente la misma que descontarTokens si la API SETea el saldo.
+                console.log(`rollBackTokens: Restaurando saldo a ${saldoOriginal} para ${currentUserEmail}`);
+                return await descontarTokens(saldoOriginal, currentUserEmail); // Reutilizar descontarTokens
+            }
+  
+            // main?
+            const useTokens = async (action:any, objectAction:any) => {
+                
+                if (currentUserEmail) {
+                    const saldoActual = await validarSaldo(currentUserEmail);
+  
+                    
+  
+                    const price = await getPrice(action);
+                    if (price === null) { // getPrice ahora devuelve null en error
+                        return { key: action, generated: { texto: `Error: No se pudo determinar el costo de la acción.`, imagen: null } };
+                    }
+  
+                    
+                    if (saldoActual === null) {
+                        return { key: action, generated: { texto: `Error: No se pudo verificar el saldo.`, imagen: null } };
+                    }
+  
+                    if (saldoActual >= price) {
+                        const saldoDespuesDelDescuento = saldoActual - price;
+                        const descuentoExitoso = await descontarTokens(saldoDespuesDelDescuento, currentUserEmail);
+  
+                        if (descuentoExitoso) { // Asumiendo que descontarTokens devuelve algo truthy en éxito
+                            const resultadoAccion = await ejecutarAccion(action, objectAction);
+  
+                            // Verificar si la acción falló (ej. resultadoAccion.generated.texto contiene "Error:")
+                            if (resultadoAccion && resultadoAccion.generated && typeof resultadoAccion.generated.texto === 'string' && resultadoAccion.generated.texto.startsWith("Error:")) {
+                                await rollBackTokens(saldoActual, currentUserEmail); // Devolver tokens al saldo original
+                                return resultadoAccion; // Devolver el error de la acción
+                            }
+  
+                            if (resultadoAccion && resultadoAccion.key != null) { // Chequeo más robusto
+                                return resultadoAccion;
+                            } else {
+                                await rollBackTokens(saldoActual, currentUserEmail); // Devolver tokens al saldo original
+                                return {
+                                    key: action,
+                                    generated: {
+                                        texto: "Oops! Fallo en la generación de contenido. Tus tokens han sido restaurados. Inténtalo de nuevo.",
+                                        imagen: null
+                                    }
+                                };
+                            }
+                        } else {
+                        return { key: action, generated: { texto: `Error: No se pudieron descontar los tokens ^saldoDespuesDelDescuento:${saldoDespuesDelDescuento}, currentUserEmail: ${currentUserEmail}.`, imagen: null } };
+                        }
+                    } else {
+                        return { key: action, generated: { texto: "Saldo Insuficiente.", imagen: null } }; // Estructura consistente
+                    }
+                }
+            }
+  
 
   
   const saveGenData = async () => {
@@ -186,6 +364,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
         id: idProyecto, 
         item: "estudio-mercado"
       }
+      
       const estudioData = await useTokens("generate-estudio",itemObjectEstudio)
       setDataEstudioMercado(estudioData?.generated as EstudioMercadoData);
       setDataItemActual(estudioData?.generated as EstudioMercadoData);
@@ -322,7 +501,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
         {currentStep === 1 && (
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 1: Estudio de Mercado</h2>
-            <img src="/step1.png"/>
+            <img src="/step1.png" className="flow-img"/>
 
             {existeEstudio === null && !isLoading && (
               <div className="text-center py-4">
@@ -373,7 +552,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
         {currentStep === 2 && (
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 2: Estrategia de Marketing</h2>
-            <img src="/step2.png"/>
+            <img src="/step2.png" className="flow-img"/>
 
             {existeEstrategia === null && !isLoading && (
               <div className="text-center py-4">
@@ -434,7 +613,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
         {currentStep === 3 && (
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 3: Campaña de Marketing</h2>
-            <img src="/step3.png"/>
+            <img src="/step3.png" className="flow-img"/>
 
             {existeCampania === null && !isLoading && (
               <div className="text-center py-4">
@@ -486,7 +665,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD}) => {
                   showSaveButton={true}
                 />
                 <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mt-4">
-                  <img src="/step4.png"/>
+                  <img src="/step4.png" className="flow-img"/>
                   <p className="text-blue-700">¡Campaña generada! Guarda para completar el flujo.</p>
                 </div>
               </div>

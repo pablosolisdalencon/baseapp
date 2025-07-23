@@ -144,27 +144,27 @@ const ProyectosClient: React.FC = () => {
               </div>
               <div className="app-card-buttons">
                 <Link href={`/catalogo/${proyecto._id}`} className="app-card-button boton-gestion">
-                  <FontAwesomeIcon icon={faBoxesPacking} />
+                  <FontAwesomeIcon icon={faBoxesPacking} className="icon" />
                   <br />
                   Catálogo
                 </Link>
                 <Link href={`/appviewer/?id=${proyecto._id}`} className="app-card-button boton-app">
-                  <FontAwesomeIcon icon={faMobileScreenButton} />
+                  <FontAwesomeIcon icon={faMobileScreenButton} className="icon"  />
                   <br />
                   eWaveApp
                 </Link>
                 <Link href={`/mktviewer/${proyecto._id}`} className="app-card-button boton-mkt">
-                  <FontAwesomeIcon icon={faBullhorn} />
+                  <FontAwesomeIcon icon={faBullhorn} className="icon" />
                   <br />
                   Marketing
                 </Link>
                 <Link href={`/contents-manager/${proyecto._id}`} className="app-card-button boton-mkt">
-                  <FontAwesomeIcon icon={faBullhorn} />
+                  <FontAwesomeIcon icon={faBullhorn}className="icon" />
                   <br />
                   Contenido
                 </Link>
                 <Link href={`/updateproyecto/?id=${proyecto._id}`} className="app-card-button boton-ficha">
-                  <FontAwesomeIcon icon={faEdit} />
+                  <FontAwesomeIcon icon={faEdit} className="icon" />
                   <br />
                   Editar
                 </Link>
@@ -172,7 +172,7 @@ const ProyectosClient: React.FC = () => {
                   onClick={() => handleDeleteClick(proyecto)}
                   className="app-card-button boton-eliminar"
                 >
-                  <FontAwesomeIcon icon={faTrashCan} />
+                  <FontAwesomeIcon icon={faTrashCan} className="icon"  />
                   <br />
                   Eliminar
                 </button>
@@ -182,7 +182,7 @@ const ProyectosClient: React.FC = () => {
         ))}
       </div>
       <hr />
-      <Link href="addproyecto">
+      <Link href="/addproyecto">
         <button className="button-add-proyecto">+ Agregar Nuevo Proyecto</button>
       </Link>
 
