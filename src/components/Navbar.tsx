@@ -11,6 +11,16 @@ function Navbar() {
       <div className="cta-bar">
         <a href="#contacto" className="cta-link">¡Oferta Lanzamiento! Contáctanos Ahora!</a>
       </div>
+         {session?.user ? (<div>
+              <><DisplayTokens/></>
+              <span className="text-xs font-bold text-blue-800 rounded p-1 bg-gray-200">
+                {session.user.email}
+              </span>
+            </div>
+        ) : (
+          <></>
+        )}
+
       <div className="nav-container">
         <a href="/" className="nav-logo"><img src="/logo.jpg" alt="Logo" /></a>
 
@@ -19,12 +29,7 @@ function Navbar() {
             <Link href="/proyectos">
               <button className="nav-button">Proyectos</button>
             </Link>
-            <div>
-              <><DisplayTokens/></>
-              <span className="text-sm font-bold text-blue-800 rounded p-1 bg-gray-200">
-                {session.user.email}
-              </span>
-            </div>
+            
               <button onClick={()=> signOut()} className="rounded p-1 text-sm font-bold text-white bg-red-500">Salir</button>
           </>
         ) : (
