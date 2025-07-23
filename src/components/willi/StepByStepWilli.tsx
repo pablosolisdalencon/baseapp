@@ -26,6 +26,7 @@ interface MarketingWorkflowProps {
 const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initialEstudio,initialEstrategia,initialCampania}) => {
   const { data: session } = useSession();
   const [idProyecto, setIdProyecto] = useState<string | null>(idProyectoD);
+    
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -437,7 +438,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
      setIdProyecto(idProyectoD)
     
 
-    const projectId=idProyecto;
+    const projectId=idProyectoD;
 
     //console.log(`######### useEffect  projectId  ${projectId}  #########`)
         
@@ -531,7 +532,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
       // Consumir tokens y generar el estudio
       const itemObjectEstudio = {
         mode: 'generate',
-        id: idProyecto, 
+        projectId: idProyecto, 
         item: "estudio-mercado"
       }
       const estudioData = await useTokens("generate-estudio",itemObjectEstudio)
@@ -564,7 +565,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
       // Consumir tokens y generar la estrategia
       const itemObjectEstrategia = {
         mode: 'generate',
-        id: idProyecto, 
+        projectId: idProyecto, 
         item: "estrategia-marketing", 
         estudio: dataEstudioMercado
       }
@@ -597,7 +598,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
       // Consumir tokens y generar la campaña
       const itemObjectCampania = {
         mode: 'generate',
-        id: idProyecto, 
+        projectId: idProyecto, 
         item: "campania-marketing", 
         estudio: dataEstudioMercado,
         estrategia: dataEstrategiaMarketing
