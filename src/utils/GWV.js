@@ -1,7 +1,54 @@
 async function getDataItem(projectId,item){
     try 
     {
-        const response = await fetch(`/api/${item}?p=${projectId}`, {
+        const response = await fetch(`${process.env.NEXTAUTH_URL}/api/${item}?p=${projectId}`, {
+          method: 'GET', 
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+    
+        if (response.ok) {
+          // Si la respuesta es 200 OK, asumimos que el item fue encontrado.
+          // La API debería devolver los datos del item directamente.
+          const res  = await response.json();
+          const data = res.data;
+
+          if(data){
+            console.log(`getDataItem verify OK =======================`)
+            console.log(data)
+
+            //-------------------------/
+            //  FIN OK
+            //-------------------------/
+            return data;
+            //-------------------------/
+          }else{
+            console.log(`getDataItem ${item}: idProyecto(${projectId} Not Found =======================`)
+          return null
+          }
+          
+
+        } else if (response.status === 404) {
+          // Si la API devuelve 404 Not Found, significa que no existe el estudio para ese proyecto.
+          console.log(`getDataItem verify 404 ${item}: idProyecto(${projectId} Not Found =======================`)
+          return null
+        } else {
+          // Manejo de otros posibles errores de la API
+          const errorData = await response.json();
+          throw new Error(errorData.message || `getDataItem Error al verificar ${item}: idProyecto(${projectId}) = status[${response.status}] StatusText [${response.statusText}]`);
+        }
+
+    } catch (error) {
+        console.error(` getDataItem Fallo al verificar ${item}: idProyecto(${projectId})`, error);
+        // Relanza el error para que el componente lo maneje en el estado `error`
+        throw new Error(`getDataItem No se pudo verificar ${item}: idProyecto(${projectId}) ${error.message}`);
+    }
+}
+async function getDataMaker(projectId,item){
+    try 
+    {
+        const response = await fetch(`${process.env.NEXTAUTH_URL}/api/${item}?p=${projectId}`, {
           method: 'GET', 
           headers: {
             'Content-Type': 'application/json',
@@ -116,7 +163,12 @@ export default async function GWV(mode,projectId,item,estudio,estrategia){
     
     if(mode=='check'){
       console.log(`=======  GWV  > getDataItem(${projectId},${item})=======`)
-      const verifyData = await getDataItem(projectId,item)
+      if(item=="maker"){
+        var verifyData = await getDataMaker(projectId,item)
+      }else{
+        var verifyData = await getDataItem(projectId,item)
+      }
+      
 
       console.log(`=======  GWV  > if(${verifyData}==null))=======`)
       if(verifyData==null){
