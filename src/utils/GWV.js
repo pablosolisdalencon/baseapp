@@ -1,7 +1,7 @@
 async function getDataItem(projectId,item){
     try 
     {
-        const response = await fetch(`${process.env.NEXTAUTH_URL}/api/${item}?p=${projectId}`, {
+        const response = await fetch(`/api/${item}?p=${projectId}`, {
           method: 'GET', 
           headers: {
             'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ async function getDataItem(projectId,item){
 async function getDataMaker(projectId,item){
     try 
     {
-        const response = await fetch(`${process.env.NEXTAUTH_URL}/api/maker?p=${projectId}`, {
+        const response = await fetch(`/api/maker?p=${projectId}`, {
           method: 'GET', 
           headers: {
             'Content-Type': 'application/json',
