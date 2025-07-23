@@ -1,4 +1,3 @@
-/*
 import React, { Suspense } from 'react';
 import MarketingWorkflow from "@/components/willi/StepByStepWilli";
 import type { CampaniaMarketingPageProps, CampaniaMarketingData, MarketingContentManagerProps } from '@/types/marketingWorkflowTypes';
@@ -48,15 +47,6 @@ export default async function CampaniaMarketingPage({ params }: CampaniaMarketin
                 </div> 
             </div>
 
-        </div>    
-    )
-}
-
-*/
-export default async function CampaniaMarketingPage() {
-return (
-        <div>
-           hola
         </div>    
     )
 }
