@@ -44,7 +44,7 @@ export default async function DynamicPage({ params }: PageProps) {
       <StepByStepWilli initialEstudio={initialEstudio}
         initialEstrategia={initialEstrategia}
         initialCampania={initialCampania}
-        projectId={projectId} // También pasar el projectId si es necesario para las acciones del cliente
+        idProyectoD={projectId} // También pasar el projectId si es necesario para las acciones del cliente
       />
     </div>
   );

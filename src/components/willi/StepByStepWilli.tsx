@@ -1,497 +1,531 @@
-// components/willi/StepByStepWilli.tsx
 'use client';
+import React from 'react'; // Necesario para .tsx
+import { useState, useEffect } from 'react';
+import { useSearchParams } from "next/navigation";
+import {useTokens,validarSaldo,getPrice} from '../tokens/simpleTokens';
 
-import React, { useEffect, useState, useCallback } from "react";
-import { Spinner } from '@heroui/react';
-import { useSession } from 'next-auth/react'; // Importar useSession correctamente
-
+import GWV from '@/utils/GWV';
 import {
   EstudioMercadoData,
   EstrategiaMarketingData,
   CampaniaMarketingData,
-  Semana,
-  Dia,
-  Post,
-} from "../../types/marketingWorkflowTypes"; // Asegúrate de que la ruta sea correcta
+  WorkflowStep,
+} from '../../types/marketingWorkflowTypes'; // Asegúrate de ajustar la ruta
 
+import EstudioMercadoDisplay from './../EstudioMercadoDisplay';
+import EstrategiaMarketingDisplay from './../EstrategiaMarketingDisplay';
+import CampaniaMarketingDisplay from './../CampaniaMarketingDisplay';
+import { useSession } from 'next-auth/react';
 
-type InputData = string | null | object | any[];
-
-function facade(data: InputData): any | null {
-  if (data === null) {
-    return null;
-  }
-
-  if (typeof data === 'string') {
-    if (data === "[]") {
-      return null;
-    }
-    try {
-      // Intentar convertir el string a objeto JSON
-      const parsedData = JSON.parse(data);
-      // Si se parseó correctamente y es un objeto (o array, que es un tipo de objeto en JS)
-      if (typeof parsedData === 'object' && parsedData !== null) {
-        return parsedData;
-      }
-      // Si se parseó pero no resultó ser un objeto (ej: "true", "123")
-      return null;
-    } catch (e) {
-      // Si la conversión falla, el string no se puede convertir a objeto JSON
-      return null;
-    }
-  }
-
-  if (Array.isArray(data)) {
-    // Si es un array y tiene al menos un elemento
-    if (data.length > 0) {
-      return data[0];
-    }
-    // Si es un array vacío
-    return null;
-  }
-
-  if (typeof data === 'object') {
-    // Si es un objeto (y ya hemos excluido null)
-    return data;
-  }
-
-  // Si no se cumple ninguna de las condiciones anteriores
-  return null;
+// --- Componente principal del Flujo de Marketing ---
+interface MarketingWorkflowProps {
+        initialEstudio:EstudioMercadoData|null|any,
+        initialEstrategia:EstrategiaMarketingData|null|any,
+        initialCampania:CampaniaMarketingData|null|any,
+        idProyectoD:string | null;
 }
+  
+const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initialEstudio,initialEstrategia,initialCampania}) => {
+  const { data: session } = useSession();
+  const [idProyecto, setIdProyecto] = useState<string | null>(idProyectoD);
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-interface GeneratedContent {
-  texto: string | null;
-  imagen: string | null;
-}
+  const [itemActual, setItemActual] = useState<string | null>(null);
+  const [dataItemActual, setDataItemActual] = useState<object | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
 
-interface StepByStepWilliProps {
-  initialEstudio: EstudioMercadoData | null;
-  initialEstrategia: EstrategiaMarketingData | null;
-  initialCampania: CampaniaMarketingData | null;
-  projectId: string; // Para las llamadas API
-}
+  const [priceEstudio, setPriceEstudio] = useState<number | null>(null);
+  const [priceEstrategia, setPriceEstrategia] = useState<number | null>(null);
+  const [priceCampania, setPriceCampania] = useState<number | null>(null);
 
-const StepByStepWilli: React.FC<StepByStepWilliProps> = ({
-  initialEstudio,
-  initialEstrategia,
-  initialCampania,
-  projectId
-}) => {
-  const { data: session, status } = useSession();
-  const currentUserEmail = session?.user?.email;
+  // Estados para los datos, ahora tipados con 'null' o el tipo de interfaz
+  const [dataEstudioMercado, setDataEstudioMercado] = useState<EstudioMercadoData | null>(initialEstudio);
+  const [dataEstrategiaMarketing, setDataEstrategiaMarketing] = useState<EstrategiaMarketingData | null>(initialEstrategia);
+  const [dataCampaniaMarketing, setDataCampaniaMarketing] = useState<CampaniaMarketingData | null>(initialCampania);
 
-  const [estudio, setEstudio] = useState<EstudioMercadoData | null>(initialEstudio);
-  const [estrategia, setEstrategia] = useState<EstrategiaMarketingData | null>(initialEstrategia);
-  const [campania, setCampania] = useState<CampaniaMarketingData | null>(initialCampania);
+  // Estados para controlar la existencia en BD (boolean o null inicial)
+  const [existeEstudio, setExisteEstudio] = useState<boolean | null>(initialEstudio||null);
+  const [existeEstrategia, setExisteEstrategia] = useState<boolean | null>(initialEstrategia||null);
+  const [existeCampania, setExisteCampania] = useState<boolean | null>(initialCampania||null);
 
-  const [saldo, setSaldo] = useState<number | null>(null); // Iniciar como null para indicar carga
-  const [price, setPrice] = useState<Map<string, number | null>>(new Map()); // Precio por tipo de acción
-  const [generatingStates, setGeneratingStates] = useState<Map<string, boolean>>(new Map());
-  const [errors, setErrors] = useState<Map<string, string | null>>(new Map());
-  const [generatedPostContent, setGeneratedPostContent] = useState<Map<string, GeneratedContent>>(new Map());
-
-
-  // --- Helper Functions for Direct API Calls ---
-
-  const generateContentApi = useCallback(async (itemType: string, payload: any): Promise<any | null> => {
-    try {
-      // Endpoint dinámico basado en el tipo de item
-      const endpointMap: { [key: string]: string } = {
-        'post-final': `/api/willi`, // Para generar posts (texto)
-        'post-final-img': `/api/willi`, // Para generar posts (imagen)
-        'estudio': `/api/estudio-mercado`, // Asumir endpoint para estudio
-        'estrategia': `/api/estrategia-marketing`, // Asumir endpoint para estrategia
-        'campania': `/api/campania-marketing`, // Asumir endpoint para campaña
-      };
-      const apiPath = endpointMap[itemType];
-      if (!apiPath) {
-        throw new Error(`Tipo de item desconocido para generación: ${itemType}`);
-      }
-
-      const bodyData = JSON.stringify(payload); // El payload ya contiene 'item' si es necesario para /api/willi
-
-      const response = await fetch(apiPath, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: bodyData,
+  
+  const saveGenData = async () => {
+    let item = itemActual;
+    let bodyData = dataItemActual;
+    console.log(`######### saveGenData ItemActual #########`)
+    console.log(itemActual)
+    console.log(`######### saveGenData dataItemActual  #########`)
+    console.log(dataItemActual)
+      const res = await fetch(`api/${item}?p=${idProyecto}`,  {
+        method: "POST",
+        body: JSON.stringify(bodyData),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Error desconocido' }));
-        throw new Error(errorData.message || `Fallo en la API ${itemType}: ${response.status}`);
+      const data = await res.json();
+      if(data){
+        console.log(data);
+        alert(item+' guardado correctamente!');
+        if(item=="estudio-mercado"){
+          setExisteEstudio(true); // Marca como existente en BD tras guardar
+          setCurrentStep(2);
+        }else if(item=="estrategia-marketing"){
+          setExisteEstrategia(true); // Marca como existente en BD tras guardar
+          setCurrentStep(3);
+        }else if(item=="campania-marketing"){
+          setExisteCampania(true); // Marca como existente en BD tras guardar
+        }
+      }else{
+        alert(item+' Oops! no se ha guardado '+item)
       }
-      let returnX = await response.json();
-      return facade(returnX);
-    } catch (error: any) {
-      console.error(`Error al generar ${itemType}:`, error);
-      throw error; // Re-lanzar para que se maneje en la función que llama
+      
+      
+      
+    };
+
+  // Efecto para verificar existencia de datos cuando cambia el paso
+  
+  useEffect(() => {
+     setIdProyecto(idProyectoD)
+    
+
+    const projectId=idProyecto;
+
+    //console.log(`######### useEffect  projectId  ${projectId}  #########`)
+        
+
+    const checkExistence = async () => {
+      setIsLoading(true);
+      setError(null);
+      
+
+      try {
+        if (currentStep === 1) {
+          
+          setItemActual("estudio-mercado")
+          const estudioExistente = await GWV('check',projectId,"estudio-mercado");
+          setExisteEstudio(!!estudioExistente);
+          //console.log(`######### checkExistence  estudioExistente  ${estudioExistente}  #########`)
+          if (estudioExistente) {
+            //console.log(`#$######## checkExistence  estudioExistente  ${estudioExistente}  #########`)
+            setDataEstudioMercado(estudioExistente);
+          }
+        } else if (currentStep === 2) {
+          setItemActual("estrategia-marketing")
+          const estrategiaExistente = await GWV('check',projectId,"estrategia-marketing");
+          setExisteEstrategia(!!estrategiaExistente);
+          if (estrategiaExistente) {
+            setDataEstrategiaMarketing(estrategiaExistente);
+          }
+        } else if (currentStep === 3) {
+          setItemActual("campania-marketing")
+          const campaniaExistente = await GWV('check',projectId,"campania-marketing");
+          setExisteCampania(!!campaniaExistente);
+          if (campaniaExistente) {
+            setDataCampaniaMarketing(campaniaExistente);
+          }
+        }
+      } catch (err: any) {
+        setError("Error al verificar datos existentes: " + err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Solo ejecuta la verificación si no estamos ya cargando
+    if (!isLoading) {
+      checkExistence();
     }
-  }, []);
+  }, [currentStep, idProyecto]); // Añadir isLoading a las dependencias si quieres re-ejecutar en cambios de carga
 
-  const getPriceApi = useCallback(async (action: string): Promise<number | null> => {
-    try {
-      const response = await fetch(`/api/pricing?a=${action}`);
-      if (!response.ok) {
-        console.error(`Fallo al obtener precio para ${action}: ${response.status}`);
-        return null;
-      }
-      const jsonPrice = await response.json();
-      return jsonPrice.price;
-    } catch (e) {
-      console.error(`Error en getPriceApi para ${action}:`, e);
-      return null;
-    }
-  }, []);
-
-  const getSaldoApi = useCallback(async (email: string): Promise<number | null> => {
-    try {
-      const response = await fetch(`/api/user-tokens/?e=${email}`);
-      if (!response.ok) {
-        console.error(`Fallo al validar saldo para ${email}: ${response.status}`);
-        return null;
-      }
-      const jsonData = await response.json();
-      return jsonData.tokens;
-    } catch (e) {
-      console.error(`Error en getSaldoApi para ${email}:`, e);
-      return null;
-    }
-  }, []);
-
-  const updateSaldoApi = useCallback(async (amountToLeave: number, email: string): Promise<any | null> => {
-    try {
-      const bodyData = JSON.stringify({ tokens: amountToLeave, email: email });
-      const response = await fetch(`/api/user-tokens`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: bodyData,
-      });
-      if (!response.ok) {
-        console.error(`Fallo al actualizar saldo para ${email}: ${response.status}`);
-        return null;
-      }
-      let returnX = await response.json();
-      return facade(returnX);
-    } catch (e) {
-      console.error(`Error en updateSaldoApi para ${email}:`, e);
-      return null;
-    }
-  }, []);
-
-  // --- Main Orchestration Logic (Handlers / Hooks) ---
-
-  // Esto ahora reemplaza la lógica de 'useTokens' del ejemplo anterior
-  const handleActionWithTokens = useCallback(async (action: string, objectAction: any) => {
-    if (!currentUserEmail) {
-      setErrors((prev) => new Map(prev).set(action, "Error: No autenticado. Debes iniciar sesión."));
-      return;
-    }
-
-    const actionKey = objectAction.week != null && objectAction.day != null
-      ? `${objectAction.week}_${objectAction.day}`
-      : action; // Clave para manejar estado de posts vs otras acciones
-
-    setGeneratingStates((prev) => new Map(prev).set(actionKey, true));
-    setErrors((prev) => new Map(prev).set(actionKey, null));
-
-    let originalSaldo: number | null = null; // Para rollback
-
-    try {
-      // 1. Validar Saldo
-      originalSaldo = await getSaldoApi(currentUserEmail);
-      if (originalSaldo === null) {
-        throw new Error("No se pudo verificar el saldo.");
-      }
-      setSaldo(originalSaldo); // Actualizar saldo en UI
-
-      // 2. Obtener Precio de la Acción
-      const currentPrice = price.get(action);
-      if (currentPrice === null || currentPrice === undefined) {
-          throw new Error("No se pudo determinar el costo de la acción.");
-      }
-
-      // 3. Verificar Saldo Suficiente
-      if (originalSaldo < currentPrice) {
-        throw new Error("Saldo insuficiente.");
-      }
-
-      // 4. Descontar Tokens
-      const saldoDespuesDelDescuento = originalSaldo - currentPrice;
-      const descuentoExitoso = await updateSaldoApi(saldoDespuesDelDescuento, currentUserEmail);
-      if (!descuentoExitoso) {
-        throw new Error(`No se pudieron descontar los tokens.`);
-      }
-      setSaldo(saldoDespuesDelDescuento); // Actualizar saldo en UI inmediatamente
-
-
-      // 5. Ejecutar la Acción de Generación
-      let generatedResult: any = null;
-      if (action === "generate-post") {
-        const textResult = await generateContentApi('post-final', { item: 'post-final', post: objectAction.post });
-        const imageResult = await generateContentApi('post-final-img', { item: 'post-final-img', post: objectAction.post });
-
-        generatedResult = {
-            texto: textResult?.[0]?.texto || null,
-            imagen: imageResult?.[0]?.data || null,
-        };
-        // Actualizar el estado de los posts generados
-        setGeneratedPostContent((prev) => new Map(prev).set(actionKey, generatedResult));
-
-      } else if (action === "generate-estudio") {
-        generatedResult = await generateContentApi('estudio', {
-          mode: 'estudio', // Asumir la estructura del payload para la API
-          projectId: projectId,
-          item: objectAction.item // Puedes pasar item de la misma manera que antes
-        });
-        setEstudio(generatedResult);
-
-      } else if (action === "generate-estrategia") {
-        generatedResult = await generateContentApi('estrategia', {
-          mode: 'estrategia',
-          projectId: projectId,
-          item: objectAction.item,
-          estudio: objectAction.estudio // Asegúrate de pasar el estudio actual
-        });
-        setEstrategia(generatedResult);
-
-      } else if (action === "generate-campania") {
-        generatedResult = await generateContentApi('campania', {
-          mode: 'campania',
-          projectId: projectId,
-          item: objectAction.item,
-          estudio: objectAction.estudio, // Pasa el estudio actual
-          estrategia: objectAction.estrategia // Pasa la estrategia actual
-        });
-        setCampania(generatedResult);
-
-      } else {
-        throw new Error(`Acción desconocida: ${action}`);
-      }
-
-      // 6. Verificar si la acción de generación tuvo un error interno
-      if (!generatedResult || generatedResult.error || (generatedResult.texto && generatedResult.texto.startsWith("Error:"))) {
-        throw new Error(generatedResult?.error || generatedResult?.texto || "Fallo en la generación de contenido.");
-      }
-
-    } catch (error: any) {
-      console.error(`Fallo en la acción ${action}:`, error);
-      setErrors((prev) => new Map(prev).set(actionKey, error.message || `Error desconocido en ${action}.`));
-
-      // 7. Rollback de Tokens si hubo un fallo después del descuento
-      if (originalSaldo !== null && saldo !== originalSaldo && currentUserEmail) {
-        console.warn(`Realizando rollback de tokens a ${originalSaldo} para ${currentUserEmail}`);
-        const rollbackExitoso = await updateSaldoApi(originalSaldo, currentUserEmail);
-        if (rollbackExitoso) {
-          setSaldo(originalSaldo); // Restaurar saldo en UI
-          setErrors((prev) => new Map(prev).set(actionKey, `${error.message || "Error al generar contenido."} Tus tokens han sido restaurados.`));
-        } else {
-          setErrors((prev) => new Map(prev).set(actionKey, `${error.message || "Error al generar contenido."} Fallo al restaurar los tokens. Por favor, contacta a soporte.`));
+  useEffect(() => {
+      const getEstudioPrice = async () => {
+        const responsePrice = await getPrice("generate-estudio")
+        if(responsePrice){
+          setPriceEstudio(responsePrice)
         }
       }
+      getEstudioPrice();
+    
+
+    const getEstrategiaPrice = async () => {
+      const responsePrice = await getPrice("generate-estrategia")
+      if(responsePrice){
+        setPriceEstrategia(responsePrice)
+      }
+    }
+    getEstrategiaPrice();
+
+    const getCampaniaPrice = async () => {
+      const responsePrice = await getPrice("generate-campania")
+      if(responsePrice){
+        setPriceCampania(responsePrice)
+      }
+    }
+    getCampaniaPrice();
+  
+  },[]);
+
+  
+  
+  const handleGenerateEstudio = async () => {
+    setEmail(session?.user?.email as string)
+    setIsLoading(true);
+    setError(null);
+
+    try {
+
+      setItemActual("estudio-mercado");
+      // Obtener el precio de los tokens para esta acción
+      const price = await getPrice("generate-estudio");
+      if (!price) throw new Error("No se pudo obtener el precio de los tokens.");
+      setPriceEstudio(price)
+      // Consumir tokens y generar el estudio
+      const itemObjectEstudio = {
+        mode: 'generate',
+        id: idProyecto, 
+        item: "estudio-mercado"
+      }
+      const estudioData = await useTokens("generate-estudio",itemObjectEstudio)
+      setDataEstudioMercado(estudioData?.generated as EstudioMercadoData);
+      setDataItemActual(estudioData?.generated as EstudioMercadoData);
+      // Actualizar el saldo después de consumir tokens
+      //const updatedSaldo = await validarSaldo(session?.user?.email as string);
+    } catch (err: any) {
+      setError("Error al generar estudio de mercado: " + err.message);
     } finally {
-      setGeneratingStates((prev) => new Map(prev).set(actionKey, false));
+      setIsLoading(false);
     }
-  }, [currentUserEmail, price, generateContentApi, getSaldoApi, updateSaldoApi, getPriceApi, projectId, saldo]);
-
-
-  // --- useEffects para Cargar Datos Iniciales y Precios ---
-
-  useEffect(() => {
-    // Cargar el saldo del usuario cuando la sesión esté disponible
-    const loadUserSaldo = async () => {
-      if (currentUserEmail) {
-        const currentSaldo = await getSaldoApi(currentUserEmail);
-        setSaldo(currentSaldo);
-      }
-    };
-    if (status === 'authenticated') {
-      loadUserSaldo();
-    }
-  }, [status, currentUserEmail, getSaldoApi]);
-
-  useEffect(() => {
-    // Cargar precios para todas las acciones relevantes
-    const loadPrices = async () => {
-      const actionsToPrice = ["generate-post", "generate-estudio", "generate-estrategia", "generate-campania"];
-      const newPrices = new Map<string, number | null>();
-      for (const action of actionsToPrice) {
-        const fetchedPrice = await getPriceApi(action);
-        newPrices.set(action, fetchedPrice);
-      }
-      setPrice(newPrices);
-    };
-    loadPrices();
-  }, [getPriceApi]);
-
-
-  // --- UI Rendering ---
-
-  const commonClasses = {
-    container: "bg-white p-8 rounded-lg shadow-xl w-full max-w-6xl mx-auto my-8 font-sans",
-    section: "mb-10 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-md border border-blue-100",
-    sectionTitle: "text-3xl font-extrabold text-indigo-800 mb-6 pb-4 border-b-2 border-indigo-200 tracking-tight",
-    postContainer: "p-3 bg-gray-50 rounded-md border border-gray-100 mb-4",
-    generatedContentContainer: "bg-green-50 p-4 rounded-md mt-4 border border-green-200",
-    errorText: "text-red-600 text-sm mt-1",
-    buttonGroup: "flex flex-wrap gap-3 mt-4",
-    buttonBase: "px-5 py-2 rounded-md font-semibold text-white transition-colors duration-200 ease-in-out",
-    buttonGenerate: "bg-purple-600 hover:bg-purple-700 focus:ring-purple-700 focus:ring-offset-2 focus:ring-purple-500",
-    buttonDisabled: "bg-gray-400 cursor-not-allowed",
   };
 
-  const getPriceForAction = (actionName: string) => price.get(actionName) || 'N/A';
+  const handleGenerateEstrategia = async () => {
+    setIsLoading(true);
+    setError(null);
 
-  const renderContentSection = (title: string, data: any, actionName: string) => {
-    const isGenerating = generatingStates.get(actionName) || false;
-    const currentError = errors.get(actionName);
-    const actionPrice = getPriceForAction(actionName);
-    const isButtonDisabled = isGenerating || saldo === null || saldo < (price.get(actionName) || 0) || actionPrice === 'N/A';
-    const buttonTitle = isGenerating ? "Generando..." :
-                        saldo === null ? "Cargando saldo..." :
-                        actionPrice === 'N/A' ? "Precio no disponible" :
-                        saldo < (price.get(actionName) || 0) ? "Saldo insuficiente" : `Generar ${title}`;
+    try {
+      // Asegúrate de que dataEstudioMercado no sea null antes de pasarlo
+      if (!dataEstudioMercado) {
+        throw new Error("Estudio de mercado es requerido para generar estrategia.");
+      }
+      setItemActual("estrategia-marketing");
 
-    return (
-      <section className={commonClasses.section}>
-        <h2 className={commonClasses.sectionTitle}>{title}</h2>
-        {data ? (
-          <pre className="bg-gray-100 p-4 rounded-md overflow-auto text-sm">{JSON.stringify(data, null, 2)}</pre>
-        ) : (
-          <p className="text-gray-600">No hay datos de {title} disponibles.</p>
-        )}
-        {isGenerating && (
-          <div className="flex items-center gap-2 mt-4">
-            <Spinner classNames={{ label: "text-foreground" }} label="wave" variant="wave" />
-            <p className="text-purple-600 italic">Generando {title}...</p>
-          </div>
-        )}
-        {currentError && <p className={commonClasses.errorText}>{currentError}</p>}
-        {status === 'authenticated' && (
-          <button
-            onClick={() => handleActionWithTokens(actionName, { projectId, item: title.toLowerCase(), estudio, estrategia, campania })}
-            className={`${commonClasses.buttonBase} ${commonClasses.buttonGenerate} ${isButtonDisabled ? commonClasses.buttonDisabled : ""}`}
-            disabled={isButtonDisabled}
-            title={buttonTitle}
-          >
-            {isGenerating ? "Generando..." : `Generar ${title} ${actionPrice}`}
-          </button>
-        )}
-        {status === 'loading' && <p className="text-gray-500 italic mt-4">Cargando sesión...</p>}
-        {status === 'unauthenticated' && <p className="text-red-500 italic mt-4">Debes iniciar sesión para generar contenido.</p>}
-      </section>
-    );
+      // Obtener el precio de los tokens para esta acción
+      const price = await getPrice("generate-estrategia");
+      if (!price) throw new Error("No se pudo obtener el precio de los tokens.");
+      setPriceEstrategia(price)
+      // Consumir tokens y generar la estrategia
+      const itemObjectEstrategia = {
+        mode: 'generate',
+        id: idProyecto, 
+        item: "estrategia-marketing", 
+        estudio: dataEstudioMercado
+      }
+      const estrategiaData = await useTokens("generate-estrategia",itemObjectEstrategia)
+
+      setDataEstrategiaMarketing(estrategiaData?.generated as EstrategiaMarketingData);
+      setDataItemActual(estrategiaData?.generated as EstrategiaMarketingData);
+  
+    } catch (err: any) {
+      setError("Error al generar estrategia de marketing: " + err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  const handleGenerateCampania = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Asegúrate de que dataEstrategiaMarketing no sea null
+      if (!dataEstrategiaMarketing) {
+        throw new Error("Estrategia de marketing es requerida para generar campaña.");
+      }
+      setItemActual("campania-marketing");
+      // Obtener el precio de los tokens para esta acción
+      const price = await getPrice("generate-campania");
+      if (!price) throw new Error("No se pudo obtener el precio de los tokens.");
+      setPriceCampania(price)
+      // Consumir tokens y generar la campaña
+      const itemObjectCampania = {
+        mode: 'generate',
+        id: idProyecto, 
+        item: "campania-marketing", 
+        estudio: dataEstudioMercado,
+        estrategia: dataEstrategiaMarketing
+      }
+      const campaniaData = await useTokens("generate-campania",itemObjectCampania)
+      setDataCampaniaMarketing(campaniaData?.generated as CampaniaMarketingData);
+      setDataItemActual(campaniaData?.generated as CampaniaMarketingData);
+
+    } catch (err: any) {
+      setError("Error al generar campaña de marketing: " + err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const steps: WorkflowStep[] = [
+    { number: 1, title: "Estudio de Mercado", completed: !!dataEstudioMercado },
+    { number: 2, title: "Estrategia de Marketing", completed: !!dataEstrategiaMarketing },
+    { number: 3, title: "Campaña de Marketing", completed: !!dataCampaniaMarketing }
+  ];
 
   return (
-    <div className={commonClasses.container}>
-      <h1 className="text-4xl font-extrabold text-center text-gray-900 mb-8 pb-4 border-b-4 border-indigo-400">
-        Workflow de Marketing (Cliente)
-      </h1>
+    <div className="max-w-6xl mx-auto p-6">
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h1 className="text-3xl font-bold text-gray-800 mb-8">
+          Flujo de Trabajo de Marketing
+        </h1>
 
-      <div className="mb-6 text-lg font-semibold text-right text-gray-700">
-        Saldo Actual: {saldo !== null ? `${saldo} tokens` : <Spinner classNames={{ label: "text-foreground inline-block ml-2" }} label="wave" variant="wave" />}
-      </div>
+        <div className="mb-8">
+          <div className="text-sm text-gray-600 mb-2">
+            Proyecto ID: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{idProyecto}</span>
+          </div>
+        </div>
 
-      {renderContentSection("Estudio de Mercado", estudio, "generate-estudio")}
-      {renderContentSection("Estrategia de Marketing", estrategia, "generate-estrategia")}
-      {renderContentSection("Campaña de Marketing", campania, "generate-campania")}
+        {/* Indicador de pasos */}
+        <div className="flex items-center justify-between mb-8">
+          {steps.map((step, index) => (
+            <React.Fragment key={step.number}>
+              <div className="flex flex-col items-center flex-1"> {/* flex-1 para distribuir espacio */}
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold
+                  ${step.number === currentStep ? 'bg-blue-600 ring-4 ring-blue-200' :
+                    step.completed ? 'bg-green-600' : 'bg-gray-300'}`}>
+                  {step.completed ? '✓' : step.number}
+                </div>
+                <span className={`text-sm mt-2 text-center ${step.number === currentStep ? 'font-semibold text-blue-600' : 'text-gray-600'}`}>
+                  {step.title}
+                </span>
+              </div>
+              {index < steps.length - 1 && (
+                <div className={`flex-1 h-1 mt-4 mx-2 ${step.completed ? 'bg-green-600' : 'bg-gray-300'}`}></div>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
 
-      <section className={commonClasses.section}>
-        <h2 className={commonClasses.sectionTitle}>Planificación de Contenido de Campaña</h2>
-        <img src="/step4.png" className="flow-img" alt="Flow Diagram" />
-        {!campania || campania.contenido.length === 0 ? (
-          <p className="text-gray-600">No hay planificación de contenido de campaña disponible.</p>
-        ) : (
-          campania.contenido.map((semana: Semana, weekIndex: number) => (
-            <div key={semana.numero} className="mb-8 p-6 bg-blue-50 rounded-lg shadow-md border border-blue-100">
-              <h3 className="text-xl font-bold text-blue-800 mb-3">Semana {semana.numero}</h3>
-              {semana.dias.map((dia: Dia, dayIndex: number) => {
-                const post = dia.post;
-                const key = `${weekIndex}_${dayIndex}`;
-                const generated = generatedPostContent.get(key);
-                const isGenerating = generatingStates.get(key) || false;
-                const currentError = errors.get(key);
-                const postPrice = getPriceForAction("generate-post");
-                const isButtonDisabled = isGenerating || saldo === null || saldo < (price.get("generate-post") || 0) || postPrice === 'N/A';
-                const buttonTitle = isGenerating ? "Generando..." :
-                                    saldo === null ? "Cargando saldo..." :
-                                    postPrice === 'N/A' ? "Precio no disponible" :
-                                    saldo < (price.get("generate-post") || 0) ? "Saldo insuficiente" : "Generar post";
-
-                return (
-                  <div key={dia.fecha} className="p-4 bg-white rounded-lg shadow-sm border border-gray-200 mb-4">
-                    <p className="text-md font-bold text-indigo-700 mb-2">
-                      Día: {dia.nombre} ({dia.fecha})
-                    </p>
-                    <div className={commonClasses.postContainer}>
-                      <h5 className="text-base font-semibold text-gray-900 mb-2">Post Original</h5>
-                      <p><strong>Título:</strong> {post.titulo}</p>
-                      <p><strong>Contenido:</strong> {post.texto}</p>
-                      {post.imagen && <p><strong>Imagen (prompt):</strong> {post.imagen}</p>}
-                    </div>
-
-                    {generated && (generated.texto || generated.imagen) && !currentError && (
-                      <div className={commonClasses.generatedContentContainer}>
-                        <h5 className="text-base font-semibold text-green-800 mb-2">Contenido Generado</h5>
-                        {generated.texto && (
-                          <>
-                            <p className="font-semibold">Texto:</p>
-                            <textarea
-                              className="w-full p-2 border border-gray-300 rounded-md bg-white text-gray-800 text-sm resize-none"
-                              rows={5}
-                              readOnly
-                              value={generated.texto}
-                            />
-                          </>
-                        )}
-                        {generated.imagen && (
-                          <>
-                            <p className="font-semibold mt-2">Imagen Generada:</p>
-                            <img src={`data:image/jpeg;base64,${generated.imagen}`} alt="Imagen generada" className="max-w-xs rounded-md shadow-md mt-1" />
-                          </>
-                        )}
-                      </div>
-                    )}
-
-                    {isGenerating && (
-                      <div className="flex items-center gap-2 mt-4">
-                        <Spinner classNames={{ label: "text-foreground" }} label="wave" variant="wave" />
-                        <p className="text-purple-600 italic">Generando contenido...</p>
-                      </div>
-                    )}
-                    {currentError && (
-                      <p className={commonClasses.errorText}>{currentError}</p>
-                    )}
-
-                    <div className={commonClasses.buttonGroup}>
-                      {status === 'authenticated' && (
-                        <button
-                          onClick={() =>
-                            handleActionWithTokens("generate-post", { week: weekIndex, day: dayIndex, post })
-                          }
-                          className={`${commonClasses.buttonBase} ${commonClasses.buttonGenerate} ${isButtonDisabled ? commonClasses.buttonDisabled : ""}`}
-                          disabled={isButtonDisabled}
-                          title={buttonTitle}
-                        >
-                          {isGenerating ? "Generando..." : `Generar Post ${postPrice}`}
-                        </button>
-                      )}
-                      {status === 'loading' && (
-                        <p className="text-gray-500 italic">Cargando sesión...</p>
-                      )}
-                      {status === 'unauthenticated' && (
-                        <p className="text-red-500 italic">Debes iniciar sesión para generar contenido.</p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ))
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+            <p className="text-red-700">Error: {error}</p>
+          </div>
         )}
-      </section>
+
+        {isLoading && (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-2 text-gray-600">Procesando...</span>
+          </div>
+        )}
+
+        {/* Paso 1: Estudio de Mercado */}
+        {currentStep === 1 && (
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 1: Estudio de Mercado</h2>
+            <img src="/step1.png"/>
+
+            {existeEstudio === null && !isLoading && (
+              <div className="text-center py-4">
+                <div className="animate-pulse">Verificando datos existentes...</div>
+              </div>
+            )}
+
+            {existeEstudio === true && dataEstudioMercado && (
+              <div>
+                <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
+                  <p className="text-green-700">Estudio de mercado existente encontrado</p>
+                </div>
+                <EstudioMercadoDisplay Input={dataEstudioMercado} />
+                <button
+                  onClick={() => setCurrentStep(2)}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Continuar al Paso 2
+                </button>
+              </div>
+            )}
+
+            {existeEstudio === false && !dataEstudioMercado && !isLoading && (
+              <div>
+                <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
+                  <p className="text-yellow-700">No se encontró estudio de mercado existente</p>
+                </div>
+                <button
+                  onClick={handleGenerateEstudio}
+                  className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors"
+                >
+                  Generar Estudio de Mercado 🪙 {priceEstudio || '...'}
+                </button>
+              </div>
+            )}
+
+            {dataEstudioMercado && existeEstudio === false && (
+              <EstudioMercadoDisplay
+                Input={dataEstudioMercado}
+                onSave={saveGenData}
+                showSaveButton={true}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Paso 2: Estrategia de Marketing */}
+        {currentStep === 2 && (
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 2: Estrategia de Marketing</h2>
+            <img src="/step2.png"/>
+
+            {existeEstrategia === null && !isLoading && (
+              <div className="text-center py-4">
+                <div className="animate-pulse">Verificando datos existentes...</div>
+              </div>
+            )}
+
+            {existeEstrategia === true && dataEstrategiaMarketing && (
+              <div>
+                <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
+                  <p className="text-green-700">Estrategia de marketing existente encontrada</p>
+                </div>
+                <EstrategiaMarketingDisplay Input={dataEstrategiaMarketing} />
+                <button
+                  onClick={() => setCurrentStep(3)}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Continuar al Paso 3
+                </button>
+              </div>
+            )}
+
+            {existeEstrategia === false && !dataEstrategiaMarketing && !isLoading && (
+              <div>
+                <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
+                  <p className="text-yellow-700">No se encontró estrategia de marketing existente</p>
+                </div>
+                <button
+                  onClick={handleGenerateEstrategia}
+                  disabled={!dataEstudioMercado || isLoading}
+                  className={`px-6 py-2 rounded-md transition-colors ${
+                    !dataEstudioMercado || isLoading
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-green-600 text-white hover:bg-green-700'
+                  }`}
+                >
+                  Generar Estrategia de Marketing 🪙 {priceEstrategia || '...'}
+                </button>
+                {!dataEstudioMercado && (
+                  <p className="text-sm text-gray-500 mt-2">
+                    Necesitas completar el Estudio de Mercado primero
+                  </p>
+                )}
+              </div>
+            )}
+
+            {dataEstrategiaMarketing && existeEstrategia === false && (
+              <EstrategiaMarketingDisplay
+                Input={dataEstrategiaMarketing}
+                onSave={saveGenData}
+                showSaveButton={true}
+              />
+            )}
+          </div>
+        )}
+
+        {/* Paso 3: Campaña de Marketing */}
+        {currentStep === 3 && (
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 3: Campaña de Marketing</h2>
+            <img src="/step3.png"/>
+
+            {existeCampania === null && !isLoading && (
+              <div className="text-center py-4">
+                <div className="animate-pulse">Verificando datos existentes...</div>
+              </div>
+            )}
+
+            {existeCampania === true && dataCampaniaMarketing && (
+              <div>
+                <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
+                  <p className="text-green-700">Campaña de marketing existente encontrada</p>
+                </div>
+                <CampaniaMarketingDisplay Input={dataCampaniaMarketing} />
+                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mt-4">
+                  <p className="text-blue-700">¡Flujo de trabajo completado exitosamente!</p>
+                </div>
+              </div>
+            )}
+
+            {existeCampania === false && !dataCampaniaMarketing && !isLoading && (
+              <div>
+                <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-4">
+                  <p className="text-yellow-700">No se encontró campaña de marketing existente</p>
+                </div>
+                <button
+                  onClick={handleGenerateCampania}
+                  disabled={!dataEstrategiaMarketing || isLoading}
+                  className={`px-6 py-2 rounded-md transition-colors ${
+                    !dataEstrategiaMarketing || isLoading
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-green-600 text-white hover:bg-green-700'
+                  }`}
+                >
+                  Generar Campaña de Marketing 🪙 {priceCampania || '...'}
+                </button>
+                {!dataEstrategiaMarketing && (
+                  <p className="text-sm text-gray-500 mt-2">
+                    Necesitas completar la Estrategia de Marketing primero
+                  </p>
+                )}
+              </div>
+            )}
+
+            {dataCampaniaMarketing && existeCampania === false && (
+              <div>
+                <CampaniaMarketingDisplay
+                  Input={dataCampaniaMarketing}
+                  onSave={saveGenData}
+                  showSaveButton={true}
+                />
+                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mt-4">
+                  <img src="/step4.png"/>
+                  <p className="text-blue-700">¡Campaña generada! Guarda para completar el flujo.</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Navegación entre pasos */}
+        <div className="flex justify-between mt-8 pt-6 border-t">
+          <button
+            onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+            disabled={currentStep === 1 || isLoading}
+            className={`px-4 py-2 rounded-md transition-colors ${
+              currentStep === 1 || isLoading
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'bg-gray-600 text-white hover:bg-gray-700'
+            }`}
+          >
+            Paso Anterior
+          </button>
+
+          <button
+            onClick={() => setCurrentStep(Math.min(3, currentStep + 1))}
+            disabled={currentStep === 3 || isLoading}
+            className={`px-4 py-2 rounded-md transition-colors ${
+              currentStep === 3 || isLoading
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+            }`}
+          >
+            Siguiente Paso
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default StepByStepWilli;
+export default MarketingWorkflow;
