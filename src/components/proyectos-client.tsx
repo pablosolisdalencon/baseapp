@@ -6,6 +6,9 @@ import { faEdit, faBoxesPacking, faTrashCan, faBullhorn, faMobileScreenButton } 
 import ConfirmModal from "@/components/ConfirmModal";
 import { useSession } from 'next-auth/react';
 import { useRouter } from "next/navigation";
+
+import { Spinner } from '@heroui/react'; 
+
 interface ItemType {
   _id: string;
   nombre: string;
@@ -95,12 +98,17 @@ const ProyectosClient: React.FC = () => {
 
   // Estado de carga global de la sesión
   if (!session) {
-    return <div className="flex justify-center items-center h-screen"><p className="text-xl">Cargando sesión...</p></div>;
+    return <div className="flex justify-center items-center h-screen">
+      <Spinner classNames={{label: "text-foreground mt-4"}} label="wave" variant="wave" />
+      <p className="text-xl">Cargando sesión...</p></div>;
   }
 
   // Estado de carga de los datos del proyecto
   if (isFetchingData) {
-    return <div className="flex justify-center items-center h-screen"><p className="text-xl">Cargando proyectos...</p></div>;
+    return <div className="flex justify-center items-center h-screen">
+           <Spinner classNames={{label: "text-foreground mt-4"}} label="wave" variant="wave" />
+            <p className="text-xl">Cargando proyectos...</p>
+          </div>;
   }
 
   if (error) {
@@ -127,7 +135,7 @@ const ProyectosClient: React.FC = () => {
         {dataList.map((proyecto) => (
           <div className="app-card" key={proyecto._id}>
             <div className="app-card-image-container">
-              <img src={proyecto.logo || '/default-logo.png'} alt={proyecto.nombre} className="app-image" /> {/* Añadir logo por defecto */}
+              <img src={proyecto.logo || '/default-logo.png'} alt={proyecto.nombre} className="app-card-image" /> {/* Añadir logo por defecto */}
             </div>
             <div className="app-card-content">
               <div>

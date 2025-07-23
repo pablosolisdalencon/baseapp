@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { Spinner } from '@heroui/react'; 
 
 import {
   MarketingContentManagerProps,
@@ -355,7 +356,7 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
       
       <section className={commonClasses.section}>
         <h2 className={commonClasses.sectionTitle}>Planificación de Contenido </h2>
-        <img src="/step5.png"/>
+        <img src="/step4.png" className="flow-img"/>
         {campaignData.contenido.map((semana: Semana, weekIndex: number) => (
           <div key={semana.numero} className="mb-8 p-6 bg-blue-50 rounded-lg shadow-md border border-blue-100">
             <h3 className="text-xl font-bold text-blue-800 mb-3">Semana {semana.numero}</h3>
@@ -402,7 +403,8 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
                   )}
 
                   {isGenerating && (
-                    <p className="text-purple-600 italic mt-2">Generando contenido...</p>
+                    <><Spinner classNames={{label: "text-foreground mt-4"}} label="wave" variant="wave" /><p className="text-purple-600 italic mt-2">Generando contenido...</p></>
+                    
                   )}
                   {currentPostError && (
                     <p className={commonClasses.errorText}>{currentPostError}</p>
@@ -428,7 +430,9 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
                       </button>
                     )}
                     {status === 'loading' && (
-                        <p className="text-gray-500 italic">Cargando sesión...</p>
+                       <><Spinner classNames={{label: "text-foreground mt-4"}} label="wave" variant="wave" /><p className="text-gray-500 italic">Cargando sesión...</p></>
+                    
+                        
                     )}
                     {status === 'unauthenticated' && (
                         <p className="text-red-500 italic">Debes iniciar sesión para generar contenido.</p>

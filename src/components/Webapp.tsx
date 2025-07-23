@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Spinner } from '@heroui/react'; 
+
 interface DataType {
     proyecto: ItemTypeProyecto;
     catalogo: ItemType[];
@@ -59,7 +61,7 @@ export default function Webapp() {
         },[]);
 
     if(isLoadingP){
-    return <p>Cargando WebApp Data...</p>;
+    return <><Spinner classNames={{label: "text-foreground mt-4"}} label="wave" variant="wave" /><p>Cargando WebApp Data...</p>;</>
     }
     if(errorP){
         return <p>Error cargando  WebApp Data: {errorP}</p>;
@@ -140,16 +142,7 @@ export default function Webapp() {
         </div>
     </section>
 
-    <footer id="contacto" className="contact-footer">
-        <div className="contact-container">
-            <h2 className="contact-title">¿Listo para Empezar?</h2>
-            <p className="contact-subtitle">Déjanos un mensaje y nos pondremos en contacto contigo.</p>
-            <div className="contact-form">             
-                <a href="https://wa.me/56920905973?text=Quiero%20hablar%20del%20eWave%20Pack"><button className="contact-button">Hablemos!</button></a>
-            </div>
-            <p className="copyright-text">© 2025 {nombreProyecto}. Todos los derechos reservados.</p>
-        </div>
-    </footer>
+    
 </div>
 
 
