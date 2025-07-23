@@ -48,7 +48,7 @@ async function getDataItem(projectId,item){
 async function getDataMaker(projectId,item){
     try 
     {
-        const response = await fetch(`${process.env.NEXTAUTH_URL}/api/${item}?p=${projectId}`, {
+        const response = await fetch(`${process.env.NEXTAUTH_URL}/api/maker?p=${projectId}`, {
           method: 'GET', 
           headers: {
             'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ async function getDataMaker(projectId,item){
           const res  = await response.json();
           const data = res.data;
 
-          if(data[0]){
+          if(data){
             console.log(`getDataItem verify OK =======================`)
             console.log(data)
 
@@ -178,7 +178,7 @@ export default async function GWV(mode,projectId,item,estudio,estrategia){
         return verifyData;
       }
     }else if(mode=='generate'){
-      const maker = await getDataItem(projectId,'maker')
+      const maker = await getDataMaker(projectId,'maker')
       if(maker){  
         const data = await useWilli(projectId,item,maker,estudio,estrategia);
         if(data){
