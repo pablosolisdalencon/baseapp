@@ -138,17 +138,20 @@ const parametros = await params;
   let estrategiaData: EstrategiaMarketingData | null = null;
   let campaniaData: CampaniaMarketingData | null = null;
   let errorMessage: string | null = null;
-
+   var mylog = "// 1. Fetch de Estudio de Mercado (Condicional)";
   try {
+   
     // 1. Fetch de Estudio de Mercado (Condicional)
     estudioData = await GWV('check', itemId, 'estudio-mercado');
 
     if (estudioData) {
+      mylog+="// 2. Fetch de Estrategia de Marketing (Condicional)";
       // 2. Fetch de Estrategia de Marketing (Condicional)
       estrategiaData = await GWV('check', itemId, 'estrategia-marketing');
     }
 
     if (estrategiaData) {
+      mylog+="// 3. Fetch de Campaña de Marketing (Condicional)"
       // 3. Fetch de Campaña de Marketing (Condicional)
       // Aunque el page.tsx original fetcheaba 'campania-marketing' primero,
       // la lógica de dependencia sugiere que la campaña solo existe si existe la estrategia.
@@ -162,9 +165,10 @@ const parametros = await params;
     // podrías agregar una lógica condicional aquí o pasarla como prop.
 
 
+
   } catch (error: any) {
     console.error('Error en DynamicPage durante el fetching inicial:', error.message);
-    errorMessage = `Error de conexión o inesperado durante la carga inicial: ${error.message}`;
+    errorMessage = `Error de conexión o inesperado durante la carga inicial: ${error.message}. MYLOG: ${mylog}`;
   }
 
   if (errorMessage) {
