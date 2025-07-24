@@ -81,12 +81,13 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
                     try {
   
                         const result = await GWV(mode, projectId, item); // Asumir que GWV puede lanzar error o devolver null/estructura
-  
+console.log("&&& ejecutaraccion result:  &&&")
+console.log(result)  
                         return result[0]; // o { key: "estudio_key", generated: result } si es necesario adaptar
   
                     } catch (error:any) {
   
-                        return { key: "estudio_error", generated: { texto: `Error: ${error.message}` } }; // Ejemplo
+                        return { key: "estudio_error", generated: { texto: `Error en Ejecutar accion: ${error.message}` } }; // Ejemplo
   
                     }
   
