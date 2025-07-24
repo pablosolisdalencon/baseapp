@@ -14,6 +14,7 @@ import EstudioMercadoDisplay from './../EstudioMercadoDisplay';
 import EstrategiaMarketingDisplay from './../EstrategiaMarketingDisplay';
 import CampaniaMarketingDisplay from './../CampaniaMarketingDisplay';
 import { useSession } from 'next-auth/react';
+import { isBigInt64Array } from 'util/types';
 
 // --- Componente principal del Flujo de Marketing ---
 interface MarketingWorkflowProps {
@@ -66,7 +67,9 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
   
   
   
-  
+  console.log(`%%% EJECUTAR ACCION ${action}  %%%`)
+  console.log(`%%% EJECUTAR ACCION OBJECTACTION:  %%%`)
+  console.log(objectAction)
                 // Para otras acciones, asegurarse que GWV también devuelve una estructura consistente
   
                 // o manejar los errores de forma similar.
