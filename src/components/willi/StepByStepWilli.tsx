@@ -357,7 +357,7 @@ console.log(result[0])
   
                             // Verificar si la acción falló (ej. resultadoAccion.generated.texto contiene "Error:")
   
-                            if (resultadoAccion && resultadoAccion.generated && typeof resultadoAccion.generated.texto === 'string' && resultadoAccion.generated.texto.startsWith("Error:")) {
+                            if (resultadoAccion.generated && resultadoAccion.generated.texto.startsWith("Error:")) {
   console.log(`@@@@ Use Tokens: action[${action}] & result:`)
   console.log(resultadoAccion)
                                await rollBackTokens(saldoActual, currentUserEmail); // Devolver tokens al saldo original
