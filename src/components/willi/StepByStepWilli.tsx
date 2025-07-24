@@ -14,7 +14,7 @@ import EstudioMercadoDisplay from './../EstudioMercadoDisplay';
 import EstrategiaMarketingDisplay from './../EstrategiaMarketingDisplay';
 import CampaniaMarketingDisplay from './../CampaniaMarketingDisplay';
 import { useSession } from 'next-auth/react';
-import { isBigInt64Array } from 'util/types';
+
 
 // --- Componente principal del Flujo de Marketing ---
 interface MarketingWorkflowProps {
@@ -82,7 +82,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
   
                         const result = await GWV(mode, projectId, item); // Asumir que GWV puede lanzar error o devolver null/estructura
   
-                        return result; // o { key: "estudio_key", generated: result } si es necesario adaptar
+                        return result[0]; // o { key: "estudio_key", generated: result } si es necesario adaptar
   
                     } catch (error:any) {
   
