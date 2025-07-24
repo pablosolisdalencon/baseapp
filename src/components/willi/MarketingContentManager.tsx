@@ -714,7 +714,7 @@ const MarketingContentManager: React.FC<MarketingContentManagerProps> = ({ Campa
 
         <h2 className={commonClasses.sectionTitle}>Planificación de Contenido </h2>
 
-        <img src="/step4.png" className="flow-img"/>
+        <img src="/step6.png" className="flow-img"/>
 
         {campaignData.contenido.map((semana: Semana, weekIndex: number) => (
 

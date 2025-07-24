@@ -678,7 +678,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
         {currentStep === 1 && (
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 1: Estudio de Mercado</h2>
-            <img src="/step1.png"/>
+            <img className="flow-img" src="/step1.png"/>
 
             {existeEstudio === null && !isLoading && (
               <div className="text-center py-4">
@@ -729,7 +729,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
         {currentStep === 2 && (
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 2: Estrategia de Marketing</h2>
-            <img src="/step2.png"/>
+            <img className="flow-img" src="/step2.png"/>
 
             {existeEstrategia === null && !isLoading && (
               <div className="text-center py-4">
@@ -790,7 +790,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
         {currentStep === 3 && (
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 3: Campaña de Marketing</h2>
-            <img src="/step3.png"/>
+            <img className="flow-img" src="/step3.png"/>
 
             {existeCampania === null && !isLoading && (
               <div className="text-center py-4">
@@ -842,7 +842,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
                   showSaveButton={true}
                 />
                 <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mt-4">
-                  <img src="/step4.png"/>
+                  <img className="flow-img" src="/step5.png"/>
                   <p className="text-blue-700">¡Campaña generada! Guarda para completar el flujo.</p>
                 </div>
               </div>
