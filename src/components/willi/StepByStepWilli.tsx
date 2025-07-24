@@ -368,7 +368,7 @@ console.log(result[0])
   
                                     generated: {
   
-                                        texto: "Oops! Fallo en la generación de contenido. Tus tokens han sido restaurados. Inténtalo de nuevo.",
+                                        texto: "Oops! Fallo en la generación de contenido (error en ejecucion de Accion). Tus tokens han sido restaurados. Inténtalo de nuevo.",
   
                                         imagen: null
   
@@ -379,7 +379,23 @@ console.log(result[0])
   
                                 return resultadoAccion
   
-                            }
+                            }else{
+                                await rollBackTokens(saldoActual, currentUserEmail); // Devolver tokens al saldo original
+  
+                                return {
+  
+                                    key: action,
+  
+                                    generated: {
+  
+                                        texto: "Oops! Fallo en la generación de  (no se ejecuto la accion). Tus tokens han sido restaurados. Inténtalo de nuevo.",
+  
+                                        imagen: null
+  
+                                    }
+  
+                                };
+  }
   
                         } else {
   
