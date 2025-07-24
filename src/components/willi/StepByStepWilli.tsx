@@ -358,22 +358,9 @@ console.log(result[0])
                             // Verificar si la acción falló (ej. resultadoAccion.generated.texto contiene "Error:")
   
                             if (resultadoAccion && resultadoAccion.generated && typeof resultadoAccion.generated.texto === 'string' && resultadoAccion.generated.texto.startsWith("Error:")) {
-  
-                                await rollBackTokens(saldoActual, currentUserEmail); // Devolver tokens al saldo original
-  
-                                return resultadoAccion; // Devolver el error de la acción
-  
-                            }
-  
-  
-  
-                            if (resultadoAccion && resultadoAccion.key != null) { // Chequeo más robusto
-  
-                                return resultadoAccion;
-  
-                            } else {
-  
-                                await rollBackTokens(saldoActual, currentUserEmail); // Devolver tokens al saldo original
+  console.log(`@@@@ Use Tokens: action[${action}] & result:`)
+  console.log(resultadoAccion)
+                               await rollBackTokens(saldoActual, currentUserEmail); // Devolver tokens al saldo original
   
                                 return {
   
@@ -388,6 +375,9 @@ console.log(result[0])
                                     }
   
                                 };
+                              } else if(resultadoAccion){
+  
+                                return resultadoAccion
   
                             }
   
