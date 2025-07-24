@@ -82,11 +82,13 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
   
                         const result = await GWV(mode, projectId, item); // Asumir que GWV puede lanzar error o devolver null/estructura
 console.log("&&& ejecutaraccion result:  &&&")
-console.log(result)  
+console.log(result[0])  
                         return result[0]; // o { key: "estudio_key", generated: result } si es necesario adaptar
   
                     } catch (error:any) {
-  
+  console.log("&&& ejecutaraccion error:  &&&");
+   console.log(`Error en Ejecutar accion: ${error.message}`);
+
                         return { key: "estudio_error", generated: { texto: `Error en Ejecutar accion: ${error.message}` } }; // Ejemplo
   
                     }
@@ -348,7 +350,9 @@ console.log(result)
                         if (descuentoExitoso) { // Asumiendo que descontarTokens devuelve algo truthy en éxito
   
                             const resultadoAccion = await ejecutarAccion(action, objectAction);
-  
+
+   console.log(`@@@@ Use Tokens: action[${action}] & result:`)
+  console.log(resultadoAccion)
   
   
                             // Verificar si la acción falló (ej. resultadoAccion.generated.texto contiene "Error:")
