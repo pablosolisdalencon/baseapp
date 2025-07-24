@@ -43,7 +43,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
   const [priceCampania, setPriceCampania] = useState<number | null>(null);
 
   // Estados para los datos, ahora tipados con 'null' o el tipo de interfaz
-  const [dataEstudioMercado, setDataEstudioMercado] = useState<EstudioMercadoData | null>(initialEstudio);
+  const [dataEstudioMercado, setDataEstudioMercado] = useState<EstudioMercadoData | null>(null);
   const [dataEstrategiaMarketing, setDataEstrategiaMarketing] = useState<EstrategiaMarketingData | null>(initialEstrategia);
   const [dataCampaniaMarketing, setDataCampaniaMarketing] = useState<CampaniaMarketingData | null>(initialCampania);
 
@@ -358,7 +358,7 @@ console.log(result[0])
                             // Verificar si la acción falló (ej. resultadoAccion.generated.texto contiene "Error:")
   
                             if (resultadoAccion.generated && resultadoAccion.generated.texto.startsWith("Error:")) {
-  console.log(`@@@@ Use Tokens: action[${action}] & result:`)
+  console.log(`@@@@ Use Tokens: action[${action}] & ERROR result:`)
   console.log(resultadoAccion)
                                await rollBackTokens(saldoActual, currentUserEmail); // Devolver tokens al saldo original
   
@@ -377,7 +377,13 @@ console.log(result[0])
                                 };
                               } else if(resultadoAccion){
   
-                                return resultadoAccion
+                                 return {
+  
+                                    key: action,
+  
+                                    generated:resultadoAccion
+  
+                                };
   
                             }else{
                                 await rollBackTokens(saldoActual, currentUserEmail); // Devolver tokens al saldo original
@@ -683,6 +689,7 @@ console.log(result[0])
 
         {isLoading && (
           <div className="flex items-center justify-center py-8">
+            <img className="flow-img" src={`/step${currentStep}.png`} />
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             <span className="ml-2 text-gray-600">Procesando...</span>
           </div>
@@ -692,7 +699,7 @@ console.log(result[0])
         {currentStep === 1 && (
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 1: Estudio de Mercado</h2>
-            <img className="flow-img" src="/step1.png"/>
+            
 
             {existeEstudio === null && !isLoading && (
               <div className="text-center py-4">
@@ -743,7 +750,6 @@ console.log(result[0])
         {currentStep === 2 && (
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 2: Estrategia de Marketing</h2>
-            <img className="flow-img" src="/step2.png"/>
 
             {existeEstrategia === null && !isLoading && (
               <div className="text-center py-4">
@@ -804,8 +810,6 @@ console.log(result[0])
         {currentStep === 3 && (
           <div>
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">Paso 3: Campaña de Marketing</h2>
-            <img className="flow-img" src="/step3.png"/>
-
             {existeCampania === null && !isLoading && (
               <div className="text-center py-4">
                 <div className="animate-pulse">Verificando datos existentes...</div>
