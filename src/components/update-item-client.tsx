@@ -3,6 +3,7 @@ import { useSearchParams } from "next/navigation";
 import { ChangeEvent, FormEvent, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { CldUploadWidget } from 'next-cloudinary';
+import { UpdateItemClientProps } from "@/types/marketingWorkflowTypes";
 
 interface DataType {
   [key: string]: string;
@@ -14,35 +15,25 @@ interface DataType {
   id_proyecto: string;
 }
 
-export default  function UpdateItemClient(){
-
+  
+const UpdateItemClient: React.FC<UpdateItemClientProps> = ({idProyecto, nombreProyecto, idItem  }) => {
+  
     const [dataI,setDataI] = useState<DataType | null>(null);
     const [isLoadingI, setIsLoadingI] = useState(true);
     const [errorI, setErrorI] = useState<string | null>(null);
-
-    const [nombreProyecto,setNombreProyecto] = useState<string | null>(null);
-    const [idProyecto, setIdProyecto] = useState<string | null>(null);
-    const [idItem, setIdItem] = useState<string | null>(null);
     const [fotoPreviewUrl, setFotoPreviewUrl] = useState<string | null>(null);
-    const router = useRouter()
-     
-    const searchParams = useSearchParams();
+    const router = useRouter() 
+    const id = idItem;
 
     useEffect( () => {
       router.refresh();
-        
-        const id = searchParams.get('id'); 
-        const nombreProyecto = searchParams.get('nombreProyecto');
-        const idProyecto = searchParams.get('idProyecto');
-        setIdItem(id);
-        setNombreProyecto(nombreProyecto);
-        setIdProyecto(idProyecto);
-        setDataI((prevData) => ({
+         setDataI((prevData) => ({
             ...prevData!,
             id_proyecto: idProyecto as string,
           }));
 
-        if (id!=null){
+        
+          if (id!=null){
             //este es el id del ITEM
             console.log(id);
 
@@ -60,7 +51,6 @@ export default  function UpdateItemClient(){
 
                 const jsonData: DataType = await response.json();
                 setDataI(jsonData);
-                setIdProyecto(jsonData.id_proyecto as string)
                 
                 setFotoPreviewUrl(jsonData.foto);
                 
@@ -85,7 +75,7 @@ export default  function UpdateItemClient(){
     }
     
 
-    },[searchParams]);
+    },[]);
 
     
     const createItem = async () => {
@@ -197,3 +187,4 @@ export default  function UpdateItemClient(){
             </div>
           );
 }
+export default UpdateItemClient;

@@ -202,6 +202,11 @@ export interface ClientProps {
   idProyecto:string | null | any; // El dato genérico puede ser de cualquier tipo definido arriba o null
 }
 
+export interface UpdateItemClientProps{
+ idProyecto:string|null;
+ nombreProyecto:string|null;
+ idItem:string|null;
+}
 // Tipos para los pasos del workflow en la UI
 export type GenerationStatus =
   'idle' | 'generating_maker_data' | 'generating_estudio' | 'generating_estrategia' |
