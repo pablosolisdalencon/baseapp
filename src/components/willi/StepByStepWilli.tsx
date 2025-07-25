@@ -44,8 +44,8 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
 
   // Estados para los datos, ahora tipados con 'null' o el tipo de interfaz
   const [dataEstudioMercado, setDataEstudioMercado] = useState<EstudioMercadoData | null>(null);
-  const [dataEstrategiaMarketing, setDataEstrategiaMarketing] = useState<EstrategiaMarketingData | null>(initialEstrategia);
-  const [dataCampaniaMarketing, setDataCampaniaMarketing] = useState<CampaniaMarketingData | null>(initialCampania);
+  const [dataEstrategiaMarketing, setDataEstrategiaMarketing] = useState<EstrategiaMarketingData | null>(null);
+  const [dataCampaniaMarketing, setDataCampaniaMarketing] = useState<CampaniaMarketingData | null>(null);
 
   // Estados para controlar la existencia en BD (boolean o null inicial)
   const [existeEstudio, setExisteEstudio] = useState<boolean | null>(initialEstudio||null);
