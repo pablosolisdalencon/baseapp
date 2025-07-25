@@ -63,59 +63,9 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
   
            
   
-            const ejecutarAccion = async (action:any, objectAction:any) =>{
+            const ejecutarAccion = async (objectAction:any) =>{
   
-  
-  
-  console.log(`%%% EJECUTAR ACCION ${action}  %%%`)
-  console.log(`%%% EJECUTAR ACCION OBJECTACTION:  %%%`)
-  console.log(objectAction)
-                // Para otras acciones, asegurarse que GWV también devuelve una estructura consistente
-  
-                // o manejar los errores de forma similar.
-  
-                if (action === "generate-estudio") {
-  
-                    const { mode, projectId, item } = objectAction;
-  
-                    try {
-  
-                        const result = await GWV(mode, projectId, item); // Asumir que GWV puede lanzar error o devolver null/estructura
-console.log("&&& ejecutaraccion result:  &&&")
-console.log(result[0])  
-                        return result[0]; // o { key: "estudio_key", generated: result } si es necesario adaptar
-  
-                    } catch (error:any) {
-  console.log("&&& ejecutaraccion error:  &&&");
-   console.log(`Error en Ejecutar accion: ${error.message}`);
-
-                        return { key: "estudio_error", generated: { texto: `Error en Ejecutar accion: ${error.message}` } }; // Ejemplo
-  
-                    }
-  
-                }
-  
-                if (action === "generate-estrategia") {
-  
-                    const { mode, projectId, item, estudio } = objectAction;
-  
-                    try {
-  
-                        const result = await GWV(mode, projectId, item, estudio);
-  
-                        return result;
-  
-                    } catch (error:any) {
-  
-                        return { key: "estrategia_error", generated: { texto: `Error: ${error.message}` } };
-  
-                    }
-  
-                }
-  
-                if (action === "generate-campania") {
-  
-                    const { mode, projectId, item, estudio, estrategia } = objectAction;
+            const { mode, projectId, item, estudio, estrategia } = objectAction;
   
                     try {
   
@@ -125,23 +75,10 @@ console.log(result[0])
   
                     } catch (error:any) {
   
-                        return { key: "campania_error", generated: { texto: `Error: ${error.message}` } };
+                        return { key: `${item}_error`, generated: { texto: `Error: ${error.message}` } };
   
-                    }
-  
-                }
-  
-                return null; // O una estructura de error por defecto
-  
-            }
-  
-  
-  
-            // displayTokensModal no se usa actualmente, se podría eliminar o implementar si es necesario.
-  
-  
-  
-            // -----------------------------------------------
+                    }
+            };
   
             const getPrice = async (action:any) => {
   
@@ -349,7 +286,7 @@ console.log(result[0])
   
                         if (descuentoExitoso) { // Asumiendo que descontarTokens devuelve algo truthy en éxito
   
-                            const resultadoAccion = await ejecutarAccion(action, objectAction);
+                            const resultadoAccion = await ejecutarAccion(objectAction);
 
    console.log(`@@@@ Use Tokens: action[${action}] & result:`)
   console.log(resultadoAccion)
