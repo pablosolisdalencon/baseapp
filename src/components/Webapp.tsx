@@ -41,7 +41,7 @@ export default function Webapp() {
                 setErrorP(null);
 
                 try {
-                    const response = await fetch('api/data');
+                    const response = await fetch('/api/data');
                     if(!response.ok){
                         throw new Error(`<br>HTTP error! in Proyecto status: ${response.status}`);
                     }

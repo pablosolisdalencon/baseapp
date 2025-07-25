@@ -1,5 +1,4 @@
 "use client";
-import { useSearchParams } from "next/navigation";
 import { ChangeEvent, FormEvent, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { CldUploadWidget } from 'next-cloudinary';
@@ -44,7 +43,7 @@ const UpdateItemClient: React.FC<UpdateItemClientProps> = ({idProyecto, nombrePr
             setErrorI(null);
 
             try {
-                const response = await fetch('api/item/'+id);
+                const response = await fetch('/api/item/'+id);
                 if(!response.ok){
                     throw new Error(`<br>HTTP error! in Item status: ${response.status}`);
                 }
@@ -79,7 +78,7 @@ const UpdateItemClient: React.FC<UpdateItemClientProps> = ({idProyecto, nombrePr
 
     
     const createItem = async () => {
-      const res = await fetch('api/item/'+idItem, {
+      const res = await fetch('/api/item/'+idItem, {
           method: "PUT",
           body: JSON.stringify(dataI),
           headers: {

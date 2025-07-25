@@ -39,7 +39,7 @@ const AddItemClient: React.FC<ClientProps> = ({ idProyecto }) => {
  
 
   const createItem = async () => {
-    const res = await fetch('api/item', {
+    const res = await fetch('/api/item', {
       method: "POST",
       body: JSON.stringify(newItem),
       headers: {

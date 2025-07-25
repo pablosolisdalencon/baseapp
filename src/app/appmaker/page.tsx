@@ -19,7 +19,7 @@ function Appmaker(){
     const router = useRouter()
 
     const createProyecto = async () => {
-        const res = await fetch('api/proyecto', {
+        const res = await fetch('/api/proyecto', {
             method: "POST",
             body: JSON.stringify(newProyecto),
             headers: {
