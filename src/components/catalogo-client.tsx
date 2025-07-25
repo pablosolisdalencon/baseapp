@@ -156,7 +156,7 @@ const CatalogoClient: React.FC<ClientProps> = ({idProyecto}) => {
                                     <p className="app-card-description"><span className="product-type-label">TIPO: {item.tipo}</span></p>
                                 </div>
                                 <div className="app-card-buttons">
-                                    <Link href={`/updateitem/${item._id}/?nombreProyecto=${encodeURIComponent(nombreProyecto)}&idProyecto=${idProyecto}`} className="app-card-button boton-ficha">
+                                    <Link href={`/updateitem/${idProyecto}/${item._id}/${encodeURIComponent(nombreProyecto)}`} className="app-card-button boton-ficha">
                                         <FontAwesomeIcon icon={faEdit} /><br />Editar
                                     </Link>
                                     <button onClick={() => handleDeleteClick(item)} className="app-card-button boton-eliminar">
@@ -172,7 +172,7 @@ const CatalogoClient: React.FC<ClientProps> = ({idProyecto}) => {
             )}
             <hr />
             {idProyecto && (
-                <Link href={`/additem/?idProyecto=${idProyecto}`}>
+                <Link href={`/additem/${idProyecto}`}>
                     <button className="button-add-proyecto">+ Agregar Nuevo Item al Catálogo</button>
                 </Link>
             )}

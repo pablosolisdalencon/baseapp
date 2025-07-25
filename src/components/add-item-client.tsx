@@ -1,6 +1,6 @@
 "use client";
 import { ChangeEvent, FormEvent, useState, useEffect, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { CldUploadWidget } from 'next-cloudinary';
 import { ClientProps } from "@/types/marketingWorkflowTypes";
 
@@ -25,7 +25,6 @@ const AddItemClient: React.FC<ClientProps> = ({ idProyecto }) => {
   });
 
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     router.refresh();

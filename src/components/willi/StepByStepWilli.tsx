@@ -71,7 +71,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({idProyectoD, initi
   
                         const result = await GWV(mode, projectId, item, estudio, estrategia);
   
-                        return result;
+                        return result[0];
   
                     } catch (error:any) {
   
