@@ -1,58 +1,52 @@
 'use client';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import GWV from '@/utils/GWV';
 import { useSession } from 'next-auth/react';
-import EstudioMercadoDisplay from './../EstudioMercadoDisplay';
-import EstrategiaMarketingDisplay from './../EstrategiaMarketingDisplay';
-import CampaniaMarketingDisplay from './../CampaniaMarketingDisplay';
 import {
   EstudioMercadoData,
   EstrategiaMarketingData,
   CampaniaMarketingData,
-  WorkflowStep
+  WorkflowStep,
 } from '../../types/marketingWorkflowTypes';
-
-interface MarketingWorkflowProps {
-  initialEstudio?: EstudioMercadoData | null,
-  initialEstrategia?: EstrategiaMarketingData | null,
-  initialCampania?: CampaniaMarketingData | null,
-  idProyectoD: string | null;
-}
+import EstudioMercadoDisplay from './../EstudioMercadoDisplay';
+import EstrategiaMarketingDisplay from './../EstrategiaMarketingDisplay';
+import CampaniaMarketingDisplay from './../CampaniaMarketingDisplay';
 
 const STEPS = [
   {
     number: 1,
-    title: "Estudio de Mercado",
-    item: "estudio-mercado",
-    action: "generate-estudio",
+    title: 'Estudio de Mercado',
+    item: 'estudio-mercado',
+    action: 'generate-estudio',
     component: EstudioMercadoDisplay,
-    propKey: "estudio",
-    initialDataProp: "initialEstudio",
-    dataState: "dataEstudioMercado"
+    propKey: 'estudio',
   },
   {
     number: 2,
-    title: "Estrategia de Marketing",
-    item: "estrategia-marketing",
-    action: "generate-estrategia",
+    title: 'Estrategia de Marketing',
+    item: 'estrategia-marketing',
+    action: 'generate-estrategia',
     component: EstrategiaMarketingDisplay,
-    propKey: "estrategia",
-    initialDataProp: "initialEstrategia",
-    dataState: "dataEstrategiaMarketing"
+    propKey: 'estrategia',
   },
   {
     number: 3,
-    title: "Campaña de Marketing",
-    item: "campania-marketing",
-    action: "generate-campania",
+    title: 'Campaña de Marketing',
+    item: 'campania-marketing',
+    action: 'generate-campania',
     component: CampaniaMarketingDisplay,
-    propKey: "campania",
-    initialDataProp: "initialCampania",
-    dataState: "dataCampaniaMarketing"
-  }
+    propKey: 'campania',
+  },
 ];
 
-const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyectoD, ...initialData }) => {
+interface MarketingWorkflowProps {
+  initialEstudio: EstudioMercadoData | null;
+  initialEstrategia: EstrategiaMarketingData | null
+  initialCampania: CampaniaMarketingData | null;
+  idProyectoD: string | null;
+}
+
+const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyectoD, initialEstudio, initialEstrategia, initialCampania }) => {
   const { data: session } = useSession();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,21 +54,21 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyectoD, ...i
   const [idProyecto] = useState(idProyectoD);
 
   const [prices, setPrices] = useState({
-    "generate-estudio": 0,
-    "generate-estrategia": 0,
-    "generate-campania": 0
+    'generate-estudio': null,
+    'generate-estrategia': null,
+    'generate-campania': null,
   });
 
   const [workflowData, setWorkflowData] = useState({
-    estudio: (initialData.initialEstudio || null),
-    estrategia: (initialData.initialEstrategia || null),
-    campania: (initialData.initialCampania || null),
+    estudio: initialEstudio,
+    estrategia: initialEstrategia,
+    campania: initialCampania,
   });
 
   const [savedStatus, setSavedStatus] = useState({
-    estudio: !!initialData.initialEstudio,
-    estrategia: !!initialData.initialEstrategia,
-    campania: !!initialData.initialCampania,
+    estudio: !!initialEstudio,
+    estrategia: !!initialEstrategia,
+    campania: !!initialCampania,
   });
 
   const getPrice = useCallback(async (action: string) => {
@@ -112,7 +106,8 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyectoD, ...i
     }
   }, []);
 
-  const ejecutarAccion = async (mode: string, projectId: string, item: string, estudio?: object, estrategia?: object) => {
+  const ejecutarAccion = async (objectAction: any) => {
+    const { mode, projectId, item, estudio, estrategia } = objectAction;
     try {
       const result = await GWV(mode, projectId, item, estudio, estrategia);
       return result[0];
@@ -121,48 +116,47 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyectoD, ...i
     }
   };
 
-  const useTokens = useCallback(async (action: string, actionObject: any) => {
-    const userEmail = session?.user?.email;
-    if (!userEmail) return { generated: { texto: "Error: No se encontró el usuario." } };
+  const useTokens = useCallback(async (action: string, objectAction: any) => {
+    const currentUserEmail = session?.user?.email;
+    if (!currentUserEmail) return { generated: { texto: 'Error: No se encontró el usuario.' } };
 
-    const saldoActual = await validarSaldo(userEmail);
+    const saldoActual = await validarSaldo(currentUserEmail);
     const price = prices[action as keyof typeof prices];
 
-    if (saldoActual === null || price === null) return { generated: { texto: "Error: No se pudo validar saldo o precio." } };
-    if (saldoActual < price) return { generated: { texto: "Saldo Insuficiente." } };
+    if (saldoActual === null || price === null) return { generated: { texto: 'Error: No se pudo validar saldo o precio.' } };
+    if (saldoActual < price) return { generated: { texto: 'Saldo Insuficiente.' } };
 
     const saldoDespuesDelDescuento = saldoActual - price;
-    const descuentoExitoso = await descontarTokens(saldoDespuesDelDescuento, userEmail);
+    const descuentoExitoso = await descontarTokens(saldoDespuesDelDescuento, currentUserEmail);
 
     if (descuentoExitoso) {
-      const resultadoAccion = await ejecutarAccion(actionObject.mode, actionObject.projectId, actionObject.item, actionObject.estudio, actionObject.estrategia);
-      if (resultadoAccion?.generated?.texto?.startsWith("Error:")) {
-        await descontarTokens(saldoActual, userEmail); // Rollback
-        return { generated: { texto: "Fallo en la generación. Tokens restaurados." } };
+      const resultadoAccion = await ejecutarAccion(objectAction);
+      if (resultadoAccion?.generated?.texto?.startsWith('Error:')) {
+        await descontarTokens(saldoActual, currentUserEmail);
+        return { generated: { texto: 'Fallo en la generación. Tus tokens han sido restaurados.' } };
       }
       return resultadoAccion;
     }
-    return { generated: { texto: "Error al descontar tokens." } };
-  }, [session, precios, validarSaldo, descontarTokens]);
+    return { generated: { texto: 'Error al descontar tokens.' } };
+  }, [session, prices, validarSaldo, descontarTokens]);
 
   const saveGenData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const step = STEPS[currentStep - 1];
-      const item = step.item;
-      const bodyData = workflowData[step.propKey as keyof typeof workflowData];
+      const step = STEPS.find(s => s.number === currentStep);
+      if (!step) return;
 
-      const res = await fetch(`/api/${item}?p=${idProyecto}`, {
-        method: "POST",
+      const bodyData = workflowData[step.propKey as keyof typeof workflowData];
+      const res = await fetch(`/api/${step.item}?p=${idProyecto}`, {
+        method: 'POST',
         body: JSON.stringify(bodyData),
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
       });
 
-      if (!res.ok) throw new Error(`Oops! No se ha guardado ${item}`);
-      
+      if (!res.ok) throw new Error(`Oops! No se ha guardado ${step.item}`);
+
       setSavedStatus(prev => ({ ...prev, [step.propKey]: true }));
       setCurrentStep(prev => prev + 1);
-
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -170,27 +164,22 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyectoD, ...i
     }
   }, [idProyecto, workflowData, currentStep]);
 
-  const handleGenerate = useCallback(async (action: string) => {
+  const handleGenerate = useCallback(async (step: typeof STEPS[0]) => {
     setIsLoading(true);
     setError(null);
     try {
-      const currentStepObj = STEPS.find(s => s.action === action);
-      if (!currentStepObj) throw new Error("Acción no reconocida.");
-      
       const itemObject = {
         mode: 'generate',
         projectId: idProyecto,
-        item: currentStepObj.item,
+        item: step.item,
         estudio: workflowData.estudio,
-        estrategia: workflowData.estrategia
+        estrategia: workflowData.estrategia,
       };
 
-      const result = await useTokens(action, itemObject);
+      const result = await useTokens(step.action, itemObject);
+      if (result?.generated?.texto?.startsWith('Error:')) throw new Error(result.generated.texto);
 
-      if (result?.generated?.texto?.startsWith("Error:")) throw new Error(result.generated.texto);
-
-      setWorkflowData(prev => ({ ...prev, [currentStepObj.propKey]: result.generated }));
-
+      setWorkflowData(prev => ({ ...prev, [step.propKey]: result.generated }));
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -198,44 +187,41 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyectoD, ...i
     }
   }, [useTokens, idProyecto, workflowData]);
 
-  const handleNextStep = useCallback(() => setCurrentStep(prev => prev + 1), []);
-  const handlePrevStep = useCallback(() => setCurrentStep(prev => Math.max(1, prev - 1)), []);
-
   useEffect(() => {
     const fetchPrices = async () => {
       const [pEstudio, pEstrategia, pCampania] = await Promise.all([
-        getPrice("generate-estudio"),
-        getPrice("generate-estrategia"),
-        getPrice("generate-campania")
+        getPrice('generate-estudio'),
+        getPrice('generate-estrategia'),
+        getPrice('generate-campania'),
       ]);
       setPrices({
-        "generate-estudio": pEstudio || 0,
-        "generate-estrategia": pEstrategia || 0,
-        "generate-campania": pCampania || 0
+        'generate-estudio': pEstudio,
+        'generate-estrategia': pEstrategia,
+        'generate-campania': pCampania,
       });
     };
     fetchPrices();
   }, [getPrice]);
 
   const currentStepObj = useMemo(() => STEPS.find(step => step.number === currentStep), [currentStep]);
-  const isLastStep = currentStep === STEPS.length;
-  const isCurrentStepSaved = savedStatus[currentStepObj?.propKey as keyof typeof savedStatus];
-  const isCurrentStepGenerated = !!workflowData[currentStepObj?.propKey as keyof typeof workflowData];
+  const isLastStep = useMemo(() => currentStep === STEPS.length, [currentStep]);
+  
+  const isCurrentStepSaved = useMemo(() => savedStatus[currentStepObj?.propKey as keyof typeof savedStatus] ?? false, [savedStatus, currentStepObj]);
+  const isCurrentStepGenerated = useMemo(() => !!workflowData[currentStepObj?.propKey as keyof typeof workflowData], [workflowData, currentStepObj]);
 
-  const hasDependency = (stepNumber: number) => {
-    if (stepNumber === 1) return true;
-    if (stepNumber === 2) return savedStatus.estudio;
-    if (stepNumber === 3) return savedStatus.estrategia;
+  const hasDependencyResolved = useMemo(() => {
+    if (currentStep === 1) return true;
+    if (currentStep === 2) return savedStatus.estudio;
+    if (currentStep === 3) return savedStatus.estrategia;
     return false;
-  };
+  }, [currentStep, savedStatus]);
 
   const renderContent = () => {
-    if (isLoading) return null;
     if (!currentStepObj) return null;
-
     const DisplayComponent = currentStepObj.component;
     const data = workflowData[currentStepObj.propKey as keyof typeof workflowData];
-    const hasDependencyResolved = hasDependency(currentStep);
+
+    if (isLoading) return null;
 
     if (isCurrentStepSaved) {
       return (
@@ -246,7 +232,7 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyectoD, ...i
           <DisplayComponent Input={data} />
           {!isLastStep && (
             <button
-              onClick={handleNextStep}
+              onClick={() => setCurrentStep(prev => prev + 1)}
               className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
             >
               Continuar al Paso {currentStep + 1}
@@ -272,9 +258,9 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyectoD, ...i
           <p className="text-yellow-700">No se encontró {currentStepObj.title} existente</p>
         </div>
         <button
-          onClick={() => handleGenerate(currentStepObj.action)}
-          disabled={!hasDependencyResolved || isLoading}
-          className={`px-6 py-2 rounded-md transition-colors ${!hasDependencyResolved || isLoading ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}
+          onClick={() => handleGenerate(currentStepObj)}
+          disabled={!hasDependencyResolved}
+          className={`px-6 py-2 rounded-md transition-colors ${!hasDependencyResolved ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-green-600 text-white hover:bg-green-700'}`}
         >
           Generar {currentStepObj.title} {prices[currentStepObj.action as keyof typeof prices] || '...'}
         </button>
@@ -335,14 +321,14 @@ const MarketingWorkflow: React.FC<MarketingWorkflowProps> = ({ idProyectoD, ...i
         )}
         <div className="flex justify-between mt-8 pt-6 border-t">
           <button
-            onClick={handlePrevStep}
+            onClick={() => setCurrentStep(prev => Math.max(1, prev - 1))}
             disabled={currentStep === 1 || isLoading}
             className={`px-4 py-2 rounded-md transition-colors ${currentStep === 1 || isLoading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gray-600 text-white hover:bg-gray-700'}`}
           >
             Paso Anterior
           </button>
           <button
-            onClick={handleNextStep}
+            onClick={() => setCurrentStep(prev => Math.min(STEPS.length + 1, prev + 1))}
             disabled={isLastStep || isLoading}
             className={`px-4 py-2 rounded-md transition-colors ${isLastStep || isLoading ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
           >
