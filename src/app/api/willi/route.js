@@ -124,7 +124,7 @@ export async function POST(req) {
       let data = williArray;
       console.log("++++++++ WILLI Generate content say : data +++++++++")
       console.log(data)
-      return NextResponse.json(data);
+      return NextResponse.json(data[0]);
     }
 
   } catch (error) {
