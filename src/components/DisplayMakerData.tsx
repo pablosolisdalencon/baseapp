@@ -51,7 +51,7 @@ const DisplayMakerData: React.FC<DisplayProps<MakerData>> = ({ Input: makerData,
         </h2>
         {makerData.catalogo && makerData.catalogo.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {makerData.catalogo.map((item, index) => (
+            {makerData.catalogo.map((item:any, index:any) => (
               <div key={index} className="bg-white p-5 rounded-lg shadow-sm border border-gray-200">
                 <h3 className="text-lg font-semibold text-indigo-700 mb-2">{item.nombre}</h3>
                 <p className="text-gray-700 text-sm mb-2">{item.descripcion}</p>
