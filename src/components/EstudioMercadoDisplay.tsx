@@ -205,7 +205,7 @@ const EstudioMercadoDisplay: React.FC<DisplayProps<EstudioMercadoData>> = ({ Inp
           onClick={() => onSave(estudio)}
           className="mt-4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
         >
-          Guardar Campaña de Marketing
+          Guardar Estudio de Mercado
         </button>
       )}
     </div>
