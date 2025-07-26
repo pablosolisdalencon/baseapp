@@ -234,7 +234,7 @@ async function useTokens(action, objectAction) {
                 const resultadoAccion = await ejecutarAccion(action, objectAction);
 
                 // Verificar si la acción falló (ej. resultadoAccion.generated.texto contiene "Error:")
-                if (resultadoAccion && resultadoAccion.generated && typeof resultadoAccion.generated.texto === 'string' && resultadoAccion.generated.texto.startsWith("Error:")) {
+                if (resultadoAccion && resultadoAccion.generated!==undefined && typeof resultadoAccion.generated.texto === 'string' && resultadoAccion.generated.texto.startsWith("Error:")) {
                     await rollBackTokens(saldoActual, email); // Devolver tokens al saldo original
                     return resultadoAccion; // Devolver el error de la acción
                 }
