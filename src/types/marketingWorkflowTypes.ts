@@ -157,7 +157,7 @@ export interface CampaniaMarketingData {
 
 // Tipos para las props de los componentes Display
 export interface DisplayProps<T> {
-  Input: T | null; // El dato genérico puede ser de cualquier tipo definido arriba o null
+  Input: T | null|any; // El dato genérico puede ser de cualquier tipo definido arriba o null
   onSave?: (data: T) => Promise<void> | void; // onSave es una función asíncrona que toma el dato T
   onOptimize?: (data: T) => Promise<void> | void; // onOptimize para el botón "Willi, Optimizalo!"
   onRetry?: (data: T) => Promise<void> | void; // onRetry para el botón "Reintentar"
