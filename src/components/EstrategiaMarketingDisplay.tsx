@@ -327,7 +327,7 @@ const EstrategiaMarketingDisplay: React.FC<DisplayProps<EstrategiaMarketingData>
         <h2 className={commonClasses.sectionTitle}>Consideraciones Adicionales</h2>
         {estrategia.consideraciones_adicionales && estrategia.consideraciones_adicionales.length > 0 ? (
           <ul className="list-disc list-inside text-gray-700 space-y-2">
-            {estrategia.consideraciones_adicionales.map((consideracion, index) => (
+            {estrategia.consideraciones_adicionales.map((consideracion:any, index:any) => (
               <li key={index}>{consideracion}</li>
             ))}
           </ul>
