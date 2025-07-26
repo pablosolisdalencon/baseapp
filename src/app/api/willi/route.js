@@ -121,10 +121,10 @@ export async function POST(req) {
       let willJSON = jsonPure(williTxt)
       let williArray = new Array();
       williArray.push(JSON.parse(willJSON))
-      let data = williArray;
+      let data = williArray[0];
       console.log("++++++++ WILLI Generate content say : data +++++++++")
       console.log(data)
-      return NextResponse.json(data[0]);
+      return NextResponse.json(data);
     }
 
   } catch (error) {
